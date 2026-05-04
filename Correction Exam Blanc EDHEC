@@ -1,0 +1,279 @@
+Correction de l'examen blanc — Finance de marché
+PARTIE 1 — QUESTIONS DE COURS
+Question 1 — Qu'est-ce qu'un SPAC ?
+Définition. Un SPAC (Special Purpose Acquisition Company) est une coquille vide cotée en bourse, créée par des sponsors financiers dans le but de réaliser l'acquisition d'une société non cotée, non identifiée au moment de l'introduction. Une fois l'acquisition réalisée, le SPAC absorbe la société rachetée, qui se retrouve ainsi cotée.
+Avantage par rapport à une IPO classique. C'est nettement moins cher : une IPO génère des frais très élevés, alors qu'un SPAC coûte environ 2 à 3 fois moins cher en frais d'introduction.
+Inconvénient principal. Au moment de l'investissement, on ne sait pas quelle sera la cible précise de l'acquisition. C'est pour cela qu'on les surnomme "blank check companies" : les investisseurs donnent un chèque en blanc aux sponsors. La confiance dans les sponsors est donc essentielle.
+Nuance. En réalité, on a quand même une idée du secteur visé en regardant le profil des sponsors (ex. : un SPAC porté par Bernard Arnault visera évidemment le luxe/médias, pas l'agroalimentaire).
+Question 2 — Qu'est-ce que la clause de Greenshoe (green shoe / option de surallocation) ?
+Définition. C'est un mécanisme de stabilisation du cours après une introduction en bourse : la banque place sur les marchés plus d'actions que nécessaire (jusqu'à 15 % du nominal de la levée).
+Fonctionnement.
+Si le cours monte après l'IPO → la banque ne fait rien.
+Si le cours baisse → la banque rachète progressivement les actions excédentaires pour soutenir le prix (création d'une pression acheteuse).
+Limites.
+Maximum 15 % du montant nominal de la levée.
+Limité dans le temps (typiquement 6 mois maximum).
+Exemple chiffré. Une boîte place 100 M d'actions à 30 €. La banque en place 1,5 M de plus (15 %). Si le cours baisse, la banque rachète progressivement ces 1,5 M d'actions pour soutenir le prix.
+Question 3 — Qu'est-ce que le Vega ? Et les autres grecques ?
+Vega. C'est la sensibilité du prix de l'option à la volatilité implicite (et non à la volatilité réalisée).
+⚠️ Attention au piège : ce n'est pas une élasticité (mesure relative en économie), c'est une mesure de sensibilité.
+Définition de la volatilité implicite. C'est la volatilité qu'il faut entrer dans la formule de Black-Scholes pour que le modèle redonne le prix de marché.
+⚠️ Attention : la vol implicite n'est pas la vol forward. Mathématiquement, c'est la vol moyenne intégrée jusqu'à maturité.
+Les autres grecques principales :
+Grecque
+Définition
+Delta (Δ)
+Sensibilité de l'option au sous-jacent
+Gamma (Γ)
+Sensibilité du Delta au sous-jacent (convexité)
+Theta (θ)
+Sensibilité au temps — toujours négatif pour une option (theta bleeding)
+Rho (ρ)
+Sensibilité aux taux d'intérêt
+Vega (V)
+Sensibilité à la volatilité implicite
+Vanna
+Sensibilité du Vega au sous-jacent = sensibilité du Delta à la vol
+Volga (Vomma)
+Sensibilité du Vega à la volatilité (convexité par rapport à la vol)
+Il existe d'autres grecques (jusqu'à des sensibilités au risque de crédit, comme Omicron) mais celles-ci sont les majeures.
+Question 4 — Les 4 philosophies du modèle de Black-Scholes
+Approche 1 — Réplication dynamique (approche textbook)
+On construit un portefeuille qui réplique dynamiquement le payoff de l'option : c'est le portefeuille Delta-neutre. Par absence d'opportunité d'arbitrage, la valeur de l'option doit être égale à la valeur de ce portefeuille répliquant.
+Approche 2 — Changement de mesure (probabilité risque-neutre)
+On passe de la probabilité physique (réelle) à la probabilité risque-neutre. La valeur de l'option est alors :
+Mathématiquement, cela repose sur :
+le théorème de Girsanov pour le changement de mesure,
+l'équation de Feynman-Kac pour résoudre l'EDP.
+Intuition (réponse simple) : les marchés financiers couvrent (hedgent) leurs options. Une option parfaitement hedgée est sans risque, donc on évalue dans un univers risque-neutre où le rendement de tout actif est le taux sans risque. C'est essentiellement un DCF dans une probabilité ajustée pour le risque.
+Approche 3 — Égalité des ratios de Sharpe
+L'option étant un dérivé du sous-jacent, il existe un lien causal entre les deux. Ils doivent donc avoir le même rendement ajusté au risque, c'est-à-dire le même ratio de Sharpe :
+Approche 4 — Limite continue du modèle binomial
+La formule de Black-Scholes correspond à la limite continue du modèle binomial à 1 pas, lorsque le pas de temps dt \to 0. À cette limite, on a une infinité de branches, chacune pondérée par sa probabilité.
+L'EDP de Black-Scholes
+Démonstration rapide : on construit un portefeuille \Pi = V - \Delta \cdot S. Comme ce portefeuille est sans risque, son accroissement doit être égal à r\Pi , dt. En appliquant le lemme d'Itô à V et en égalisant les deux expressions de d\Pi, on obtient l'EDP.
+Question 5 — Le risque de liquidité en finance de marché
+Définition. C'est le risque qu'au moment où je veux vendre un actif, il n'y ait pas suffisamment d'acheteurs en face. Concrètement :
+soit la vente prend beaucoup de temps,
+soit il faut baisser le prix significativement pour trouver rapidement un acheteur.
+Reformulation positive. La liquidité est la capacité à vendre au prix souhaité, rapidement.
+Pourquoi c'est le risque le plus dur à estimer. Contrairement au risque de marché, il ne se mesure pas dans des conditions normales — il se révèle en période de stress, quand tout le monde veut vendre en même temps.
+Le paradoxe liquidité ↔ volatilité.
+Un actif liquide (ex. : action cotée) est par définition plus volatile : n'importe qui peut entrer et sortir à tout moment.
+Un actif illiquide (ex. : immobilier, private equity) a une volatilité apparente faible, mais ce n'est qu'une illusion : la NAV est une estimation, pas une vraie valeur de marché.
+Distinction cruciale : NAV vs prix de marché.
+Le cours de bourse = vrai prix issu de transactions réelles → mark-to-market.
+La NAV d'un fonds privé = estimation de valeur. Tant qu'on n'a pas vendu, la perte n'est pas matérialisée.
+Le mécanisme de gating (private debt, private equity) protège en réalité les investisseurs : si tout le monde veut sortir simultanément, le fonds devrait vendre ses actifs en urgence avec une décote massive. Le gating force à attendre des conditions de cession normales.
+Question 6 — Quand une obligation est-elle callable ?
+Définition. Une obligation callable (rappelable) donne à l'émetteur le droit (mais pas l'obligation) de rembourser sa dette de façon anticipée à un prix prédéfini.
+Quand l'émetteur exerce-t-il ce droit ? Quand les taux baissent. Il rappelle son obligation existante (taux de coupon élevé) et la refinance par une nouvelle dette à un taux plus avantageux. C'est l'équivalent d'une renégociation de crédit immobilier.
+Caractéristiques contractuelles.
+Il existe généralement une période de protection (call protection) au début, pendant laquelle l'émetteur ne peut pas rappeler.
+Au-delà de cette période, l'émetteur peut rappeler à n'importe quelle date prévue au contrat.
+Lien avec les options. Du point de vue de l'investisseur, détenir une callable bond revient à :
+C'est bien une option américaine car l'émetteur peut exercer à n'importe quel moment dans une fenêtre de dates (≠ option européenne, exerçable seulement à maturité).
+Question 7 — La règle de Taylor (macroéconomie)
+Définition. La règle de Taylor relie le taux directeur cible d'une banque centrale à deux variables principales :
+où :
+\pi_t - \pi^* : écart d'inflation (par rapport à la cible, ~2 % en Europe),
+y_t - y^* : output gap (écart entre le PIB réel et le PIB potentiel).
+Hiérarchie des facteurs. Le facteur inflation est prioritaire sur l'output gap (en tout cas pour la BCE, dont le mandat principal est la stabilité des prix).
+Intuition économique — politique contracyclique.
+Inflation forte → la BC remonte les taux → freine l'économie → fait baisser l'inflation.
+Récession (output gap négatif) → la BC baisse les taux → relance l'emprunt et la consommation.
+La banque centrale joue ainsi un rôle de stabilisateur : elle freine quand l'économie surchauffe (pour éviter les bulles) et relance quand elle ralentit.
+Question 8 — Formule de l'Expected Loss (perte moyenne actualisée)
+Identité fondamentale.
+Formule de l'Expected Loss actualisée :
+où :
+PD_t = Probability of Default à la période t,
+LGD_t = Loss Given Default (1 - taux de recouvrement),
+EAD_t = Exposure At Default,
+r_f = taux sans risque.
+Interprétation. C'est l'espérance des pertes futures (par défaut), actualisée au taux sans risque. C'est une démarche analogue à un DCF, mais appliquée aux pertes potentielles.
+⚠️ Ce n'est pas une moyenne pondérée mais bien une somme actualisée d'espérances de pertes sur chaque période.
+PARTIE 2 — EXERCICES
+EXERCICE 1 — Augmentation de capital avec DPS
+Données :
+Cours de bourse : S_0 = 120 €
+Décote d'offre : 12,5 %
+Nombre d'actions existantes : 12 millions
+Montant levé : 157,5 M€
+Q1 — Prix de l'offre (prix d'émission)
+Q2 — Market cap avant l'opération
+Q3 — Nombre d'actions créées
+Q4 — Parité des DPS
+Chaque action existante donne 1 DPS, donc 12 M de DPS au total. Pour souscrire à 1,5 M d'actions nouvelles :
+Q5 — TERP (cours théorique ex-droit)
+Interprétation : c'est le cours théorique de l'action juste après l'exercice de tous les DPS.
+Q6 — Prix du DPS
+Q7 — L'opération blanche
+Définition. Une opération blanche est cash-neutre : l'actionnaire ne dépense ni ne reçoit de cash. Il vend une partie de ses DPS pour financer la souscription des actions nouvelles avec le reste de ses DPS.
+Mécanique du calcul :
+Pour souscrire à 1 action nouvelle, il faut :
+Conserver et exercer 8 DPS + payer 105 €.
+Mais on veut financer ces 105 € en vendant des DPS, sans sortir de cash.
+Combien de DPS faut-il vendre pour récupérer 105 € ? À 1,67 € pièce :
+Conclusion. Par bloc de 71 DPS (= 8 conservés + 63 vendus) : on en exerce 8 pour souscrire 1 action nouvelle, et on en vend 63 pour financer les 105 € de souscription.
+Q8 — Dilution d'un actionnaire détenant 10 M d'actions
+Avant l'opération :
+Cas 1 : il vend tous ses DPS (souscription nulle) :
+Cas 2 : il fait une opération blanche. Il a 10 M de DPS. Par blocs de 71 DPS, il peut souscrire :
+Sa nouvelle position :
+→ Dilution = 83,33 % - 75,12 % = 8,21 points
+Conclusion. L'opération blanche limite la dilution mais ne l'élimine pas (logique : il a investi 0 € de cash). Pour conserver exactement son pourcentage, il faudrait souscrire pleinement avec du cash.
+EXERCICE 2 — Augmentation de capital avec ROE et levier
+Données :
+Net income initial : 1 687,5 M€
+Equity initial : 13 500 M€
+Nombre d'actions : 150 M
+Cours : 135 €
+EBITDA : 2 750 M€
+Dette : 5 500 M€
+Levée totale visée : 8 000 M€
+ROE sur les nouveaux investissements : 9,5 %
+Coût après impôt de la nouvelle dette : 4,5 %
+Levier cible : 3,5× EBITDA
+Prix d'émission des nouvelles actions : 120 €
+Q1 — ROE initial
+Q2 — Levier initial
+Q3 — EPS initial
+Q4 — Répartition dette / equity de la levée
+Logique. La boîte veut limiter la dilution → elle utilise un mix dette + equity.
+Contrainte de levier. Levier passe de 2× à 3,5× → la boîte lève 1,5 × EBITDA en dette :
+Equity levé :
+Q5 — Nombre de nouvelles actions émises
+Q6 — Nouveau Net Income
+Trois effets à intégrer :
+Ancien NI : +1 687,5 M€
+Coût après impôt de la nouvelle dette : −4,5 % × 4 125 = −185,6 M€
+Retour sur les 8 Md€ investis au ROE de 9,5 % : +9,5 % × 8 000 = +760 M€
+⚠️ Important : les 8 Md€ entiers sont investis (l'argent ne dort pas), pas seulement la part en dette.
+Q7 — Nouveau EPS
+Nouveau nombre d'actions = 150 + 32,29 = 182,29 M
+Q8 — Nouveau Share Price (en supposant PER constant)
+PER initial :
+Nouveau cours :
+→ Le cours monte (de 135 à 148,9 €) : l'opération est relutive car le ROE marginal (9,5 %) > coût de la dette après impôt (4,5 %), même si elle dilue (32,29 M nouvelles actions).
+EXERCICE 3 — Bootstrapping de la courbe zéro-coupon
+Données :
+Maturité
+Coupon annuel
+Prix
+3 mois
+0 (ZC)
+99,42
+6 mois
+0 (ZC)
+98,83
+1 an
+0 (ZC)
+97,72
+2 ans
+2,25 %
+100,00
+3 ans
+2,125 %
+100,05
+Philosophie du bootstrapping. À partir des prix de marché des obligations, on reconstruit la courbe des taux zéro-coupon par récurrence, en partant de la maturité la plus courte et en avançant une inconnue à la fois.
+Équation A — Taux 3 mois (R_{3M})
+Équation B — Taux 6 mois (R_{6M})
+Équation C — Taux 1 an (R_1)
+Équation D — Taux 2 ans (R_2)
+Méthode : on isole le terme inconnu.
+Équation E — Taux 3 ans (R_3)
+Calcul des deux premiers termes :
+2{,}125 / 1{,}02333 = 2{,}0766
+2{,}125 / 1{,}04549 = 2{,}0325
+Question bonus — Cas semi-annuel : R_{1{,}5}
+Si on a une obligation 1,5 an avec un coupon C semi-annuel, prix P_{1{,}5} :
+⚠️ Points clés :
+3 semestres = 3 flux,
+Coupons divisés par 2 (semi-annuel),
+Taux annualisés divisés par 2 dans chaque facteur d'actualisation,
+Puissances = nombre de semestres écoulés.
+Question bonus — Cas trimestriel : R_2
+Si coupon C trimestriel, prix P_2, 2 ans = 8 trimestres :
+⚠️ Tous les taux trimestriels précédents doivent déjà avoir été bootstrappés.
+EXERCICE 4 — Taux forwards
+Notation. F_{x,y} = taux forward à appliquer dans x années pour une durée de y années.
+⚠️ Piège classique : F_{3,2} \neq F_{2,3}.
+Formule générale (No Arbitrage)
+Emprunter dans x ans pour y ans doit donner le même résultat qu'emprunter aujourd'hui pour x+y ans :
+D'où :
+⚠️ Erreurs classiques à éviter :
+Confondre F_{x,y} et F_{y,x}.
+Mettre les taux à la puissance plutôt que les facteurs d'actualisation (1 + R).
+Oublier le « -1 » à la fin (en dehors de la racine !).
+Calculs (avec une courbe spot R₁, R₂, R₃, R₄, R₅)
+F_{3,2} — Dans 3 ans, j'emprunte pour 2 ans supplémentaires :
+F_{1,4} — Dans 1 an, j'emprunte pour 4 ans supplémentaires :
+F_{4,1} — Dans 4 ans, j'emprunte pour 1 an supplémentaire :
+⚠️ Pour F_{4,1}, la racine est de degré 1 → pas de racine.
+EXERCICE 5 — Matrix pricing avec interpolation
+Données :
+Obligation
+Maturité
+Yield brut
+Ajustement crédit
+Yield ajusté
+A
+2 ans
+5 %
++0,5 %
+5,5 %
+B
+5 ans
+8 %
+−1,5 %
+6,5 %
+C
+3 ans
+?
+—
+à calculer
+L'obligation C a le même risque crédit que A et B (après ajustements).
+Q1 — Yield de l'obligation C (interpolation linéaire)
+Formule de l'interpolation linéaire entre deux points (x_1, y_1) et (x_2, y_2) :
+Application : pour x = 3 ans entre (2, 5{,}5%) et (5, 6{,}5%) :
+Q2 — Prix de l'obligation C avec coupon 6 %
+Calculs :
+6 / 1{,}05833 = 5{,}669
+6 / 1{,}12006 = 5{,}357
+106 / 1{,}18540 = 89{,}422
+Q3 — Yield à 2 ans de détention si P = 98{,}5
+⚠️ Logique clé : dans 2 ans, il restera 1 an avant la maturité (l'obligation est de maturité 3 ans aujourd'hui).
+Donc un seul cash flow restant :
+→ Le yield a monté par rapport au yield d'origine (5,83 %) : le prix de l'obligation a baissé.
+Note : si la maturité initiale avait été 4 ans, dans 2 ans il resterait 2 ans → on aurait 2 flux et la formule serait quadratique.
+RAPPELS DE FORMULES À CONNAÎTRE PAR CŒUR
+Concept
+Formule
+TERP
+\dfrac{N_{\text{anc}} \cdot S_0 + N_{\text{new}} \cdot P_{\text{émission}}}{N_{\text{anc}} + N_{\text{new}}}
+Prix DPS
+S_0 - \text{TERP}
+ROE
+\text{NI} / \text{Equity}
+Levier
+\text{Dette} / \text{EBITDA}
+EPS
+\text{NI} / N_{\text{actions}}
+PER
+\text{Cours} / \text{EPS}
+Forward
+F_{x,y} = \left[\dfrac{(1+R_{x+y})^{x+y}}{(1+R_x)^x}\right]^{1/y} - 1
+Interpolation linéaire
+y = y_1 + \dfrac{y_2 - y_1}{x_2 - x_1}(x - x_1)
+Bond risquée
+B_{\text{risquée}} = B_{\text{sans risque}} - EL_{\text{actualisée}}
+Black-Scholes (RN)
+V_0 = \mathbb{E}^{\mathbb{Q}}[e^{-rT} \cdot \text{Payoff}_T]
+CONSEILS POUR LE JOUR J
+Lis bien l'énoncé — beaucoup d'erreurs viennent de mauvaises lectures (notamment confusion F_{x,y} vs F_{y,x}).
+Procède par étapes dans les exos calculatoires, pose chaque équation avant de calculer.
+Méfie-toi des approximations (type prix obligation court terme = 100 - taux) — démontre toujours.
+Aucune formule n'est à apprendre par cœur si tu sais la démontrer — surtout pour les forwards et le bootstrapping.
+2 heures suffisent largement pour cet examen si tu maîtrises les formules de base.
+Soigne ta calculatrice — entraîne-toi à faire les calculs en amont, ça fait gagner du temps.
