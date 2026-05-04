@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0907">
+<title>TRIAL — Le Procès Vellmore</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Crimson+Pro:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+
+:root {
+  --black: #0a0907;
+  --ink: #1a1815;
+  --paper: #ebe4d4;
+  --paper-aged: #d8cfb8;
+  --blood: #8b1f1f;
+  --blood-bright: #b62828;
+  --blood-dark: #5a0f0f;
+  --gold: #c89a3a;
+  --gold-aged: #a07825;
+  --green: #4a6b3a;
+  --shadow: rgba(0,0,0,0.4);
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: var(--black);
+  color: var(--paper);
+  font-family: 'Crimson Pro', Georgia, serif;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ======================================== */
+/*  ÉCRANS GÉNÉRIQUES                       */
+/* ======================================== */
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+}
+
+.screen.active { display: flex; }
+
+/* ======================================== */
+/*  HOME SCREEN                             */
+/* ======================================== */
+
+.home {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(139, 31, 31, 0.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(200, 154, 58, 0.15) 0%, transparent 50%),
+    var(--black);
+  justify-content: space-between;
+  padding: 40px 24px 30px;
+  position: fixed;
+  inset: 0;
+}
+
+.home-top {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.home-mark {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--blood-bright);
+  margin-bottom: 16px;
+}
+
+.home-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-size: clamp(3.5rem, 18vw, 5.5rem);
+  line-height: 0.85;
+  color: var(--paper);
+  letter-spacing: -0.04em;
+}
+
+.home-title em {
+  display: block;
+  font-style: italic;
+  color: var(--blood-bright);
+  text-shadow: 0 0 30px rgba(182, 40, 40, 0.5);
+  margin-top: 6px;
+}
+
+.home-subtitle {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  color: var(--paper-aged);
+  margin-top: 24px;
+  line-height: 1.7;
+  opacity: 0.85;
+}
+
+.home-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin: 30px 0;
+  padding: 0 4px;
+}
+
+.home-stat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(200, 154, 58, 0.3);
+  padding: 14px 8px;
+  text-align: center;
+}
+
+.home-stat-value {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.home-stat-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--paper-aged);
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* Bouton principal */
+.btn-primary {
+  width: 100%;
+  padding: 22px 16px;
+  background: var(--blood);
+  color: var(--paper);
+  border: 2px solid var(--blood-bright);
+  font-family: 'Special Elite', monospace;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 20px rgba(139, 31, 31, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  background: var(--blood-bright);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 16px 12px;
+  background: transparent;
+  color: var(--paper-aged);
+  border: 1px solid rgba(200, 154, 58, 0.4);
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.btn-secondary:active { background: rgba(255,255,255,0.05); }
+
+.home-mode-info {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--paper-aged);
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+/* ======================================== */
+/*  GAME SCREEN — LE PROCÈS                 */
+/* ======================================== */
+
+.game {
+  background: var(--black);
+  position: fixed;
+  inset: 0;
+}
+
+/* Top bar — Justice meter */
+.game-top {
+  padding: env(safe-area-inset-top, 0) 0 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+  position: relative;
+  z-index: 10;
+}
+
+.justice-meter {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 10px;
+}
+
+.meter-side {
+  flex: 1;
+  text-align: center;
+}
+
+.meter-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+}
+
+.meter-prosecution { color: var(--gold); }
+.meter-defense { color: var(--blood-bright); }
+
+.meter-value {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+}
+
+.meter-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(139, 31, 31, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.meter-fill {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-aged), var(--gold));
+  transition: width 0.5s ease;
+}
+
+.day-indicator {
+  text-align: center;
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--paper-aged);
+  padding: 4px 16px 12px;
+  border-bottom: 1px solid rgba(200, 154, 58, 0.2);
+  opacity: 0.8;
+}
+
+.day-indicator strong { color: var(--gold); font-family: inherit; font-weight: bold; }
+
+/* Streak / combo */
+.streak-flame {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--gold);
+  font-style: italic;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.streak-flame.active {
+  opacity: 1;
+  animation: flameWiggle 1.5s infinite;
+}
+
+@keyframes flameWiggle {
+  0%, 100% { transform: scale(1) rotate(0); }
+  50% { transform: scale(1.05) rotate(-3deg); }
+}
+
+/* Question area */
+.game-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px 0;
+  overflow-y: auto;
+}
+
+.q-category {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--blood-bright);
+  text-align: center;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.q-prefix {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  color: var(--gold-aged);
+  text-align: center;
+  margin-bottom: 14px;
+  letter-spacing: 0.05em;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.q-text {
+  font-family: 'Crimson Pro', serif;
+  font-size: clamp(1.3rem, 5vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--paper);
+  text-align: center;
+  margin-bottom: 28px;
+  letter-spacing: -0.005em;
+  flex-shrink: 0;
+}
+
+.q-text em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+/* Options - GROSSE ZONE DE TAP */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  padding-bottom: 24px;
+}
+
+.option {
+  flex: 1;
+  min-height: 70px;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(200, 154, 58, 0.3);
+  color: var(--paper);
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  padding: 16px 20px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  transition: all 0.15s;
+}
+
+.option-letter {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--gold-aged);
+  font-family: 'Special Elite', monospace;
+  font-size: 0.95rem;
+  color: var(--gold);
+  background: rgba(0,0,0,0.3);
+}
+
+.option-text { flex: 1; }
+
+.option:active {
+  transform: scale(0.98);
+  background: rgba(200, 154, 58, 0.1);
+}
+
+.option.correct {
+  background: rgba(74, 107, 58, 0.25);
+  border-color: var(--green);
+  animation: pulseGreen 0.5s;
+}
+
+.option.correct .option-letter {
+  background: var(--green);
+  color: var(--paper);
+  border-color: var(--green);
+}
+
+.option.wrong {
+  background: rgba(139, 31, 31, 0.3);
+  border-color: var(--blood-bright);
+  animation: shake 0.4s;
+}
+
+.option.wrong .option-letter {
+  background: var(--blood);
+  color: var(--paper);
+  border-color: var(--blood-bright);
+}
+
+.option.dim {
+  opacity: 0.4;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); box-shadow: 0 0 30px rgba(74, 107, 58, 0.5); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Feedback */
+.feedback {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.feedback.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.feedback-good {
+  background: radial-gradient(circle, rgba(74, 107, 58, 0.4) 0%, rgba(0,0,0,0.85) 70%);
+}
+
+.feedback-bad {
+  background: radial-gradient(circle, rgba(139, 31, 31, 0.5) 0%, rgba(0,0,0,0.9) 70%);
+}
+
+.feedback-card {
+  background: var(--paper);
+  color: var(--ink);
+  padding: 28px 24px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  border-left: 6px solid var(--blood);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.feedback-good .feedback-card { border-left-color: var(--green); }
+
+.feedback-banner {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  margin-bottom: 8px;
+}
+
+.feedback-good .feedback-banner { color: var(--green); }
+.feedback-bad .feedback-banner { color: var(--blood); }
+
+.feedback-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-size: 1.7rem;
+  font-style: italic;
+  margin-bottom: 14px;
+  line-height: 1.15;
+}
+
+.feedback-good .feedback-title { color: var(--green); }
+.feedback-bad .feedback-title { color: var(--blood); }
+
+.feedback-body {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.feedback-body strong { color: var(--blood); }
+.feedback-body em { color: var(--gold-aged); font-style: italic; }
+
+.feedback-formula {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+.feedback-trap {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: rgba(139, 31, 31, 0.08);
+  border-left: 3px solid var(--blood);
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--blood);
+}
+
+.feedback-trap::before { content: '⚠ '; }
+
+.feedback-points {
+  margin-top: 18px;
+  padding: 12px;
+  background: var(--ink);
+  color: var(--gold);
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.4rem;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.feedback-bad .feedback-points {
+  color: var(--blood-bright);
+}
+
+.feedback-continue {
+  width: 100%;
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family: 'Special Elite', monospace;
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  cursor: pointer;
+}
+
+.feedback-continue:active { background: var(--blood); }
+
+/* ======================================== */
+/*  VERDICT (RESULTS) SCREEN                */
+/* ======================================== */
+
+.verdict {
+  background: var(--black);
+  padding: 40px 24px;
+  justify-content: space-between;
+}
+
+.verdict-top {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.verdict-mark {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.verdict-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 3rem;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.verdict-good { color: var(--green); }
+.verdict-mid { color: var(--gold); }
+.verdict-bad { color: var(--blood-bright); }
+
+.verdict-text {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--paper-aged);
+  font-style: italic;
+  max-width: 380px;
+  margin: 0 auto 28px;
+}
+
+.verdict-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.verdict-stat {
+  padding: 16px;
+  border: 1px solid rgba(200, 154, 58, 0.4);
+  background: rgba(255,255,255,0.03);
+}
+
+.verdict-stat-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--paper-aged);
+  margin-bottom: 6px;
+}
+
+.verdict-stat-value {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--gold);
+  line-height: 1;
+}
+
+/* ======================================== */
+/*  CHEAT MODE (PAUSE / SKIP)               */
+/* ======================================== */
+
+.pause-btn {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(200, 154, 58, 0.3);
+  color: var(--paper);
+  font-family: 'Special Elite', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pause-btn:active { background: rgba(255,255,255,0.1); }
+
+/* ======================================== */
+/*  MASCOTTE / SCRIBE                       */
+/* ======================================== */
+
+.scribe-msg {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--gold);
+  text-align: center;
+  margin: 8px auto 16px;
+  padding: 10px 16px;
+  background: rgba(200, 154, 58, 0.08);
+  border-left: 3px solid var(--gold);
+  max-width: 360px;
+}
+
+.scribe-msg::before { content: '"'; opacity: 0.6; }
+.scribe-msg::after { content: '"'; opacity: 0.6; }
+
+/* ======================================== */
+/*  XP GAIN ANIMATION                       */
+/* ======================================== */
+
+.xp-popup {
+  position: fixed;
+  pointer-events: none;
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--gold);
+  z-index: 1000;
+  text-shadow: 0 0 12px rgba(200, 154, 58, 0.6);
+  opacity: 0;
+}
+
+.xp-popup.fly {
+  animation: flyUp 1.2s ease-out forwards;
+}
+
+@keyframes flyUp {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-100px); opacity: 0; }
+}
+
+/* ======================================== */
+/*  RESPONSIVE                              */
+/* ======================================== */
+
+@media (max-height: 700px) {
+  .home { padding: 20px 24px; }
+  .home-stats { margin: 16px 0; }
+}
+
+@media (max-width: 360px) {
+  .option { font-size: 1rem; padding: 14px 16px; }
+  .q-text { font-size: 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============= HOME ============= -->
+<div class="screen home active" id="home">
+  <div class="home-top">
+    <div class="home-mark">— ÉTUDE DE CAS · COURS BERTRAND FORESTIER —</div>
+    <h1 class="home-title">TRIAL<em>l'examen</em></h1>
+    <p class="home-subtitle">
+      Tu es l'inspecteur Costa.<br>
+      Réponds aux preuves pour faire condamner Don Keizer.<br>
+      Six jours d'audience, six chapitres.
+    </p>
+  </div>
+
+  <div class="home-stats">
+    <div class="home-stat">
+      <div class="home-stat-value" id="statDay">1</div>
+      <div class="home-stat-label">JOUR D'AUDIENCE</div>
+    </div>
+    <div class="home-stat">
+      <div class="home-stat-value" id="statXP">0</div>
+      <div class="home-stat-label">PREUVES</div>
+    </div>
+    <div class="home-stat">
+      <div class="home-stat-value" id="statBest">—</div>
+      <div class="home-stat-label">MEILLEUR STREAK</div>
+    </div>
+  </div>
+
+  <div>
+    <p class="home-mode-info" id="modeInfo">
+      ▶ Reprendre l'audience où tu t'étais arrêté
+    </p>
+    <button class="btn-primary" id="btnPlay">CONTINUER L'AUDIENCE</button>
+    <button class="btn-secondary" id="btnReview">RÉVISER LES PREUVES RATÉES</button>
+    <button class="btn-secondary" id="btnRandom">SESSION LIBRE 5 MIN</button>
+    <button class="btn-secondary" id="btnReset">↺ RÉINITIALISER LE PROCÈS</button>
+  </div>
+</div>
+
+<!-- ============= GAME ============= -->
+<div class="screen game" id="game">
+  <div class="game-top">
+    <button class="pause-btn" id="btnPause">×</button>
+    <div class="streak-flame" id="streakFlame">🔥<span id="streakNum">0</span></div>
+    <div class="justice-meter">
+      <div class="meter-side meter-prosecution">
+        <div class="meter-label">ACCUSATION</div>
+        <div class="meter-value" id="prosecutionScore">0</div>
+      </div>
+      <div class="meter-bar">
+        <div class="meter-fill" id="meterFill" style="width: 50%"></div>
+      </div>
+      <div class="meter-side meter-defense">
+        <div class="meter-label">DÉFENSE</div>
+        <div class="meter-value" id="defenseScore">0</div>
+      </div>
+    </div>
+    <div class="day-indicator">
+      JOUR <strong id="dayNumber">1</strong> · <span id="dayTitle">L'IPO</span> · <span id="qProgress">0 / 0</span>
+    </div>
+  </div>
+
+  <div class="game-content">
+    <div class="q-prefix" id="qPrefix"></div>
+    <div class="q-category" id="qCategory">CATÉGORIE</div>
+    <div class="q-text" id="qText">Question</div>
+    <div class="options" id="options"></div>
+  </div>
+</div>
+
+<!-- Feedback overlay -->
+<div class="feedback" id="feedback">
+  <div class="feedback-card">
+    <div class="feedback-banner" id="fbBanner"></div>
+    <div class="feedback-title" id="fbTitle"></div>
+    <div class="feedback-body" id="fbBody"></div>
+    <div class="feedback-formula" id="fbFormula" style="display:none"></div>
+    <div class="feedback-trap" id="fbTrap" style="display:none"></div>
+    <div class="feedback-points" id="fbPoints"></div>
+    <button class="feedback-continue" id="fbContinue">CONTINUER ▶</button>
+  </div>
+</div>
+
+<!-- ============= VERDICT (END OF DAY) ============= -->
+<div class="screen verdict" id="verdict">
+  <div class="verdict-top">
+    <div class="verdict-mark" id="verdictMark">— FIN DE L'AUDIENCE —</div>
+    <h2 class="verdict-title" id="verdictTitle">VERDICT</h2>
+    <p class="verdict-text" id="verdictText"></p>
+
+    <div class="verdict-stats">
+      <div class="verdict-stat">
+        <div class="verdict-stat-label">PREUVES</div>
+        <div class="verdict-stat-value" id="vStatGood">0</div>
+      </div>
+      <div class="verdict-stat">
+        <div class="verdict-stat-label">STREAK MAX</div>
+        <div class="verdict-stat-value" id="vStatStreak">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <button class="btn-primary" id="btnNextDay">PROCHAIN JOUR D'AUDIENCE ▶</button>
+    <button class="btn-secondary" id="btnHome">RETOUR AU MENU</button>
+  </div>
+</div>
+
+<script>
+// ========================================
+// BANQUE DE QUESTIONS — 6 JOURS D'AUDIENCE
+// ========================================
+
+const QUESTIONS = [
+  // ========== JOUR 1 — IPO ==========
+  { day: 1, cat: "IPO", q: "Marcus voulait éviter le 'spinning'. Qu'est-ce que c'est ?", o: ["Allouer des actions à un dirigeant en échange de futurs mandats — INTERDIT", "Une rotation tactique des actionnaires", "Un type de short selling", "Vendre par étapes"], a: 0, exp: "Le spinning est une forme de corruption strictement interdite par la SEC/FINRA." },
+  { day: 1, cat: "IPO", q: "L'option Greenshoe c'est :", o: ["10 % du nominal pendant 3 mois", "15 % du nominal pendant 6 mois maximum", "20 % du nominal pendant 1 an", "5 % à perpétuité"], a: 1, exp: "La Greenshoe permet à la banque de placer 15 % d'actions en plus pour stabiliser le cours, sur 6 mois max." },
+  { day: 1, cat: "IPO", q: "Iris voulait pratiquer le 'laddering'. C'est :", o: ["Une enchère par paliers", "Allouer plus à des investisseurs en échange de futurs achats à prix donné", "Émettre par tranches", "Stabiliser par paliers"], a: 1, exp: "Le laddering crée une demande artificielle. Strictement interdit." },
+  { day: 1, cat: "IPO", q: "Don voulait un SPAC. Surnom du SPAC ?", o: ["Mystery vehicle", "Black box company", "Blank check company", "Wild card fund"], a: 2, exp: "On signe un chèque en blanc aux sponsors — d'où le surnom." },
+  { day: 1, cat: "SPAC", q: "Avantage majeur du SPAC vs IPO classique :", o: ["Plus de transparence", "Frais 2-3× moins chers", "Plus de contrôle investisseur", "Procédure plus longue"], a: 1, exp: "Le SPAC contourne le bookbuilding et ses frais associés." },
+  { day: 1, cat: "IPO", q: "Le 'reverse takeover' c'est :", o: ["Une OPA hostile", "Une firme privée rachète une cotée et fusionne — donc se retrouve cotée", "Une fusion défensive", "Une cession contre actions"], a: 1, exp: "Raccourci vers la cotation sans bookbuilding." },
+  { day: 1, cat: "IPO", q: "Lazlo proposait un 'bought deal' (firm commitment). Concrètement :", o: ["Best effort sans garantie", "La banque doit acheter toutes les actions invendues", "Garantit un prix minimum", "Reverse les pertes à l'émetteur"], a: 1, exp: "Engagement maximum de la banque introductrice." },
+  { day: 1, cat: "IPO", q: "Direct listing (Spotify, Slack) :", o: ["Avec bookbuilding mais sans IB", "Sans bookbuilding, sans IB, sans Greenshoe — très risqué", "Avec Greenshoe seulement", "Réservé aux SPAC"], a: 1, exp: "Sans la machinerie classique. Réservé aux marques connues." },
+  { day: 1, cat: "Strat", q: "Costa applique PESTEL. Que signifie le L final ?", o: ["Linguistique", "Logistique", "Légal", "Linéaire"], a: 2, exp: "Politique, Économique, Sociétal, Technologique, Environnemental, Légal." },
+  { day: 1, cat: "Strat", q: "Selon le cours, qualité cardinale d'un bon CEO ?", o: ["Diplomatie internationale", "Maîtrise du marketing digital", "Financially driven (vision financière forte)", "Capacité à innover"], a: 2, exp: "Leadership, team building, entrepreneurship, change management ET financially driven — ce dernier distingue les CEO de cotées." },
+
+  // ========== JOUR 2 — DPS / EQUITY ==========
+  { day: 2, cat: "DPS", q: "Helena émet 1,5M d'actions à 105€, sur 12M existantes à 120€. TERP ?", o: ["112,50 €", "115,00 €", "118,33 €", "120,00 €"], a: 2, exp: "TERP = (12×120 + 1,5×105)/13,5 = 118,33 €.", formula: "TERP = (N_anc × S₀ + N_new × P) / (N_anc + N_new)" },
+  { day: 2, cat: "DPS", q: "Cours = 120€, TERP = 118,33€. Prix théorique du DPS ?", o: ["1,67 €", "2,50 €", "5 €", "12 €"], a: 0, exp: "Prix DPS = Cours - TERP = 120 - 118,33 = 1,67 €." },
+  { day: 2, cat: "DPS", q: "L'opération blanche c'est :", o: ["Sans nouvelles actions", "Cash-neutre : vendre des DPS pour souscrire avec le reste", "Réservée aux fondateurs", "Sans dilution"], a: 1, exp: "On garde X DPS pour souscrire et on en vend Y pour financer le prix d'émission." },
+  { day: 2, cat: "DPS", q: "Parité 8 DPS = 1 action à 105€, DPS vaut 1,67€. Combien de DPS faut-il vendre pour financer 1 action en opération blanche ?", o: ["8 DPS", "63 DPS", "71 DPS", "105 DPS"], a: 1, exp: "105 / 1,67 ≈ 63 DPS à vendre. Bloc total = 71 DPS (8 conservés + 63 vendus)." },
+  { day: 2, cat: "DPS", q: "Une augmentation de capital implique généralement un cours :", o: ["+5 %", "Stable", "-3 % à -5 %", "+10 %"], a: 2, exp: "Signal de surévaluation possible + dilution mécanique." },
+  { day: 2, cat: "Ratios", q: "Net Income = 1687,5 M€, Equity = 13500 M€. ROE ?", o: ["8,5 %", "10 %", "12,5 %", "15 %"], a: 2, exp: "ROE = NI/Equity = 1687,5/13500 = 12,5 %." },
+  { day: 2, cat: "Ratios", q: "Dette = 5500 M€, EBITDA = 2750 M€. Levier ?", o: ["1×", "2×", "3,5×", "5×"], a: 1, exp: "Levier = Dette/EBITDA = 5500/2750 = 2×." },
+  { day: 2, cat: "Ratios", q: "Pour passer de 2× à 3,5× EBITDA, combien de dette lever ? (EBITDA = 2750)", o: ["1500 M€", "2750 M€", "4125 M€", "5500 M€"], a: 2, exp: "1,5 × 2750 = 4125 M€ de nouvelle dette." },
+  { day: 2, cat: "Ratios", q: "Levée 8 Md€ avec 4125 M€ de dette à 4,5 % et ROE marginal de 9,5 %. Δ Net Income ?", o: ["+184 M€", "+574 M€", "+760 M€", "+1000 M€"], a: 1, exp: "Effet : -4,5%×4125 + 9,5%×8000 = -185,6 + 760 = +574,4 M€." },
+  { day: 2, cat: "Ratios", q: "Pourquoi les managers émettent quand le PER est haut ?", o: ["Pour le prestige", "Mathématiquement relutif → cours monte", "Obligation légale", "Réduire les impôts"], a: 1, exp: "Si PER élevé, l'opération relève l'EPS futur, donc le cours suit." },
+
+  // ========== JOUR 3 — OPTIONS & BS ==========
+  { day: 3, cat: "Options", q: "Long Call + Short Put au même strike =", o: ["Long Forward", "Short Forward", "Straddle", "Iron condor"], a: 0, exp: "Put-Call Parity. Identité d'arbitrage absolue." },
+  { day: 3, cat: "Greeks", q: "Le Vega mesure la sensibilité à :", o: ["La vol historique", "La vol implicite", "La vol forward", "Le sous-jacent"], a: 1, exp: "Vol implicite = celle qu'il faut entrer dans BS pour retrouver le prix de marché." },
+  { day: 3, cat: "Greeks", q: "Le Theta d'une option longue :", o: ["Toujours positif", "Toujours négatif (theta bleeding)", "Variable", "Nul à la monnaie"], a: 1, exp: "L'option perd de la valeur chaque jour qui passe." },
+  { day: 3, cat: "Greeks", q: "Le Vanna est :", o: ["Sensibilité du Vega au sous-jacent", "Sensibilité du Vega au temps", "Convexité du Vega à la vol", "Sensibilité au crédit"], a: 0, exp: "Vanna = ∂²V/(∂σ ∂S). Equivaut à la sensibilité du Delta à la vol." },
+  { day: 3, cat: "Greeks", q: "Le Volga est :", o: ["Sensibilité au crédit", "Convexité du Vega par rapport à la vol", "Sensibilité du Delta au temps", "Sensibilité au strike"], a: 1, exp: "Volga = ∂²V/∂σ². Convexité par rapport à la vol." },
+  { day: 3, cat: "BS", q: "Hypothèse FAUSSE de Black-Scholes :", o: ["Hedging continu sans frais", "Vol stock constante", "Volatilité stochastique", "Corrélation parfaite option/stock"], a: 2, exp: "BS suppose une vol CONSTANTE — la stochastique est l'extension Heston." },
+  { day: 3, cat: "BS", q: "Sous mesure risque-neutre Q, V₀ =", o: ["Max du payoff", "E^Q[e^(-rT) × Payoff]", "Moyenne historique", "Somme non actualisée"], a: 1, exp: "On change de mesure (Girsanov) puis on actualise au taux sans risque." },
+  { day: 3, cat: "Options", q: "Un put US ITM vs son jumeau EU :", o: ["A moins de valeur", "A la même valeur", "A plus de valeur (peut s'exercer plus tôt)", "Dépend du strike"], a: 2, exp: "Exercice anticipé possible permet de placer le cash." },
+  { day: 3, cat: "Greeks", q: "Le Vega est maximum :", o: ["Loin du strike", "Près du strike (ATM)", "À expiration", "À l'émission"], a: 1, exp: "Maximum d'incertitude au strike → maximum de Vega." },
+  { day: 3, cat: "Options", q: "Quelle approche n'est PAS une philo de Black-Scholes ?", o: ["Réplication delta-neutre", "Probabilité risque-neutre", "Égalité des Sharpe", "Maximisation d'utilité"], a: 3, exp: "Les 4 voies BS : réplication, RN, Sharpe, limite continue du binomial." },
+
+  // ========== JOUR 4 — BONDS & FORWARDS ==========
+  { day: 4, cat: "Bonds", q: "Maturité < 1 an =", o: ["Capital market securities", "Money market securities", "Convertibles", "Perpétuels"], a: 1, exp: "Money market : commercial papers, CD, etc." },
+  { day: 4, cat: "Bonds", q: "Coupons des US bonds & UK Gilts :", o: ["Annuels", "Semi-annuels", "Trimestriels", "Mensuels"], a: 1, exp: "US et UK = semi-annuel. France/Allemagne = annuel." },
+  { day: 4, cat: "Bonds", q: "Le spread d'une bond reflète :", o: ["Uniquement risque taux", "Risque défaut + recovery + liquidité", "Inflation seulement", "Risque de change"], a: 1, exp: "Trois composantes : default, recovery, liquidité." },
+  { day: 4, cat: "Bonds", q: "Sensibilité ÉLEVÉE quand :", o: ["Maturité courte, gros coupon", "Maturité longue, petit coupon, petit yield", "Coupon élevé", "Yield élevé"], a: 1, exp: "Plus c'est long et faible en coupon, plus c'est sensible au yield." },
+  { day: 4, cat: "Bonds", q: "Duration =", o: ["Sensibilité × Yield", "(1+Yield) × Sensibilité", "1/Sensibilité", "Yield/Sensibilité"], a: 1, exp: "Duration de Macaulay = (1+Y) × Modified Duration." },
+  { day: 4, cat: "Bonds", q: "Coupon < Yield, le prix de la bond avec le temps :", o: ["Reste constant", "Augmente vers le par", "Diminue", "Variable"], a: 1, exp: "Bond below par → time path montant vers 100." },
+  { day: 4, cat: "Forwards", q: "F(3,2) signifie :", o: ["Dans 2 ans, emprunt 3 ans", "Dans 3 ans, emprunt 2 ans", "Le ratio R3/R2", "R3 dans 2 ans"], a: 1, exp: "Convention : F(x,y) = dans x ans, pour y ans. F(3,2) ≠ F(2,3)." },
+  { day: 4, cat: "Forwards", q: "Formule du forward F(x,y) :", o: ["[(1+R_x)^x × (1+R_y)^y]^(1/(x+y)) − 1", "[(1+R_(x+y))^(x+y) / (1+R_x)^x]^(1/y) − 1", "(R_(x+y) − R_x)/y", "R_(x+y) − R_x"], a: 1, exp: "No-arbitrage : (1+R_x+y)^(x+y) = (1+R_x)^x × (1+F(x,y))^y.", formula: "(1+R_x+y)^(x+y) = (1+R_x)^x × (1+F(x,y))^y" },
+  { day: 4, cat: "Forwards", q: "Si la courbe spot est croissante, la courbe forward est :", o: ["En dessous", "Au-dessus", "Confondue", "Plate"], a: 1, exp: "Les forwards 'tirent vers le haut' la courbe spot." },
+  { day: 4, cat: "Callable", q: "Une callable est rappelée par l'émetteur quand :", o: ["Les taux montent", "Les taux baissent (refinancement)", "Défaut", "Maturité"], a: 1, exp: "Refinancement à un coût plus faible." },
+  { day: 4, cat: "Callable", q: "Détenir une callable bond =", o: ["Bond + call US", "Bond - call US (vendu à l'émetteur)", "Bond + put", "Bond - put"], a: 1, exp: "L'investisseur a vendu (implicitement) une option call à l'émetteur." },
+  { day: 4, cat: "Swaps", q: "Valeur d'un IR swap à l'inception :", o: ["Égale à la jambe fixe", "Égale à la jambe flottante", "Zéro", "Égale au notionnel"], a: 2, exp: "Construction même du swap : PV fixe = PV flottant à t=0." },
+
+  // ========== JOUR 5 — CONVERTIBLES, CURVE, CRÉDIT ==========
+  { day: 5, cat: "Convert", q: "Le coupon d'une convertible est généralement :", o: ["Plus élevé qu'une bond classique", "Plus faible qu'une bond classique", "Identique", "Toujours zéro"], a: 1, exp: "L'investisseur accepte moins de revenu en échange de l'upside actions." },
+  { day: 5, cat: "Convert", q: "Une CoCo bond :", o: ["Conversion volontaire", "Conversion mandatoire si trigger event (ex: ratio prudentiel bas)", "Pas de conversion", "Convertible perpétuelle"], a: 1, exp: "Utilisée pour le capital prudentiel des banques." },
+  { day: 5, cat: "Convert", q: "L'arbitrage convertible cherche à profiter :", o: ["Du défaut", "Vol future réalisée > vol implicite pricée", "Vol future < implicite", "Du change"], a: 1, exp: "Long convertible + short stock (delta hedge). Pari sur la vol." },
+  { day: 5, cat: "Curve", q: "Une courbe inversée signale :", o: ["Croissance forte", "Récession ou peur de déflation", "Inflation modérée", "Stabilité"], a: 1, exp: "Le marché anticipe une baisse future des taux." },
+  { day: 5, cat: "Boot", q: "Le bootstrapping reconstruit la courbe :", o: ["De la maturité longue vers la courte", "De la courte vers la longue, par récurrence", "Indifféremment", "À partir des forwards"], a: 1, exp: "On part de la maturité courte (ZC) et on isole une inconnue à la fois." },
+  { day: 5, cat: "Boot", q: "ZC 3 mois prix 99,42. R₃ₘ ≈ ?", o: ["1,5 %", "2,36 %", "3,5 %", "5 %"], a: 1, exp: "99,42 = 100/(1+R)^(1/4) → R = (100/99,42)^4 - 1 ≈ 2,36 %." },
+  { day: 5, cat: "Credit", q: "Loss Given Default modélisée par :", o: ["Distribution normale", "Beta en U", "Uniforme", "Lognormale"], a: 1, exp: "Recoveries rarement moyennes : soit beaucoup, soit presque rien." },
+  { day: 5, cat: "Credit", q: "BBB- en S&P =", o: ["High Yield", "Investment Grade (limite basse)", "Default", "AAA"], a: 1, exp: "Frontière critique. BB+ et en dessous = speculative grade." },
+  { day: 5, cat: "Credit", q: "Expected Loss formule :", o: ["PD + LGD + EAD", "PD × LGD × EAD actualisés", "PD/LGD", "Coupon × PD"], a: 1, exp: "EL = Σ(PD × LGD × EAD) / (1+rf)^t.", formula: "EL = Σ_t (PD_t × LGD_t × EAD_t) / (1+r_f)^t" },
+  { day: 5, cat: "Credit", q: "Risque principal d'un portefeuille de crédit :", o: ["Liquidité", "Risque de corrélation", "Inflation", "Change"], a: 1, exp: "C'est ce qu'on a oublié en 2008. Tous les actifs corrélés au cycle." },
+  { day: 5, cat: "Macro", q: "Mandat principal de la BCE :", o: ["Croissance", "Inflation", "Emploi", "Change"], a: 1, exp: "Mandat numéro 1 de la BCE = stabilité des prix." },
+  { day: 5, cat: "Liq", q: "La NAV d'un fonds privé est :", o: ["Une vraie valeur de marché", "Une estimation", "Le prix garanti", "Un prix réglementaire"], a: 1, exp: "Tant qu'on n'a pas vendu, la 'perte' n'est pas matérialisée." },
+  { day: 5, cat: "Liq", q: "Matrix pricing entre 2 ans (5,5%) et 5 ans (6,5%) → 3 ans ?", o: ["5,667 %", "5,833 %", "6,000 %", "6,167 %"], a: 1, exp: "Y(3) = 5,5 + (6,5-5,5)/3 × 1 = 5,833 %." },
+
+  // ========== JOUR 6 — ESG, LEVFIN, STRUCTURED ==========
+  { day: 6, cat: "ESG", q: "Un Sustainability-Linked Bond a :", o: ["Pas de coupon", "Un coupon directement lié à des KPI ESG", "Un coupon fixe seulement", "Coupon en actions"], a: 1, exp: "Pénalité financière si l'émetteur rate ses objectifs." },
+  { day: 6, cat: "ESG", q: "Combien de principes pour un Green Bond ?", o: ["3", "4 (use, evaluation, management, reporting)", "5", "6"], a: 1, exp: "Use of proceeds, evaluation/selection, management, reporting." },
+  { day: 6, cat: "ESG", q: "SDG (Sustainable Development Goals) ONU : combien ?", o: ["10", "12", "17", "21"], a: 2, exp: "17 objectifs définis par l'ONU dans le cadre de l'agenda 2030." },
+  { day: 6, cat: "ESG", q: "Combien de principes UN-PRI ?", o: ["3", "5", "6", "10"], a: 2, exp: "Six principes pour l'investissement responsable." },
+  { day: 6, cat: "LevFin", q: "Un leveraged loan est rated :", o: ["AAA seulement", "BB+ ou inférieur", "Investment Grade uniquement", "Non noté toujours"], a: 1, exp: "Speculative grade. Spread minimum SFOR+230 bps." },
+  { day: 6, cat: "LevFin", q: "High yield bonds = bonds rated :", o: ["AAA-AA", "BBB ou plus", "Sous BBB-", "Non noté seulement"], a: 2, exp: "Junk bonds. Coupon 6-12 %, semi-annuel." },
+  { day: 6, cat: "LevFin", q: "Le 'make whole call' :", o: ["Annule le call", "Permet le rappel avec premium = NPV des coupons + 50 bps", "Force la conversion", "Réduit le coupon"], a: 1, exp: "Permet à l'émetteur d'éviter la structure de call standard." },
+  { day: 6, cat: "Securit", q: "La securitization transforme :", o: ["Cash en actions", "Actifs illiquides en titres négociables", "Bonds en actions", "Equity en dette"], a: 1, exp: "Le pic de la complexité en finance." },
+  { day: 6, cat: "Securit", q: "SPV =", o: ["Special Purchase Vehicle", "Special Purpose Vehicle (bankruptcy-remote)", "Sponsor Public Vehicle", "Senior Private Vehicle"], a: 1, exp: "Entité juridique séparée portant les actifs titrisés." },
+  { day: 6, cat: "Securit", q: "Dans une structure tranchée, qui est payé en premier ?", o: ["Equity", "Junior", "Mezzanine", "Senior (waterfall)"], a: 3, exp: "Cascade : Senior d'abord, Equity en dernier (et prend les pertes)." },
+  { day: 6, cat: "Securit", q: "MBS =", o: ["Money Backed Securities", "Mortgage Backed Securities", "Multi Bond Series", "Market Beta Strategy"], a: 1, exp: "Titrise les créances immobilières." },
+  { day: 6, cat: "Securit", q: "CLO =", o: ["Cash Loss Option", "Collateralized Loan Obligation", "Credit Linked Obligation", "Closed Loop Operation"], a: 1, exp: "Titrise les prêts bancaires (souvent leveraged loans)." },
+];
+
+const DAY_TITLES = {
+  1: "L'IPO",
+  2: "L'AUGMENTATION",
+  3: "LES OPTIONS",
+  4: "LES OBLIGATIONS",
+  5: "LE CRÉDIT",
+  6: "LE FINAL"
+};
+
+const PROSECUTOR_LINES = [
+  "Costa, à toi.",
+  "Une preuve de plus contre lui, inspecteur.",
+  "La pièce suivante au dossier.",
+  "Le procureur attend ta réponse.",
+  "Le greffier note. Réponds.",
+  "Le jury observe.",
+  "L'audience reprend.",
+  "Don sourit. Efface ce sourire.",
+  "Une dernière question avant la pause.",
+];
+
+const VERDICT_GOOD = [
+  "Don Keizer faiblit. La défense vacille.",
+  "Le jury hoche la tête. Tu as marqué des points.",
+  "Audience exemplaire, inspecteur. La presse en parlera.",
+];
+const VERDICT_MID = [
+  "Audience mitigée. La défense reprend espoir.",
+  "Tu tiens, mais Don sourit encore. Reviens plus aiguisée demain.",
+];
+const VERDICT_BAD = [
+  "Don Keizer prend l'avantage. Il faut réviser le dossier.",
+  "L'audience tourne mal. Reprends les preuves ratées.",
+];
+
+// ========================================
+// ÉTAT — PERSISTANT VIA LOCALSTORAGE
+// ========================================
+
+const STORAGE_KEY = 'trial_vellmore_v1';
+
+const DEFAULT_STATE = {
+  currentDay: 1,
+  totalXP: 0,
+  bestStreak: 0,
+  // Par question : { seen, correct, wrong, lastResult }
+  questionStats: {},
+  // Queue de la session en cours
+  sessionQueue: [],
+  sessionType: null,    // 'day' | 'review' | 'random'
+  sessionStreak: 0,
+  sessionMaxStreak: 0,
+  sessionGood: 0,
+  sessionWrong: 0,
+  sessionXP: 0,
+  // Total par jour
+  dayProgress: {},      // {1: {good, wrong}, ...}
+  daysCompleted: [],    // [1, 2, ...]
+};
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...DEFAULT_STATE, ...parsed };
+    }
+  } catch(e) { console.warn('Load failed', e); }
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) { console.warn('Save failed', e); }
+}
+
+function resetState() {
+  state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  saveState();
+}
+
+// ========================================
+// VIBRATION (HAPTIC)
+// ========================================
+
+function vibrate(pattern) {
+  if (navigator.vibrate) {
+    try { navigator.vibrate(pattern); } catch(e) {}
+  }
+}
+
+// ========================================
+// SCREEN MANAGEMENT
+// ========================================
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ========================================
+// HOME SCREEN
+// ========================================
+
+function refreshHome() {
+  document.getElementById('statDay').textContent = state.currentDay;
+  document.getElementById('statXP').textContent = state.totalXP;
+  document.getElementById('statBest').textContent = state.bestStreak || '—';
+
+  const wrongIds = getWrongQuestionIds();
+  const reviewBtn = document.getElementById('btnReview');
+  reviewBtn.textContent = wrongIds.length > 0
+    ? `RÉVISER ${wrongIds.length} PREUVES RATÉES`
+    : 'AUCUNE PREUVE RATÉE — BRAVO';
+  reviewBtn.disabled = wrongIds.length === 0;
+  reviewBtn.style.opacity = wrongIds.length === 0 ? 0.4 : 1;
+
+  const playBtn = document.getElementById('btnPlay');
+  if (state.daysCompleted.length === 0 && state.sessionQueue.length === 0) {
+    playBtn.textContent = 'COMMENCER L\'AUDIENCE — JOUR 1';
+    document.getElementById('modeInfo').textContent = `▶ Démarrer ${DAY_TITLES[1]}`;
+  } else if (state.currentDay > 6) {
+    playBtn.textContent = 'PROCÈS TERMINÉ — REJOUER';
+    document.getElementById('modeInfo').textContent = `🏆 Tu as conclu les 6 audiences`;
+  } else {
+    playBtn.textContent = `JOUR ${state.currentDay} — ${DAY_TITLES[state.currentDay]}`;
+    const dayQs = QUESTIONS.filter(q => q.day === state.currentDay).length;
+    const done = state.dayProgress[state.currentDay]?.good || 0;
+    document.getElementById('modeInfo').textContent = `▶ Audience ${state.currentDay} : ${done}/${dayQs} preuves`;
+  }
+}
+
+document.getElementById('btnPlay').addEventListener('click', () => {
+  if (state.currentDay > 6) {
+    // Rejouer = reset jours
+    state.currentDay = 1;
+    state.daysCompleted = [];
+    state.dayProgress = {};
+    saveState();
+  }
+  startDay(state.currentDay);
+});
+
+document.getElementById('btnReview').addEventListener('click', () => {
+  startReview();
+});
+
+document.getElementById('btnRandom').addEventListener('click', () => {
+  startRandom();
+});
+
+document.getElementById('btnReset').addEventListener('click', () => {
+  if (confirm('Réinitialiser tout le procès ? (Toutes tes preuves seront perdues)')) {
+    resetState();
+    refreshHome();
+  }
+});
+
+// ========================================
+// SESSION MANAGEMENT
+// ========================================
+
+function getWrongQuestionIds() {
+  const wrong = [];
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    const stat = state.questionStats[i];
+    if (stat && stat.wrong > 0 && (stat.lastResult === 'wrong' || stat.wrong >= stat.correct)) {
+      wrong.push(i);
+    }
+  }
+  return wrong;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startDay(day) {
+  // Construire la queue avec : questions du jour + 30% de questions ratées des jours précédents
+  const dayQs = [];
+  QUESTIONS.forEach((q, i) => {
+    if (q.day === day) dayQs.push(i);
+  });
+
+  const wrongQs = getWrongQuestionIds().filter(i => QUESTIONS[i].day < day);
+  const reviewMix = shuffle(wrongQs).slice(0, Math.min(3, wrongQs.length));
+
+  state.sessionQueue = shuffle([...dayQs, ...reviewMix]);
+  state.sessionType = 'day';
+  state.sessionStreak = 0;
+  state.sessionMaxStreak = 0;
+  state.sessionGood = 0;
+  state.sessionWrong = 0;
+  state.sessionXP = 0;
+  saveState();
+
+  document.getElementById('dayNumber').textContent = day;
+  document.getElementById('dayTitle').textContent = DAY_TITLES[day] || '';
+  showScreen('game');
+  loadNextQuestion();
+}
+
+function startReview() {
+  const wrongQs = getWrongQuestionIds();
+  if (wrongQs.length === 0) return;
+  state.sessionQueue = shuffle(wrongQs);
+  state.sessionType = 'review';
+  state.sessionStreak = 0;
+  state.sessionMaxStreak = 0;
+  state.sessionGood = 0;
+  state.sessionWrong = 0;
+  state.sessionXP = 0;
+  saveState();
+
+  document.getElementById('dayNumber').textContent = '↺';
+  document.getElementById('dayTitle').textContent = 'RÉVISION';
+  showScreen('game');
+  loadNextQuestion();
+}
+
+function startRandom() {
+  // 5 minutes ≈ ~10-15 questions selon le rythme
+  const allIds = QUESTIONS.map((_, i) => i);
+  state.sessionQueue = shuffle(allIds).slice(0, 15);
+  state.sessionType = 'random';
+  state.sessionStreak = 0;
+  state.sessionMaxStreak = 0;
+  state.sessionGood = 0;
+  state.sessionWrong = 0;
+  state.sessionXP = 0;
+  saveState();
+
+  document.getElementById('dayNumber').textContent = '✦';
+  document.getElementById('dayTitle').textContent = 'SESSION LIBRE';
+  showScreen('game');
+  loadNextQuestion();
+}
+
+// ========================================
+// QUESTION DISPLAY
+// ========================================
+
+let currentQId = null;
+let totalSessionStart = 0;
+
+function loadNextQuestion() {
+  if (state.sessionQueue.length === 0) {
+    endSession();
+    return;
+  }
+
+  if (totalSessionStart === 0) {
+    totalSessionStart = state.sessionGood + state.sessionWrong + state.sessionQueue.length;
+  }
+
+  currentQId = state.sessionQueue[0];
+  const q = QUESTIONS[currentQId];
+
+  // Préfixe procureur (un peu de variation)
+  const prefix = PROSECUTOR_LINES[Math.floor(Math.random() * PROSECUTOR_LINES.length)];
+  document.getElementById('qPrefix').textContent = `« ${prefix} »`;
+
+  document.getElementById('qCategory').textContent = q.cat;
+  document.getElementById('qText').innerHTML = q.q;
+
+  // Update bar progression
+  const total = totalSessionStart;
+  const done = state.sessionGood + state.sessionWrong;
+  document.getElementById('qProgress').textContent = `${done + 1} / ${total}`;
+
+  // Build options
+  const optsEl = document.getElementById('options');
+  optsEl.innerHTML = '';
+  q.o.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<div class="option-letter">${String.fromCharCode(65 + idx)}</div><div class="option-text">${opt}</div>`;
+    btn.addEventListener('click', () => answer(idx));
+    optsEl.appendChild(btn);
+  });
+
+  // Update meters
+  updateMeters();
+}
+
+function updateMeters() {
+  document.getElementById('prosecutionScore').textContent = state.sessionGood;
+  document.getElementById('defenseScore').textContent = state.sessionWrong;
+
+  const total = state.sessionGood + state.sessionWrong;
+  const ratio = total === 0 ? 50 : (state.sessionGood / total) * 100;
+  document.getElementById('meterFill').style.width = `${ratio}%`;
+
+  const flame = document.getElementById('streakFlame');
+  if (state.sessionStreak >= 3) {
+    flame.classList.add('active');
+    document.getElementById('streakNum').textContent = state.sessionStreak;
+  } else {
+    flame.classList.remove('active');
+  }
+}
+
+// ========================================
+// ANSWER LOGIC
+// ========================================
+
+function answer(idx) {
+  const q = QUESTIONS[currentQId];
+  const correct = idx === q.a;
+
+  // Désactiver les options
+  const opts = document.querySelectorAll('.option');
+  opts.forEach((o, i) => {
+    o.style.pointerEvents = 'none';
+    if (i === q.a) o.classList.add('correct');
+    else if (i === idx && !correct) o.classList.add('wrong');
+    else if (i !== q.a) o.classList.add('dim');
+  });
+
+  // Maj des stats
+  if (!state.questionStats[currentQId]) {
+    state.questionStats[currentQId] = { seen: 0, correct: 0, wrong: 0, lastResult: null };
+  }
+  const stat = state.questionStats[currentQId];
+  stat.seen++;
+  if (correct) {
+    stat.correct++;
+    stat.lastResult = 'correct';
+    state.sessionGood++;
+    state.sessionStreak++;
+    if (state.sessionStreak > state.sessionMaxStreak) state.sessionMaxStreak = state.sessionStreak;
+    if (state.sessionStreak > state.bestStreak) state.bestStreak = state.sessionStreak;
+
+    // Calcul des points
+    let pts = 10;
+    if (state.sessionStreak >= 3) pts += 5;
+    if (state.sessionStreak >= 5) pts += 5;
+    if (state.sessionStreak >= 10) pts += 10;
+    state.sessionXP += pts;
+    state.totalXP += pts;
+
+    // Vibration + sound + visual feedback
+    vibrate(40);
+    showFeedback(true, q, pts);
+    flashXP(pts);
+  } else {
+    stat.wrong++;
+    stat.lastResult = 'wrong';
+    state.sessionWrong++;
+    state.sessionStreak = 0;
+
+    // Pour SRS : remettre la question à la fin de la queue (mais 3 questions plus loin)
+    state.sessionQueue.splice(3, 0, currentQId);
+
+    vibrate([60, 30, 60]);
+    showFeedback(false, q, 0);
+  }
+
+  // Pop la queue
+  state.sessionQueue.shift();
+  saveState();
+  updateMeters();
+}
+
+// XP popup animation
+function flashXP(pts) {
+  const popup = document.createElement('div');
+  popup.className = 'xp-popup';
+  popup.textContent = `+${pts}`;
+  popup.style.left = '50%';
+  popup.style.top = '60%';
+  popup.style.transform = 'translateX(-50%)';
+  document.body.appendChild(popup);
+  setTimeout(() => popup.classList.add('fly'), 50);
+  setTimeout(() => popup.remove(), 1500);
+}
+
+function showFeedback(correct, q, pts) {
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback active ' + (correct ? 'feedback-good' : 'feedback-bad');
+
+  document.getElementById('fbBanner').textContent = correct
+    ? '— PIÈCE À CONVICTION VALIDÉE —'
+    : '— LA DÉFENSE OBJECTE —';
+  document.getElementById('fbTitle').textContent = correct
+    ? 'PREUVE ACCEPTÉE'
+    : 'PREUVE REJETÉE';
+
+  const correctOpt = q.o[q.a];
+  document.getElementById('fbBody').innerHTML = correct
+    ? `<strong>${correctOpt}</strong><br><br>${q.exp}`
+    : `La bonne réponse était : <strong>${correctOpt}</strong><br><br>${q.exp}`;
+
+  if (q.formula) {
+    document.getElementById('fbFormula').style.display = '';
+    document.getElementById('fbFormula').textContent = q.formula;
+  } else {
+    document.getElementById('fbFormula').style.display = 'none';
+  }
+
+  if (q.trap) {
+    document.getElementById('fbTrap').style.display = '';
+    document.getElementById('fbTrap').innerHTML = q.trap;
+  } else {
+    document.getElementById('fbTrap').style.display = 'none';
+  }
+
+  document.getElementById('fbPoints').textContent = correct
+    ? `+${pts} preuves au dossier`
+    : `Cette preuve reviendra dans 3 questions`;
+}
+
+document.getElementById('fbContinue').addEventListener('click', () => {
+  document.getElementById('feedback').classList.remove('active');
+  setTimeout(loadNextQuestion, 200);
+});
+
+// ========================================
+// END OF SESSION
+// ========================================
+
+function endSession() {
+  totalSessionStart = 0;
+
+  // Si jour normal : marquer le jour comme complété
+  if (state.sessionType === 'day') {
+    const day = state.currentDay;
+    if (!state.dayProgress[day]) state.dayProgress[day] = { good: 0, wrong: 0 };
+    state.dayProgress[day].good = state.sessionGood;
+    state.dayProgress[day].wrong = state.sessionWrong;
+
+    if (!state.daysCompleted.includes(day)) state.daysCompleted.push(day);
+
+    // Si bon résultat : passer au jour suivant
+    const total = state.sessionGood + state.sessionWrong;
+    const ratio = total === 0 ? 0 : state.sessionGood / total;
+    if (ratio >= 0.7 && day < 6) {
+      state.currentDay = day + 1;
+    } else if (day === 6 && ratio >= 0.7) {
+      state.currentDay = 7; // marqueur de fin
+    }
+  }
+
+  saveState();
+  showVerdict();
+}
+
+function showVerdict() {
+  const total = state.sessionGood + state.sessionWrong;
+  const ratio = total === 0 ? 0 : state.sessionGood / total;
+
+  let title, text, mark, cls;
+  if (ratio >= 0.85) {
+    title = 'AUDIENCE MAGISTRALE';
+    text = VERDICT_GOOD[Math.floor(Math.random() * VERDICT_GOOD.length)];
+    mark = '— LE JURY APPLAUDIT —';
+    cls = 'verdict-good';
+  } else if (ratio >= 0.6) {
+    title = 'AUDIENCE TENUE';
+    text = VERDICT_MID[Math.floor(Math.random() * VERDICT_MID.length)];
+    mark = '— SUITE DEMAIN —';
+    cls = 'verdict-mid';
+  } else {
+    title = 'AUDIENCE DIFFICILE';
+    text = VERDICT_BAD[Math.floor(Math.random() * VERDICT_BAD.length)];
+    mark = '— LA DÉFENSE GAGNE DU TERRAIN —';
+    cls = 'verdict-bad';
+  }
+
+  // End of trial special
+  if (state.currentDay === 7) {
+    title = 'DON KEIZER CONDAMNÉ';
+    text = "Le jury rend son verdict après 6 audiences. La justice est rendue. Tu as bouclé tout le cours.";
+    mark = '— PROCÈS HISTORIQUE —';
+    cls = 'verdict-good';
+  }
+
+  const titleEl = document.getElementById('verdictTitle');
+  titleEl.textContent = title;
+  titleEl.className = 'verdict-title ' + cls;
+  document.getElementById('verdictText').textContent = text;
+  document.getElementById('verdictMark').textContent = mark;
+  document.getElementById('vStatGood').textContent = state.sessionGood;
+  document.getElementById('vStatStreak').textContent = state.sessionMaxStreak;
+
+  const nextBtn = document.getElementById('btnNextDay');
+  if (state.sessionType === 'day' && state.currentDay <= 6 && state.currentDay > (Object.keys(state.dayProgress).length === 0 ? 0 : Math.max(...Object.keys(state.dayProgress).map(Number)))) {
+    nextBtn.textContent = `JOUR ${state.currentDay} ▶`;
+    nextBtn.style.display = '';
+  } else if (state.sessionType === 'day' && state.currentDay <= 6) {
+    nextBtn.textContent = `RÉESSAYER LE JOUR ${state.daysCompleted[state.daysCompleted.length-1] || 1} ↺`;
+    nextBtn.style.display = '';
+  } else {
+    nextBtn.textContent = 'RETOUR AU MENU';
+    nextBtn.style.display = '';
+  }
+
+  showScreen('verdict');
+}
+
+document.getElementById('btnNextDay').addEventListener('click', () => {
+  if (state.sessionType === 'day' && state.currentDay <= 6) {
+    startDay(state.currentDay);
+  } else {
+    showScreen('home');
+    refreshHome();
+  }
+});
+
+document.getElementById('btnHome').addEventListener('click', () => {
+  showScreen('home');
+  refreshHome();
+});
+
+document.getElementById('btnPause').addEventListener('click', () => {
+  if (confirm('Quitter l\'audience ? La progression est sauvegardée.')) {
+    showScreen('home');
+    refreshHome();
+  }
+});
+
+// ========================================
+// PREVENT SCROLL ON BODY (KEEP MOBILE FIXED)
+// ========================================
+
+document.addEventListener('touchmove', (e) => {
+  if (!e.target.closest('.feedback-card') && !e.target.closest('.game-content')) {
+    if (e.cancelable) e.preventDefault();
+  }
+}, { passive: false });
+
+// ========================================
+// INIT
+// ========================================
+
+refreshHome();
+</script>
+
+</body>
+</html>
