@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0907">
+<title>CLUEDO VELLMORE — Le dernier procès</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Crimson+Pro:ital,wght@0,400;0,700;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --black: #0a0907;
+  --ink: #1a1815;
+  --paper: #ebe4d4;
+  --paper-aged: #d8cfb8;
+  --paper-stain: #c9bd9c;
+  --blood: #8b1f1f;
+  --blood-bright: #b62828;
+  --blood-dark: #5a0f0f;
+  --gold: #c89a3a;
+  --gold-aged: #a07825;
+  --green: #4a6b3a;
+  --shadow: rgba(0,0,0,0.4);
+}
+
+html, body {
+  font-family: 'Crimson Pro', Georgia, serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 600px 400px at 15% 10%, rgba(107, 24, 24, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 400px 300px at 85% 70%, rgba(107, 24, 24, 0.04) 0%, transparent 50%),
+    var(--paper);
+  position: relative;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: inset 0 0 120px rgba(0,0,0,0.2);
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+}
+.screen.active { display: block; }
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* ====== INTRO ====== */
+.intro {
+  background: var(--black);
+  color: var(--paper);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+  min-height: 100vh;
+  text-align: center;
+}
+.intro.active { display: flex; }
+
+.intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(139, 31, 31, 0.4) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.intro-content {
+  position: relative;
+  z-index: 2;
+  max-width: 540px;
+}
+
+.intro-stamp {
+  display: inline-block;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--blood-bright);
+  border: 1px solid var(--blood);
+  padding: 8px 16px;
+  margin-bottom: 40px;
+  background: rgba(139, 31, 31, 0.05);
+}
+
+.intro-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-size: clamp(2.8rem, 11vw, 5rem);
+  line-height: 0.92;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.intro-title em {
+  display: block;
+  font-style: italic;
+  color: var(--blood-bright);
+  text-shadow: 0 0 30px rgba(182, 40, 40, 0.5);
+  margin-top: 4px;
+}
+
+.intro-subtitle {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: var(--paper-aged);
+  margin: 30px 0;
+  line-height: 1.7;
+  opacity: 0.9;
+}
+
+.intro-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: var(--paper-aged);
+  margin: 30px 0 40px;
+}
+
+.intro-text strong {
+  color: var(--paper);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.intro-text em-blood {
+  color: var(--blood-bright);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.btn-primary {
+  width: 100%;
+  max-width: 440px;
+  padding: 22px 16px;
+  background: var(--blood);
+  color: var(--paper);
+  border: 2px solid var(--blood-bright);
+  font-family: 'Special Elite', monospace;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  margin: 8px 0;
+  box-shadow: 0 6px 20px rgba(139, 31, 31, 0.5);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover, .btn-primary:active {
+  transform: scale(1.02);
+  background: var(--blood-bright);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--blood);
+  padding: 14px;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background: rgba(139, 31, 31, 0.08);
+}
+
+/* ====== HUB ====== */
+
+.hub-header {
+  text-align: center;
+  padding: 32px 0 24px;
+  border-bottom: 2px solid var(--blood);
+  margin-bottom: 28px;
+}
+
+.hub-mark {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--blood);
+  margin-bottom: 8px;
+}
+
+.hub-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(2rem, 6vw, 2.6rem);
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.hub-title em {
+  font-style: italic;
+  color: var(--blood);
+}
+
+.hub-subtitle {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  color: var(--gold-aged);
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+/* Status banner */
+
+.status-banner {
+  background: var(--paper-aged);
+  border-left: 4px solid var(--blood);
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.status-banner-label {
+  display: block;
+  font-family: 'Special Elite', monospace;
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--blood);
+  margin-bottom: 6px;
+}
+
+/* Section title */
+
+.section-title {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--blood);
+  text-transform: uppercase;
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--blood);
+}
+
+/* Cards */
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.card {
+  background: var(--paper-aged);
+  border: 1px solid var(--ink);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  min-height: 100px;
+}
+
+.card:hover, .card:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow);
+  border-color: var(--blood);
+}
+
+.card-icon {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+  color: var(--blood);
+}
+
+.card-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-family: 'Special Elite', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: var(--gold-aged);
+  text-transform: uppercase;
+}
+
+.card.visited::before {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  color: var(--green);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.card.eliminated {
+  background: rgba(139, 31, 31, 0.06);
+  opacity: 0.5;
+}
+
+.card.eliminated .card-title {
+  text-decoration: line-through;
+  color: var(--blood);
+}
+
+/* Notebook button */
+.notebook-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  border: 3px solid var(--blood);
+  cursor: pointer;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  transition: all 0.2s;
+  font-family: 'Special Elite', monospace;
+}
+
+.notebook-fab:hover, .notebook-fab:active {
+  transform: scale(1.08);
+}
+
+.notebook-fab-icon { font-size: 22px; line-height: 1; }
+.notebook-fab-label { font-size: 8px; letter-spacing: 0.1em; margin-top: 2px; }
+
+.accuse-fab {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 14px 18px;
+  background: var(--blood);
+  color: var(--paper);
+  border: 2px solid var(--blood-bright);
+  cursor: pointer;
+  z-index: 50;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  box-shadow: 0 6px 18px rgba(139, 31, 31, 0.5);
+  transition: all 0.2s;
+}
+
+.accuse-fab:hover, .accuse-fab:active {
+  transform: scale(1.05);
+  background: var(--blood-bright);
+}
+
+/* ====== LOCATION SCREEN ====== */
+
+.location-screen, .suspect-screen, .accusation-screen, .ending-screen, .notebook-screen {
+  background: var(--paper);
+}
+
+.back-bar {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.back-btn {
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid var(--paper);
+  padding: 6px 10px;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.back-btn:hover { background: var(--blood); border-color: var(--blood); }
+
+.back-bar-title {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  flex: 1;
+  text-align: center;
+}
+
+.scene-header {
+  padding: 32px 24px 20px;
+  background: linear-gradient(180deg, var(--paper-stain) 0%, var(--paper) 100%);
+  text-align: center;
+  border-bottom: 1px solid var(--blood);
+}
+
+.scene-mark {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--blood);
+  margin-bottom: 12px;
+}
+
+.scene-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.scene-title em {
+  color: var(--blood);
+}
+
+.scene-tagline {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.8rem;
+  color: var(--gold-aged);
+  letter-spacing: 0.05em;
+  margin-top: 12px;
+  font-style: italic;
+}
+
+.scene-body {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: var(--ink);
+  padding: 0 0 30px;
+}
+
+.scene-body p {
+  margin-bottom: 1.4em;
+}
+
+.scene-body p:first-of-type::first-letter {
+  font-family: 'Crimson Pro', serif;
+  font-size: 4rem;
+  font-weight: 900;
+  font-style: italic;
+  float: left;
+  line-height: 0.85;
+  margin: 6px 12px 0 0;
+  color: var(--blood);
+}
+
+.scene-body strong { color: var(--blood); font-weight: 700; }
+.scene-body em { color: var(--gold-aged); font-style: italic; }
+
+/* Case file */
+.case-file {
+  background: var(--paper-aged);
+  border: 1px dashed var(--gold-aged);
+  padding: 20px 22px;
+  margin: 24px 0;
+  position: relative;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--ink);
+  box-shadow: 2px 3px 10px var(--shadow);
+}
+
+.case-file::before {
+  content: 'PIÈCE À CONVICTION';
+  position: absolute;
+  top: -10px;
+  left: 18px;
+  background: var(--paper);
+  padding: 2px 10px;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--blood);
+  border: 1px solid var(--blood);
+}
+
+.case-file h4 {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+
+.case-file p {
+  margin-bottom: 6px;
+}
+
+/* Puzzle */
+
+.puzzle-box {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 28px 24px;
+  margin: 24px 0;
+  border: 2px solid var(--blood);
+  position: relative;
+}
+
+.puzzle-box::before {
+  content: '⌗ ÉNIGME ⌗';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  padding: 0 16px;
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--blood-bright);
+}
+
+.puzzle-question {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  margin-bottom: 18px;
+  color: var(--paper);
+}
+
+.puzzle-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.06);
+  padding: 12px 14px;
+  margin: 14px 0;
+  text-align: center;
+  border-left: 3px solid var(--gold);
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+.puzzle-input-group {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 8px;
+}
+
+.puzzle-input {
+  flex: 1;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid var(--gold-aged);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  outline: none;
+  border-radius: 0;
+}
+
+.puzzle-input:focus {
+  border-color: var(--gold);
+  background: rgba(255,255,255,0.12);
+}
+
+.puzzle-submit {
+  padding: 14px 18px;
+  background: var(--blood);
+  color: var(--paper);
+  border: 2px solid var(--blood-bright);
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+}
+
+.puzzle-submit:hover { background: var(--blood-bright); }
+
+.puzzle-hint {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--paper-aged);
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.puzzle-result {
+  margin-top: 16px;
+  padding: 16px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  display: none;
+}
+
+.puzzle-result.show { display: block; }
+
+.puzzle-result.success {
+  background: rgba(74, 107, 58, 0.2);
+  border-left: 3px solid var(--green);
+  color: var(--paper);
+}
+
+.puzzle-result.error {
+  background: rgba(139, 31, 31, 0.3);
+  border-left: 3px solid var(--blood-bright);
+  color: var(--paper);
+}
+
+.puzzle-result strong { color: var(--gold); }
+
+/* Suspect screen */
+
+.suspect-portrait {
+  width: 120px;
+  height: 150px;
+  margin: 0 auto 20px;
+  background: var(--paper-stain);
+  border: 2px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Crimson Pro', serif;
+  font-size: 4.5rem;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--ink);
+  box-shadow: 4px 4px 12px var(--shadow);
+}
+
+.suspect-name {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--blood);
+  text-align: center;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.suspect-role {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.dialogue {
+  margin: 24px 0;
+  padding: 0 0 0 20px;
+  border-left: 3px solid var(--blood);
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.dialogue-speaker {
+  display: block;
+  font-family: 'Special Elite', monospace;
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--blood);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.qcm-question {
+  background: var(--paper-aged);
+  padding: 22px 22px 16px;
+  margin: 24px 0;
+  border-top: 2px solid var(--blood);
+  border-bottom: 2px solid var(--blood);
+}
+
+.qcm-prompt {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+.qcm-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.qcm-option {
+  background: var(--paper);
+  border: 1.5px solid var(--gold-aged);
+  padding: 12px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--ink);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  transition: all 0.15s;
+}
+
+.qcm-option:hover { border-color: var(--blood); background: var(--paper-stain); }
+
+.qcm-option-letter {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.8rem;
+  border-radius: 0;
+}
+
+.qcm-option.correct {
+  background: rgba(74, 107, 58, 0.2);
+  border-color: var(--green);
+}
+.qcm-option.correct .qcm-option-letter { background: var(--green); }
+
+.qcm-option.wrong {
+  background: rgba(139, 31, 31, 0.15);
+  border-color: var(--blood);
+}
+.qcm-option.wrong .qcm-option-letter { background: var(--blood); }
+
+.qcm-option.dim {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.qcm-feedback {
+  margin-top: 14px;
+  padding: 12px 14px;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  display: none;
+}
+
+.qcm-feedback.show { display: block; }
+
+.qcm-feedback.success {
+  background: rgba(74, 107, 58, 0.12);
+  border-left: 3px solid var(--green);
+  color: var(--ink);
+}
+
+.qcm-feedback.error {
+  background: rgba(139, 31, 31, 0.08);
+  border-left: 3px solid var(--blood);
+  color: var(--ink);
+}
+
+/* CLUE REVEAL */
+
+.clue-reveal {
+  margin-top: 20px;
+  padding: 20px 22px;
+  background: var(--ink);
+  color: var(--paper);
+  border-left: 4px solid var(--gold);
+  position: relative;
+  display: none;
+}
+
+.clue-reveal.show { display: block; }
+
+.clue-reveal::before {
+  content: '★ INDICE DÉBLOQUÉ ★';
+  display: block;
+  font-family: 'Special Elite', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.clue-reveal-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.clue-reveal strong { color: var(--gold); font-style: normal; }
+
+/* NOTEBOOK */
+
+.notebook-screen {
+  background: var(--paper-aged);
+  padding-bottom: 100px;
+}
+
+.nb-section {
+  margin: 24px 0;
+}
+
+.nb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.nb-item {
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 12px 14px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+.nb-item.eliminated {
+  background: rgba(139, 31, 31, 0.06);
+  text-decoration: line-through;
+  color: var(--blood-dark);
+  opacity: 0.6;
+}
+
+.nb-item-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.nb-item.eliminated .nb-item-name { color: var(--blood); }
+
+.nb-item-detail {
+  font-family: 'Special Elite', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: var(--gold-aged);
+  text-transform: uppercase;
+}
+
+.nb-clues {
+  background: var(--paper);
+  padding: 16px 20px;
+  border-left: 3px solid var(--gold);
+  margin-top: 14px;
+}
+
+.nb-clue {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink);
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--gold-aged);
+}
+
+.nb-clue:last-child { border-bottom: none; }
+
+.nb-clue::before {
+  content: '★ ';
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* ACCUSATION */
+
+.accusation-screen {
+  background: var(--ink);
+  color: var(--paper);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.accusation-screen .scene-header {
+  background: linear-gradient(180deg, var(--blood-dark) 0%, var(--ink) 100%);
+  border-bottom: 2px solid var(--blood);
+  color: var(--paper);
+}
+
+.accusation-screen .scene-title { color: var(--paper); }
+.accusation-screen .scene-mark { color: var(--blood-bright); }
+
+.accusation-section {
+  margin: 28px 0;
+}
+
+.accusation-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--blood-bright);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.accusation-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.acc-option {
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(200,154,58,0.4);
+  padding: 12px 14px;
+  cursor: pointer;
+  font-family: 'Crimson Pro', serif;
+  color: var(--paper);
+  text-align: left;
+  font-size: 0.95rem;
+  transition: all 0.15s;
+}
+
+.acc-option.eliminated {
+  opacity: 0.3;
+  pointer-events: none;
+  background: rgba(139, 31, 31, 0.15);
+  text-decoration: line-through;
+}
+
+.acc-option.selected {
+  background: var(--blood);
+  border-color: var(--gold);
+  color: var(--paper);
+  box-shadow: 0 0 16px rgba(139, 31, 31, 0.6);
+}
+
+.acc-option-name {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.acc-option-role {
+  font-family: 'Special Elite', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.accuse-final {
+  width: 100%;
+  padding: 22px;
+  background: var(--blood);
+  color: var(--paper);
+  border: 2px solid var(--gold);
+  font-family: 'Special Elite', monospace;
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.accuse-final:disabled {
+  background: rgba(139, 31, 31, 0.3);
+  border-color: rgba(200, 154, 58, 0.3);
+  cursor: not-allowed;
+}
+
+.accuse-final:not(:disabled):hover { background: var(--blood-bright); }
+
+/* ENDING */
+
+.ending-screen {
+  min-height: 100vh;
+  padding: 60px 24px;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.ending-screen.active { display: flex; }
+
+.ending-screen.victory {
+  background: var(--ink);
+  color: var(--paper);
+  background-image: radial-gradient(ellipse at center, rgba(74, 107, 58, 0.15) 0%, var(--ink) 60%);
+}
+
+.ending-screen.defeat {
+  background: var(--ink);
+  color: var(--paper);
+  background-image: radial-gradient(ellipse at center, rgba(139, 31, 31, 0.25) 0%, var(--ink) 60%);
+}
+
+.ending-stamp {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  margin-bottom: 16px;
+}
+
+.victory .ending-stamp { color: var(--gold); }
+.defeat .ending-stamp { color: var(--blood-bright); }
+
+.ending-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(2.4rem, 8vw, 3.6rem);
+  line-height: 1.05;
+  margin-bottom: 24px;
+}
+
+.victory .ending-title { color: var(--gold); }
+.defeat .ending-title { color: var(--blood-bright); }
+
+.ending-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 540px;
+  color: var(--paper-aged);
+  margin: 0 auto 40px;
+}
+
+/* Bullets */
+
+ul.scene-list {
+  margin: 12px 0 16px 24px;
+  font-family: 'Crimson Pro', serif;
+  line-height: 1.65;
+}
+
+ul.scene-list li {
+  margin-bottom: 6px;
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  .nb-grid { grid-template-columns: 1fr; }
+  .accusation-options { grid-template-columns: 1fr; }
+  .container { padding: 16px; }
+  .scene-body { font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============== INTRO ============== -->
+<div class="screen intro active" id="intro">
+  <div class="intro-content">
+    <div class="intro-stamp">DOSSIER 47-VLM-FINAL · CONFIDENTIEL</div>
+    <h1 class="intro-title">CLUEDO<em>Vellmore</em></h1>
+    <p class="intro-subtitle">Le dernier procès</p>
+    <p class="intro-text">
+      Marcus Vellmore avait simulé sa mort. Ce que personne ne savait. Mais hier soir,
+      <em>son vrai cadavre</em> a été retrouvé dans les bureaux de Vellmore Industries.
+      <br><br>
+      Don Keizer est en garde à vue mais clame son innocence. Six suspects ont accès aux
+      lieux. Six armes financières ont pu être utilisées. Six lieux dans la tour.
+      <br><br>
+      <strong>Trouve le tueur, le lieu et l'arme.</strong> Ou il s'en sortira.
+    </p>
+    <button class="btn-primary" onclick="startGame()">COMMENCER L'ENQUÊTE ▶</button>
+    <button class="btn-primary" style="background:transparent;color:var(--paper);border-color:var(--gold);box-shadow:none;font-size:11px" onclick="resetGame()">↺ NOUVELLE PARTIE</button>
+  </div>
+</div>
+
+<!-- ============== HUB ============== -->
+<div class="screen" id="hub">
+  <div class="container">
+    <div class="hub-header">
+      <div class="hub-mark">— ENQUÊTE EN COURS —</div>
+      <h1 class="hub-title">L'<em>Affaire Vellmore</em></h1>
+      <div class="hub-subtitle">Inspecteur Daniela Costa · Brigade des Affaires Financières</div>
+    </div>
+
+    <div class="status-banner">
+      <span class="status-banner-label">— ÉTAT DE L'ENQUÊTE —</span>
+      <span id="statusText">Aucun indice. Visite les lieux et interroge les suspects pour réduire la liste.</span>
+    </div>
+
+    <div class="section-title">▶ Lieux à explorer</div>
+    <div class="cards-grid" id="locationsGrid"></div>
+
+    <div class="section-title">▶ Suspects à interroger</div>
+    <div class="cards-grid" id="suspectsGrid"></div>
+
+    <div class="section-title">▶ Armes du crime potentielles</div>
+    <div class="cards-grid" id="weaponsGrid"></div>
+
+    <div style="height: 100px"></div>
+  </div>
+
+  <button class="notebook-fab" onclick="showNotebook()">
+    <span class="notebook-fab-icon">📔</span>
+    <span class="notebook-fab-label" id="fabClueCount">CARNET</span>
+  </button>
+
+  <button class="accuse-fab" onclick="showAccusation()">⚖ ACCUSER</button>
+</div>
+
+<!-- ============== LOCATION ============== -->
+<div class="screen" id="locationScreen">
+  <div class="back-bar">
+    <button class="back-btn" onclick="showHub()">← RETOUR</button>
+    <span class="back-bar-title">LIEU</span>
+  </div>
+  <div class="container" id="locationContent"></div>
+</div>
+
+<!-- ============== SUSPECT ============== -->
+<div class="screen" id="suspectScreen">
+  <div class="back-bar">
+    <button class="back-btn" onclick="showHub()">← RETOUR</button>
+    <span class="back-bar-title">INTERROGATOIRE</span>
+  </div>
+  <div class="container" id="suspectContent"></div>
+</div>
+
+<!-- ============== NOTEBOOK ============== -->
+<div class="screen notebook-screen" id="notebookScreen">
+  <div class="back-bar">
+    <button class="back-btn" onclick="showHub()">← RETOUR</button>
+    <span class="back-bar-title">CARNET D'ENQUÊTE</span>
+  </div>
+  <div class="container">
+    <div class="hub-header" style="border-bottom-color: var(--ink)">
+      <div class="hub-mark">— DANIELA COSTA —</div>
+      <h2 class="hub-title">Mes <em>déductions</em></h2>
+    </div>
+
+    <div class="nb-section">
+      <div class="section-title">SUSPECTS</div>
+      <div class="nb-grid" id="nbSuspects"></div>
+    </div>
+
+    <div class="nb-section">
+      <div class="section-title">LIEUX</div>
+      <div class="nb-grid" id="nbLocations"></div>
+    </div>
+
+    <div class="nb-section">
+      <div class="section-title">ARMES</div>
+      <div class="nb-grid" id="nbWeapons"></div>
+    </div>
+
+    <div class="nb-section">
+      <div class="section-title">INDICES RECUEILLIS</div>
+      <div class="nb-clues" id="nbClues">
+        <div style="font-style:italic;color:var(--gold-aged);text-align:center;padding:20px">Aucun indice pour l'instant. Résous les énigmes.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== ACCUSATION ============== -->
+<div class="screen accusation-screen" id="accusationScreen">
+  <div class="back-bar" style="background: var(--blood-dark)">
+    <button class="back-btn" onclick="showHub()">← RETOUR</button>
+    <span class="back-bar-title">ACCUSATION FINALE</span>
+  </div>
+  <div class="scene-header">
+    <div class="scene-mark">— L'HEURE DE VÉRITÉ —</div>
+    <h2 class="scene-title">L'<em>accusation</em></h2>
+    <p class="scene-tagline">Nomme le tueur, le lieu et l'arme. Une seule chance.</p>
+  </div>
+  <div class="container">
+    <div class="accusation-section">
+      <div class="accusation-label">▶ JE NOMME LE TUEUR :</div>
+      <div class="accusation-options" id="accSuspects"></div>
+    </div>
+
+    <div class="accusation-section">
+      <div class="accusation-label">▶ DANS LE LIEU :</div>
+      <div class="accusation-options" id="accLocations"></div>
+    </div>
+
+    <div class="accusation-section">
+      <div class="accusation-label">▶ AVEC L'ARME :</div>
+      <div class="accusation-options" id="accWeapons"></div>
+    </div>
+
+    <button class="accuse-final" id="finalAccuseBtn" disabled onclick="finalAccusation()">⚖ JE PORTE L'ACCUSATION ⚖</button>
+  </div>
+</div>
+
+<!-- ============== ENDING ============== -->
+<div class="ending-screen" id="endingScreen">
+  <div class="ending-stamp" id="endingStamp"></div>
+  <h1 class="ending-title" id="endingTitle"></h1>
+  <p class="ending-text" id="endingText"></p>
+  <button class="btn-primary" onclick="resetGame()">↺ NOUVELLE PARTIE</button>
+</div>
+
+<script>
+// ====== DATA ======
+
+const SOLUTION = { suspect: 'sebastian', location: 'options-vault', weapon: 'volga' };
+
+const SUSPECTS = [
+  {
+    id: 'helena', name: 'Helena Vellmore', role: 'Veuve & nouvelle PDG',
+    initial: 'H', icon: '👤',
+    intro: 'Helena Vellmore vous reçoit dans son bureau au 47e étage. Le visage tendu, mais maîtrisée. C\'est elle qui dirige Vellmore Industries depuis la prétendue mort de Marcus.',
+    dialogue: 'Inspecteur. Je sais que je suis suspecte. Mais réfléchissez : pourquoi tuerais-je l\'homme qui m\'a fait reine ? J\'ai bâti cette firme avec lui. Je veux protéger son legacy.',
+    questions: [
+      {
+        q: 'Marcus avait étudié plusieurs voies de cotation. Qu\'est-ce qu\'un reverse takeover ?',
+        opts: [
+          'Une OPA hostile défensive',
+          'Une firme privée qui rachète une firme cotée et fusionne avec elle pour se retrouver cotée',
+          'Une fusion-absorption inverse',
+          'Une cession contre actions'
+        ],
+        a: 1,
+        explanation: 'C\'est un raccourci vers la cotation sans bookbuilding.',
+        clueOnSuccess: 'Helena confirme que Marcus avait écarté le SPAC et le reverse takeover. Elle savait tout. Elle élimine une arme.',
+        eliminate: { type: 'weapons', id: 'tranche' }
+      },
+      {
+        q: 'Pour limiter la dilution lors d\'une augmentation de capital, on émet aussi de la dette. Quelle est la formule du levier ?',
+        opts: ['Equity / Dette', 'Dette / EBITDA', 'EBITDA / Net Income', 'Net Income / Dette'],
+        a: 1,
+        explanation: 'Le levier corporate = Dette / EBITDA, exprimé en multiple.',
+        clueOnSuccess: 'Helena rappelle que l\'opération avait fait monter le levier de 2× à 3,5× — donc ~4 125 M€ de dette nouvelle. Elle élimine un suspect.',
+        eliminate: { type: 'suspects', id: 'theodora' }
+      }
+    ]
+  },
+  {
+    id: 'sebastian', name: 'Sebastian Vex', role: 'CFO de Vellmore Industries',
+    initial: 'S', icon: '👤',
+    intro: 'Sebastian Vex vous reçoit avec une cordialité un peu trop maîtrisée. Costume parfait, sourire juste assez chaleureux. Le profil idéal du Chief Financial Officer.',
+    dialogue: 'Daniela — pardon, Inspecteur Costa. Je vais vous épargner les ratios. Vous savez aussi bien que moi que les chiffres ne mentent jamais. Sauf quand on les fait mentir.',
+    questions: [
+      {
+        q: 'Le Vega d\'une option mesure la sensibilité à quoi ?',
+        opts: [
+          'La volatilité historique',
+          'La volatilité implicite',
+          'La volatilité forward',
+          'Le sous-jacent'
+        ],
+        a: 1,
+        explanation: 'Le Vega mesure la sensibilité à la volatilité IMPLICITE — celle qu\'il faut entrer dans Black-Scholes pour retrouver le prix de marché.',
+        clueOnSuccess: 'Sebastian connaît trop bien les Greeks. Il glisse une remarque sur la Volga. Costa note : le CFO maîtrise les options exotiques. Aucun lieu éliminé — au contraire, il devient suspect.',
+        eliminate: null
+      },
+      {
+        q: 'Selon la règle de Taylor, quelle est la priorité de la BCE ?',
+        opts: [
+          'Le taux de change EUR/USD',
+          'L\'inflation',
+          'Le taux de chômage',
+          'La croissance du PIB'
+        ],
+        a: 1,
+        explanation: 'Le mandat numéro 1 de la BCE est la stabilité des prix. L\'inflation prime sur l\'output gap.',
+        clueOnSuccess: 'Sebastian détourne la conversation. Costa élimine une arme grâce à un fragment de phrase qu\'il laisse échapper.',
+        eliminate: { type: 'weapons', id: 'cds' }
+      }
+    ]
+  },
+  {
+    id: 'marina', name: 'Marina Quill', role: 'Head of Investor Relations',
+    initial: 'M', icon: '👤',
+    intro: 'Marina Quill — la voix officielle de Vellmore Industries auprès du marché. Elle parle vite, en fragments précis. Trop précis pour être innocents.',
+    dialogue: 'Marcus avait construit sa trust auprès des investisseurs sur dix ans. Personne — PERSONNE — n\'avait intérêt à briser cela. Le marché aurait tué Vellmore Industries en quelques heures si la vérité avait fuité.',
+    questions: [
+      {
+        q: 'Marina prépare l\'equity story d\'une nouvelle augmentation de capital. Qu\'analyse-t-on avec PESTEL ?',
+        opts: [
+          'Les concurrents directs et indirects',
+          'L\'environnement macro : Politique, Économique, Sociétal, Technologique, Environnemental, Légal',
+          'Les ratios financiers de l\'entreprise',
+          'La satisfaction client et le NPS'
+        ],
+        a: 1,
+        explanation: 'PESTEL analyse les six dimensions de l\'environnement macro qui pèsent sur une entreprise.',
+        clueOnSuccess: 'Marina avoue que le PESTEL avait identifié une menace : un procès anti-trust en cours. Elle élimine un lieu.',
+        eliminate: { type: 'locations', id: 'spv-warehouse' }
+      },
+      {
+        q: 'Marina mentionne le \'spinning\'. C\'est :',
+        opts: [
+          'Une rotation tactique des actionnaires',
+          'Allouer des actions à un dirigeant en échange de futurs mandats — INTERDIT par SEC/FINRA',
+          'Une stratégie de short selling',
+          'Une vente par étapes'
+        ],
+        a: 1,
+        explanation: 'Le spinning est une forme de corruption — interdit par la SEC et la FINRA.',
+        clueOnSuccess: 'Marina avait soupçonné Lazlo de spinning. Elle écarte un suspect que Costa surveillait.',
+        eliminate: { type: 'suspects', id: 'don' }
+      }
+    ]
+  },
+  {
+    id: 'theodora', name: 'Theodora Asher', role: 'General Counsel',
+    initial: 'T', icon: '👤',
+    intro: 'Maître Theodora Asher est l\'avocate générale de Vellmore Industries. Calme, précise, redoutable. Elle a passé l\'après-midi à anticiper vos questions.',
+    dialogue: 'Inspecteur, mes clients ont des droits. Mais je suis aussi attachée à la justice. Posez vos questions — je répondrai si elles sont pertinentes. Et vous me direz ce que vous savez sur les CoCo bonds.',
+    questions: [
+      {
+        q: 'Une CoCo bond se convertit en actions :',
+        opts: [
+          'Au choix de l\'investisseur, à tout moment',
+          'Obligatoirement à maturité',
+          'Mandatoirement si un trigger event survient (ex : ratio prudentiel bas)',
+          'Jamais — c\'est une bond classique'
+        ],
+        a: 2,
+        explanation: 'Les CoCo (Contingent Convertibles) se convertissent automatiquement à un événement déclencheur. Très utilisées par les banques.',
+        clueOnSuccess: 'Theodora révèle qu\'Helena avait émis des CoCo bonds piégés. Mais elle confirme que ce n\'est PAS l\'arme du crime. Elle élimine une arme.',
+        eliminate: { type: 'weapons', id: 'callable' }
+      },
+      {
+        q: 'Une callable bond est rappelée par l\'émetteur quand :',
+        opts: [
+          'Les taux montent',
+          'Les taux baissent (refinancement plus avantageux)',
+          'L\'investisseur l\'exige',
+          'À la date de maturité initiale'
+        ],
+        a: 1,
+        explanation: 'L\'émetteur rappelle pour refinancer à moindre coût quand les taux baissent.',
+        clueOnSuccess: 'Theodora glisse qu\'elle a vu Marina dans la Crypte des Obligations le soir du meurtre. Mais aussi quelqu\'un d\'autre. Elle élimine la Crypte des Obligations comme lieu du crime.',
+        eliminate: { type: 'locations', id: 'bond-crypt' }
+      }
+    ]
+  },
+  {
+    id: 'aaron', name: 'Aaron Brentwood', role: 'Quant auditeur',
+    initial: 'A', icon: '👤',
+    intro: 'Aaron Brentwood, ancien quant chez Goldman, a été engagé par Costa pour auditer les comptes. Yeux rouges, café à la main. Il n\'a pas dormi.',
+    dialogue: 'Inspecteur, j\'ai trouvé quelque chose. Quelqu\'un a manipulé les hypothèses de pricing des options exotiques. La Volga implicite a été surestimée. Le bilan le montre, mais il faut savoir lire.',
+    questions: [
+      {
+        q: 'Aaron parle de \'parallel shift\'. Qu\'est-ce que c\'est ?',
+        opts: [
+          'Une rotation de la courbe',
+          'Une translation uniforme de toute la courbe des taux',
+          'Un changement de devise',
+          'Une dérivée croisée'
+        ],
+        a: 1,
+        explanation: 'Le parallel shift est l\'hypothèse simplificatrice : toute la courbe se translate uniformément.',
+        clueOnSuccess: 'Aaron confirme qu\'aucun simple parallel shift n\'expliquait le mouvement de la Volga. C\'était délibéré. Aucun lieu éliminé.',
+        eliminate: null
+      },
+      {
+        q: 'Aaron évoque la Loss Given Default. Comment est-elle modélisée ?',
+        opts: [
+          'Distribution normale autour de 50 %',
+          'Distribution Beta en U (recoveries souvent extrêmes)',
+          'Distribution uniforme',
+          'Distribution lognormale'
+        ],
+        a: 1,
+        explanation: 'La LGD suit une Beta en U — soit on récupère beaucoup, soit presque rien.',
+        clueOnSuccess: 'Aaron pointe la Tour Equity comme un point de passage sans crime. Elle est éliminée comme lieu du crime.',
+        eliminate: { type: 'locations', id: 'equity-tower' }
+      }
+    ]
+  },
+  {
+    id: 'don', name: 'Don Keizer', role: 'Sponsor SPAC en garde à vue',
+    initial: 'D', icon: '👤',
+    intro: 'Don Keizer dans la salle d\'interrogatoire. Menottes, regard fixe. Il a déjà été condamné dans votre dossier précédent. Mais il clame son innocence pour ce nouveau crime.',
+    dialogue: 'Costa — vous m\'avez déjà eu une fois. Je ne suis pas un saint. Mais je n\'ai PAS tué Marcus. Pas cette fois. Cherchez dans la titrisation. Cherchez dans le SPV. Quelqu\'un d\'autre y a accès.',
+    questions: [
+      {
+        q: 'Don mentionne un SPV. Qu\'est-ce que c\'est ?',
+        opts: [
+          'Special Public Vehicle',
+          'Special Purpose Vehicle (entité bankruptcy-remote portant des actifs titrisés)',
+          'Sponsor Public Vehicle',
+          'Senior Private Vehicle'
+        ],
+        a: 1,
+        explanation: 'Le SPV est une entité juridique séparée qui porte une dette non-recours.',
+        clueOnSuccess: 'Don révèle qu\'il avait constitué un SPV avec Sebastian. Mais le SPV n\'est pas le lieu du crime. Costa l\'élimine.',
+        eliminate: null
+      },
+      {
+        q: 'Dans une structure tranchée, l\'ordre du waterfall est :',
+        opts: [
+          'Equity → Junior → Mezzanine → Senior',
+          'Senior → Mezzanine → Junior → Equity (Senior payé en premier)',
+          'Tous payés au prorata',
+          'Equity payée en premier puis le reste'
+        ],
+        a: 1,
+        explanation: 'Senior d\'abord (rendement faible, risque faible). Equity en dernier — prend les pertes en premier.',
+        clueOnSuccess: 'Don laisse échapper que Sebastian Vex avait accès à la Salle des Marchés via une porte dérobée. Costa élimine la Salle des Marchés.',
+        eliminate: { type: 'locations', id: 'trading-floor' }
+      }
+    ]
+  }
+];
+
+const LOCATIONS = [
+  {
+    id: 'trading-floor', name: 'Salle des Marchés', subtitle: 'Trading Floor — Étage 12',
+    icon: '📊',
+    intro: `<p>La <strong>Salle des Marchés</strong> de Vellmore Industries. Costa pénètre sous les écrans bleutés qui clignotent. C'est ici que Marcus avait orchestré son IPO — le grand passage. Vingt ans plus tôt.</p><p>Sur le sol, un fragment de note : <em>« Greenshoe... 1,5M actions à racheter... cours en chute... »</em> Quelqu'un avait modélisé une stabilisation post-IPO.</p>`,
+    caseFile: {
+      title: 'NOTES DE VELLMORE — IPO HISTORIQUE',
+      lines: [
+        'IPO de 100 millions d\'actions placées à 30 €',
+        'Greenshoe : option de surallocation activée',
+        'Limite légale : 15 % du nominal',
+        'Durée maximale : 6 mois',
+        'Cours qui décroche : nécessité d\'intervenir'
+      ]
+    },
+    puzzle: {
+      question: 'La banque a placé 100 M d\'actions à 30 € lors de l\'IPO. Si la Greenshoe est exercée à son maximum légal, combien d\'actions supplémentaires la banque rachète-t-elle pour stabiliser le cours ?',
+      formula: 'Greenshoe max = 15 % × Nb actions placées',
+      hint: 'Réponse en millions (ex: si 5,2 M actions, taper 5.2)',
+      answer: 15,
+      tolerance: 0.1,
+      successText: 'Bingo. <strong>15 millions d\'actions</strong> — c\'est le maximum légal. La banque a effectivement intervenu lors de l\'IPO de Marcus, mais aucune trace d\'usage criminel ici.',
+      eliminate: { type: 'weapons', id: 'greenshoe' },
+      clue: 'Le Greenshoe a été utilisé légalement pour l\'IPO historique. Ce n\'est pas l\'arme du crime.'
+    }
+  },
+  {
+    id: 'equity-tower', name: 'Tour Equity', subtitle: 'Bureau M&A — Étage 23',
+    icon: '🏛',
+    intro: `<p>La <strong>Tour Equity</strong>. C'est ici que Helena avait orchestré l'augmentation de capital posthume après la disparition de Marcus. Le bureau est vide, sauf une feuille avec des chiffres griffonnés.</p><p>« <em>12 M actions, 120 €, opération blanche. Calculer le TERP. — H.V.</em> »</p>`,
+    caseFile: {
+      title: 'AUGMENTATION DE CAPITAL — DOSSIER HV',
+      lines: [
+        'Cours initial S₀ = 120 €',
+        'Émission de 1,5 M actions nouvelles à 105 € (décote 12,5 %)',
+        '12 M actions existantes',
+        'Parité : 8 DPS pour 1 action nouvelle',
+        'Question : Quel TERP ? (cours théorique ex-droit)'
+      ]
+    },
+    puzzle: {
+      question: 'Calcule le TERP — le cours théorique de l\'action après exercice de tous les DPS.',
+      formula: 'TERP = (N_anc × S₀ + N_new × P_émission) / (N_anc + N_new)\n     = (12 × 120 + 1,5 × 105) / (12 + 1,5)',
+      hint: 'Réponse en € avec 2 décimales (ex: 118.33)',
+      answer: 118.33,
+      tolerance: 0.05,
+      successText: 'Correct. <strong>TERP = 118,33 €</strong>. Et donc le prix théorique du DPS est 120 − 118,33 = 1,67 €. Helena a bien orchestré l\'opération. Pas le lieu du crime — mais Helena reste sous surveillance.',
+      eliminate: { type: 'weapons', id: 'dps' },
+      clue: 'Le DPS truqué est éliminé : l\'opération de Helena est mathématiquement propre.'
+    }
+  },
+  {
+    id: 'options-vault', name: 'Coffre des Options', subtitle: 'Salle blindée — Sous-sol B',
+    icon: '🔒',
+    intro: `<p>Le <strong>Coffre des Options</strong>. La porte blindée est ouverte. À l'intérieur, des écrans figés sur des Greeks. Sur la table, un calepin annoté de Marcus : « <em>Volga anormale. Quelqu'un a manipulé la convexité de la vol. Sebastian ?</em> »</p><p>Le sang sur le sol n'est pas vieux.</p>`,
+    caseFile: {
+      title: 'ALERTE FORENSIQUE — VOLGA',
+      lines: [
+        'Volga = ∂²V / ∂σ² (convexité par rapport à la volatilité)',
+        'Black-Scholes hypothèse : vol constante',
+        'Marcus avait détecté une dérive non expliquée',
+        'Manipulation de la valeur des options exotiques',
+        'Lieu probable du crime'
+      ]
+    },
+    puzzle: {
+      question: 'Pour un call européen avec sous-jacent S = 100, strike K = 100, taux r = 2 %, σ = 20 %, T = 1 an : quel est l\'ordre de grandeur du Vega ATM ? (rappel : pour S = K, le Vega ATM ≈ S × √(T/(2π)) × e^(−d₁²/2). Avec ces paramètres, simplifie : Vega ≈ S × √T / √(2π))',
+      formula: 'Vega ATM ≈ S × √T / √(2π)\n         ≈ 100 × 1 / √6,28\n         ≈ 100 × 1 / 2,5066',
+      hint: 'Réponse arrondie à l\'unité (ex : si tu trouves 39,89, tape 40)',
+      answer: 40,
+      tolerance: 1.5,
+      successText: 'Précis. <strong>Vega ≈ 40</strong>. Mais Marcus avait trouvé un Vega anormalement décalé — par 10 points. La <em>Volga explosive</em> a manipulé les prix des options. Le coffre est bien le lieu du crime.',
+      eliminate: null,
+      clue: 'Le Coffre des Options est confirmé comme lieu probable du crime. Marcus y avait détecté la manipulation. Quelqu\'un l\'y a surpris.',
+      special: 'crime-scene'
+    }
+  },
+  {
+    id: 'bond-crypt', name: 'Crypte des Obligations', subtitle: 'Archives Bond Desk',
+    icon: '📜',
+    intro: `<p>La <strong>Crypte des Obligations</strong>. Au sous-sol. Atmosphère poussiéreuse, archives jaunies. Les bonds historiques de Vellmore Industries depuis 30 ans dorment ici.</p><p>Une chemise est sur la table — elle a été consultée récemment. À l'intérieur, une note manuscrite : « <em>F(3,2) = ? Calcul Marcus. R₃ = 4 %, R₅ = 6 %.</em> »</p>`,
+    caseFile: {
+      title: 'COURBE DES TAUX — VELLMORE 2026',
+      lines: [
+        'R₃ = 4,0 % (taux spot 3 ans)',
+        'R₅ = 6,0 % (taux spot 5 ans)',
+        'Calcul du forward F(3,2) : dans 3 ans, j\'emprunte pour 2 ans',
+        'Formule : (1+R_(x+y))^(x+y) = (1+R_x)^x × (1+F(x,y))^y',
+        '⚠ ATTENTION : F(3,2) ≠ F(2,3)'
+      ]
+    },
+    puzzle: {
+      question: 'Calcule F(3,2) — le taux forward dans 3 ans pour une durée de 2 ans, avec R₃ = 4 % et R₅ = 6 %.',
+      formula: 'F(3,2) = [(1 + R_5)^5 / (1 + R_3)^3]^(1/2) − 1\n       = [(1,06)^5 / (1,04)^3]^(1/2) − 1\n       = [1,3382 / 1,1249]^(1/2) − 1\n       = (1,1896)^(1/2) − 1',
+      hint: 'Réponse en % avec 2 décimales (ex: 5.45)',
+      answer: 9.07,
+      tolerance: 0.1,
+      successText: 'Excellent. <strong>F(3,2) ≈ 9,07 %</strong>. Marcus avait fait ce calcul juste avant sa mort. Mais la Crypte n\'est pas le lieu du crime — il y est juste passé pour vérifier ce taux.',
+      eliminate: { type: 'weapons', id: 'cds' },
+      clue: 'Marcus avait calculé F(3,2) ≈ 9,07 % juste avant le crime. Le CDS toxique est éliminé.'
+    }
+  },
+  {
+    id: 'credit-lab', name: 'Laboratoire de Crédit', subtitle: 'Risk Department — Étage 18',
+    icon: '⚗',
+    intro: `<p>Le <strong>Laboratoire de Crédit</strong>. Modèles de défaut, courbes de risque, matrices de transition. C'est ici qu'Aaron Brentwood passe ses nuits à auditer.</p><p>Sur l'écran, une obligation à 3 ans. PD risque-neutre 1,5 %/an. Recovery 40 %. Taux sans risque 2,5 %.</p><p>« <em>Calculer l'Expected Loss actualisée — Marcus avait souligné cette ligne. M.</em> »</p>`,
+    caseFile: {
+      title: 'CALCUL CVA — DOSSIER M.V.',
+      lines: [
+        'EAD (Exposure at Default) = 100 € (nominal pour simplifier)',
+        'PD = 1,5 % par an (constante)',
+        'LGD = 1 − Recovery = 1 − 0,40 = 0,60',
+        'Taux sans risque r_f = 2,5 %',
+        'Maturité 3 ans, calcul EL actualisée',
+        'Formule : EL = Σ_t (PD × LGD × EAD) / (1+r_f)^t'
+      ]
+    },
+    puzzle: {
+      question: 'Calcule l\'Expected Loss actualisée sur 3 ans. PD = 1,5 %/an, LGD = 60 %, EAD = 100, r_f = 2,5 %.',
+      formula: 'EL_t = PD × LGD × EAD = 0,015 × 0,60 × 100 = 0,9\n\nEL = 0,9/1,025 + 0,9/1,025² + 0,9/1,025³\n   = 0,8780 + 0,8566 + 0,8357',
+      hint: 'Somme des 3 termes, arrondie à 2 décimales (ex: 2.57)',
+      answer: 2.57,
+      tolerance: 0.05,
+      successText: 'Parfait. <strong>EL ≈ 2,57 €</strong>. Donc CVA = 2,57 €. Marcus avait pricé le risque correctement. Le laboratoire est juste un lieu de passage.',
+      eliminate: { type: 'locations', id: 'credit-lab' },
+      clue: 'Le Laboratoire de Crédit n\'est pas le lieu du crime. Marcus y avait pricé le CVA = 2,57 € — preuve qu\'il était lucide jusqu\'à la fin.'
+    }
+  },
+  {
+    id: 'spv-warehouse', name: 'Entrepôt des SPV', subtitle: 'Structured Finance — Bâtiment annexe',
+    icon: '🏗',
+    intro: `<p>L'<strong>Entrepôt des SPV</strong>. Don Keizer y avait monté ses titrisations. Senior, Mezzanine, Junior, Equity. Une cascade ordonnée.</p><p>Sur le mur : un schéma de tranching. Pool de prêts $1500 M découpé en quatre tranches. À côté, les SLB ESG. Et un calepin : « <em>Calculer la première perte — c'est ce qui me sauvera.</em> »</p>`,
+    caseFile: {
+      title: 'STRUCTURE TRANCHÉE — CDO 2025-X',
+      lines: [
+        'Pool total : 1 500 M$',
+        'Tranche Senior AAA : 1 200 M$ (Libor + 25 bps)',
+        'Tranche Mezzanine AA : 225 M$ (Libor + 85 bps)',
+        'Tranche Junior BBB : 45 M$ (Libor + 350 bps)',
+        'Tranche Equity (unrated) : 30 M$',
+        'Waterfall : Senior payé en premier, Equity en dernier'
+      ]
+    },
+    puzzle: {
+      question: 'Si le pool subit 5 % de pertes (= 75 M$), quelle tranche est intégralement détruite et combien reste-t-il dans la tranche Junior ? (réponse : montant restant en Junior, en M$)',
+      formula: 'Pertes : 75 M$\nEquity (30 M$) : intégralement détruite (absorbe les 30 premiers M$)\nReste : 75 − 30 = 45 M$ à absorber par Junior\nJunior (45 M$) : reçoit 45 M$ de pertes\nReste dans Junior : 45 − 45 = ?',
+      hint: 'Réponse en millions $ (ex : si 12, taper 12)',
+      answer: 0,
+      tolerance: 0.5,
+      successText: 'Exact. <strong>Junior = 0 M$</strong>. La cascade waterfall a tout détruit jusqu\'au Junior inclus. Mezzanine et Senior sont intacts. Don Keizer est innocent ici — c\'est de la structure pure, pas un meurtre.',
+      eliminate: { type: 'suspects', id: 'aaron' },
+      clue: 'Don avait correctement structuré le tranching. Aaron Brentwood, qui a audité, n\'est pas le tueur — il a confirmé l\'innocence de la structure.'
+    }
+  }
+];
+
+const WEAPONS = [
+  { id: 'greenshoe', name: 'Greenshoe empoisonné', subtitle: 'Manipulation de stabilisation', icon: '🩸' },
+  { id: 'dps', name: 'DPS truqué', subtitle: 'Dilution piégée', icon: '✂' },
+  { id: 'volga', name: 'Volga explosive', subtitle: 'Option exotique', icon: '💥' },
+  { id: 'callable', name: 'Callable étranglée', subtitle: 'Rappel anticipé toxique', icon: '🪢' },
+  { id: 'cds', name: 'CDS toxique', subtitle: 'Swap de défaut', icon: '☠' },
+  { id: 'tranche', name: 'Tranche junior piégée', subtitle: 'Waterfall corrompu', icon: '🌊' }
+];
+
+// ====== STATE ======
+
+const STATE_KEY = 'cluedo_vellmore_v1';
+
+let state = loadState();
+
+function defaultState() {
+  return {
+    visited: { locations: [], suspects: [] },
+    eliminated: { suspects: [], locations: [], weapons: [] },
+    cluesFound: [],
+    accusedSuspect: null,
+    accusedLocation: null,
+    accusedWeapon: null,
+    puzzleResults: {}, // location.id -> bool
+    qcmResults: {}, // suspect.id -> [bool, bool]
+    crimeSceneRevealed: false
+  };
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STATE_KEY);
+    if (s) return { ...defaultState(), ...JSON.parse(s) };
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function resetGame() {
+  state = defaultState();
+  saveState();
+  showScreen('intro');
+}
+
+// ====== NAV ======
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startGame() {
+  showScreen('hub');
+  renderHub();
+}
+
+function showHub() { showScreen('hub'); renderHub(); }
+
+// ====== RENDER HUB ======
+
+function renderHub() {
+  const locGrid = document.getElementById('locationsGrid');
+  locGrid.innerHTML = '';
+  LOCATIONS.forEach(loc => {
+    const isVisited = state.visited.locations.includes(loc.id);
+    const isElim = state.eliminated.locations.includes(loc.id);
+    const card = document.createElement('button');
+    card.className = 'card' + (isVisited ? ' visited' : '') + (isElim ? ' eliminated' : '');
+    card.innerHTML = `
+      <span class="card-icon">${loc.icon}</span>
+      <span class="card-title">${loc.name}</span>
+      <span class="card-subtitle">${loc.subtitle}</span>
+    `;
+    card.onclick = () => showLocation(loc.id);
+    locGrid.appendChild(card);
+  });
+
+  const susGrid = document.getElementById('suspectsGrid');
+  susGrid.innerHTML = '';
+  SUSPECTS.forEach(sus => {
+    const isVisited = state.visited.suspects.includes(sus.id);
+    const isElim = state.eliminated.suspects.includes(sus.id);
+    const card = document.createElement('button');
+    card.className = 'card' + (isVisited ? ' visited' : '') + (isElim ? ' eliminated' : '');
+    card.innerHTML = `
+      <span class="card-icon">${sus.icon}</span>
+      <span class="card-title">${sus.name}</span>
+      <span class="card-subtitle">${sus.role}</span>
+    `;
+    card.onclick = () => showSuspect(sus.id);
+    susGrid.appendChild(card);
+  });
+
+  const weapGrid = document.getElementById('weaponsGrid');
+  weapGrid.innerHTML = '';
+  WEAPONS.forEach(w => {
+    const isElim = state.eliminated.weapons.includes(w.id);
+    const card = document.createElement('div');
+    card.className = 'card' + (isElim ? ' eliminated' : '');
+    card.style.cursor = 'default';
+    card.innerHTML = `
+      <span class="card-icon">${w.icon}</span>
+      <span class="card-title">${w.name}</span>
+      <span class="card-subtitle">${w.subtitle}</span>
+    `;
+    weapGrid.appendChild(card);
+  });
+
+  // Status
+  const totalElims = state.eliminated.suspects.length + state.eliminated.locations.length + state.eliminated.weapons.length;
+  const totalClues = state.cluesFound.length;
+  document.getElementById('statusText').innerHTML =
+    totalClues === 0
+      ? 'Aucun indice. Visite les lieux et interroge les suspects pour réduire la liste.'
+      : `<strong>${totalClues}</strong> indice${totalClues > 1 ? 's' : ''} recueilli${totalClues > 1 ? 's' : ''} — <strong>${totalElims}</strong> élimination${totalElims > 1 ? 's' : ''} confirmée${totalElims > 1 ? 's' : ''}.`;
+
+  document.getElementById('fabClueCount').textContent = totalClues > 0 ? `${totalClues} 📔` : 'CARNET';
+}
+
+// ====== LOCATION ======
+
+function showLocation(id) {
+  const loc = LOCATIONS.find(l => l.id === id);
+  if (!loc) return;
+  if (!state.visited.locations.includes(id)) {
+    state.visited.locations.push(id);
+    saveState();
+  }
+
+  const c = document.getElementById('locationContent');
+  const puzzleSolved = state.puzzleResults[id];
+
+  c.innerHTML = `
+    <div class="scene-header">
+      <div class="scene-mark">— ${loc.subtitle.toUpperCase()} —</div>
+      <h2 class="scene-title">${loc.name}</h2>
+    </div>
+    <div class="scene-body">${loc.intro}</div>
+    <div class="case-file">
+      <h4>${loc.caseFile.title}</h4>
+      ${loc.caseFile.lines.map(l => `<p>▸ ${l}</p>`).join('')}
+    </div>
+    <div class="puzzle-box">
+      <div class="puzzle-question">${loc.puzzle.question}</div>
+      <div class="puzzle-formula">${loc.puzzle.formula}</div>
+      <div class="puzzle-input-group">
+        <input type="text" inputmode="decimal" class="puzzle-input" id="puzzleInput" placeholder="Ta réponse" ${puzzleSolved ? 'disabled' : ''}>
+        <button class="puzzle-submit" id="puzzleSubmit" ${puzzleSolved ? 'disabled' : ''}>VALIDER</button>
+      </div>
+      <div class="puzzle-hint">${loc.puzzle.hint}</div>
+      <div class="puzzle-result ${puzzleSolved ? 'show success' : ''}" id="puzzleResult">
+        ${puzzleSolved ? loc.puzzle.successText : ''}
+      </div>
+      ${puzzleSolved ? `<div class="clue-reveal show"><div class="clue-reveal-text">${loc.puzzle.clue}</div></div>` : ''}
+    </div>
+  `;
+
+  showScreen('locationScreen');
+
+  if (!puzzleSolved) {
+    setTimeout(() => {
+      document.getElementById('puzzleSubmit').onclick = () => validatePuzzle(loc);
+      document.getElementById('puzzleInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') validatePuzzle(loc);
+      });
+    }, 50);
+  }
+}
+
+function validatePuzzle(loc) {
+  const input = document.getElementById('puzzleInput');
+  const result = document.getElementById('puzzleResult');
+  const raw = input.value.trim().replace(',', '.');
+  const val = parseFloat(raw);
+
+  if (isNaN(val)) {
+    result.className = 'puzzle-result show error';
+    result.innerHTML = '<strong>Réponse invalide.</strong> Entre un nombre.';
+    return;
+  }
+
+  const ok = Math.abs(val - loc.puzzle.answer) <= loc.puzzle.tolerance;
+
+  if (ok) {
+    state.puzzleResults[loc.id] = true;
+    if (loc.puzzle.eliminate) {
+      const arr = state.eliminated[loc.puzzle.eliminate.type];
+      if (!arr.includes(loc.puzzle.eliminate.id)) arr.push(loc.puzzle.eliminate.id);
+    }
+    if (loc.puzzle.special === 'crime-scene') {
+      state.crimeSceneRevealed = true;
+    }
+    if (!state.cluesFound.includes(loc.puzzle.clue)) {
+      state.cluesFound.push(loc.puzzle.clue);
+    }
+    saveState();
+
+    result.className = 'puzzle-result show success';
+    result.innerHTML = loc.puzzle.successText;
+    input.disabled = true;
+    document.getElementById('puzzleSubmit').disabled = true;
+
+    setTimeout(() => {
+      const reveal = document.createElement('div');
+      reveal.className = 'clue-reveal show';
+      reveal.innerHTML = `<div class="clue-reveal-text">${loc.puzzle.clue}</div>`;
+      result.parentElement.appendChild(reveal);
+    }, 600);
+  } else {
+    result.className = 'puzzle-result show error';
+    result.innerHTML = `<strong>Pas tout à fait.</strong> Reprends le calcul. ${loc.puzzle.hint}`;
+  }
+}
+
+// ====== SUSPECT ======
+
+function showSuspect(id) {
+  const sus = SUSPECTS.find(s => s.id === id);
+  if (!sus) return;
+  if (!state.visited.suspects.includes(id)) {
+    state.visited.suspects.push(id);
+    saveState();
+  }
+
+  const qcmDone = state.qcmResults[id] || [];
+  const c = document.getElementById('suspectContent');
+
+  c.innerHTML = `
+    <div class="scene-header">
+      <div class="scene-mark">— SUSPECT INTERROGÉ —</div>
+    </div>
+    <div style="padding: 30px 0">
+      <div class="suspect-portrait">${sus.initial}</div>
+      <div class="suspect-name">${sus.name}</div>
+      <div class="suspect-role">${sus.role}</div>
+    </div>
+    <div class="scene-body">
+      <p>${sus.intro}</p>
+      <div class="dialogue">
+        <span class="dialogue-speaker">— ${sus.name}</span>
+        ${sus.dialogue}
+      </div>
+    </div>
+    ${sus.questions.map((q, i) => renderQCM(sus, q, i, qcmDone[i])).join('')}
+  `;
+
+  showScreen('suspectScreen');
+
+  setTimeout(() => {
+    sus.questions.forEach((q, i) => {
+      if (qcmDone[i] !== undefined) return; // déjà répondu
+      q.opts.forEach((opt, optIdx) => {
+        const btn = document.getElementById(`qcm-${sus.id}-${i}-${optIdx}`);
+        if (btn) btn.onclick = () => answerQCM(sus, i, optIdx);
+      });
+    });
+  }, 50);
+}
+
+function renderQCM(sus, q, qIdx, alreadyDone) {
+  const showFeedback = alreadyDone !== undefined;
+  return `
+    <div class="qcm-question">
+      <div class="qcm-prompt">${q.q}</div>
+      <div class="qcm-options">
+        ${q.opts.map((opt, optIdx) => {
+          let cls = 'qcm-option';
+          if (showFeedback) {
+            if (optIdx === q.a) cls += ' correct';
+            else cls += ' dim';
+          }
+          return `
+            <button class="${cls}" id="qcm-${sus.id}-${qIdx}-${optIdx}" ${showFeedback ? 'disabled' : ''}>
+              <span class="qcm-option-letter">${String.fromCharCode(65+optIdx)}</span>
+              <span>${opt}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      ${showFeedback ? `
+        <div class="qcm-feedback show ${alreadyDone ? 'success' : 'error'}">
+          <strong>${alreadyDone ? 'Bonne réponse !' : 'Mauvaise réponse.'}</strong> ${q.explanation}
+          ${alreadyDone ? `<br><br><em>★ ${q.clueOnSuccess}</em>` : ''}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function answerQCM(sus, qIdx, optIdx) {
+  const q = sus.questions[qIdx];
+  const correct = optIdx === q.a;
+
+  if (!state.qcmResults[sus.id]) state.qcmResults[sus.id] = [];
+  state.qcmResults[sus.id][qIdx] = correct;
+
+  if (correct) {
+    if (q.eliminate) {
+      const arr = state.eliminated[q.eliminate.type];
+      if (!arr.includes(q.eliminate.id)) arr.push(q.eliminate.id);
+    }
+    if (q.clueOnSuccess && !state.cluesFound.includes(q.clueOnSuccess)) {
+      state.cluesFound.push(q.clueOnSuccess);
+    }
+  }
+  saveState();
+
+  // Re-render this question
+  const btns = document.querySelectorAll(`[id^="qcm-${sus.id}-${qIdx}-"]`);
+  btns.forEach(btn => {
+    btn.disabled = true;
+    const btnIdx = parseInt(btn.id.split('-').pop());
+    if (btnIdx === q.a) btn.classList.add('correct');
+    else if (btnIdx === optIdx && !correct) btn.classList.add('wrong');
+    else btn.classList.add('dim');
+  });
+
+  const parent = btns[0].parentElement.parentElement;
+  const fb = document.createElement('div');
+  fb.className = `qcm-feedback show ${correct ? 'success' : 'error'}`;
+  fb.innerHTML = `
+    <strong>${correct ? 'Bonne réponse !' : 'Mauvaise réponse.'}</strong> ${q.explanation}
+    ${correct ? `<br><br><em>★ ${q.clueOnSuccess}</em>` : ''}
+  `;
+  parent.appendChild(fb);
+}
+
+// ====== NOTEBOOK ======
+
+function showNotebook() {
+  const renderNb = (items, type) => items.map(it => {
+    const isElim = state.eliminated[type].includes(it.id);
+    return `
+      <div class="nb-item ${isElim ? 'eliminated' : ''}">
+        <div class="nb-item-name">${it.name || it.title}</div>
+        <div class="nb-item-detail">${it.role || it.subtitle || ''}</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('nbSuspects').innerHTML = renderNb(SUSPECTS, 'suspects');
+  document.getElementById('nbLocations').innerHTML = renderNb(LOCATIONS, 'locations');
+  document.getElementById('nbWeapons').innerHTML = renderNb(WEAPONS, 'weapons');
+
+  const cluesEl = document.getElementById('nbClues');
+  if (state.cluesFound.length === 0) {
+    cluesEl.innerHTML = '<div style="font-style:italic;color:var(--gold-aged);text-align:center;padding:20px">Aucun indice pour l\'instant. Résous les énigmes.</div>';
+  } else {
+    cluesEl.innerHTML = state.cluesFound.map(c => `<div class="nb-clue">${c}</div>`).join('');
+  }
+
+  showScreen('notebookScreen');
+}
+
+// ====== ACCUSATION ======
+
+function showAccusation() {
+  const renderOpts = (items, type, container) => {
+    container.innerHTML = '';
+    items.forEach(it => {
+      const isElim = state.eliminated[type].includes(it.id);
+      const acc = state[`accused${type === 'suspects' ? 'Suspect' : type === 'locations' ? 'Location' : 'Weapon'}`];
+      const isSelected = acc === it.id;
+      const btn = document.createElement('button');
+      btn.className = 'acc-option' + (isElim ? ' eliminated' : '') + (isSelected ? ' selected' : '');
+      btn.innerHTML = `
+        <div class="acc-option-name">${it.name}</div>
+        <div class="acc-option-role">${it.role || it.subtitle}</div>
+      `;
+      if (!isElim) {
+        btn.onclick = () => {
+          if (type === 'suspects') state.accusedSuspect = it.id;
+          if (type === 'locations') state.accusedLocation = it.id;
+          if (type === 'weapons') state.accusedWeapon = it.id;
+          saveState();
+          showAccusation();
+        };
+      }
+      container.appendChild(btn);
+    });
+  };
+
+  renderOpts(SUSPECTS, 'suspects', document.getElementById('accSuspects'));
+  renderOpts(LOCATIONS, 'locations', document.getElementById('accLocations'));
+  renderOpts(WEAPONS, 'weapons', document.getElementById('accWeapons'));
+
+  const allSelected = state.accusedSuspect && state.accusedLocation && state.accusedWeapon;
+  document.getElementById('finalAccuseBtn').disabled = !allSelected;
+
+  showScreen('accusationScreen');
+}
+
+// ====== FINAL ======
+
+function finalAccusation() {
+  const correct =
+    state.accusedSuspect === SOLUTION.suspect &&
+    state.accusedLocation === SOLUTION.location &&
+    state.accusedWeapon === SOLUTION.weapon;
+
+  const screen = document.getElementById('endingScreen');
+  screen.className = 'ending-screen active ' + (correct ? 'victory' : 'defeat');
+
+  const sus = SUSPECTS.find(s => s.id === SOLUTION.suspect);
+  const loc = LOCATIONS.find(l => l.id === SOLUTION.location);
+  const weap = WEAPONS.find(w => w.id === SOLUTION.weapon);
+
+  if (correct) {
+    document.getElementById('endingStamp').textContent = '— LE JURY REND SON VERDICT —';
+    document.getElementById('endingTitle').innerHTML = 'COUPABLE.<br>Sebastian Vex.';
+    document.getElementById('endingText').innerHTML = `
+      <strong style="color:var(--paper)">Sebastian Vex, CFO de Vellmore Industries, a tué Marcus dans le Coffre des Options avec la Volga explosive.</strong>
+      <br><br>
+      Marcus avait découvert que Sebastian manipulait la convexité de la volatilité implicite (Volga) pour gonfler la valeur d'options exotiques au bilan. Lorsqu'il l'a confronté dans le Coffre, Sebastian l'a tué pour faire taire la preuve.
+      <br><br>
+      Don Keizer est libéré. Helena reprend Vellmore Industries en main. Et le procès historique est gagné.
+      <br><br>
+      <em style="color:var(--gold)">Tu as bouclé tout le cours, inspecteur.</em>
+    `;
+  } else {
+    document.getElementById('endingStamp').textContent = '— LE TUEUR S\'ÉCHAPPE —';
+    document.getElementById('endingTitle').innerHTML = 'ACCUSATION<br>ERRONÉE.';
+    let explanation = '';
+    if (state.accusedSuspect !== SOLUTION.suspect) {
+      explanation += `Le tueur n'était pas <strong>${SUSPECTS.find(s=>s.id===state.accusedSuspect).name}</strong>. C'était <strong style="color:var(--gold)">${sus.name}</strong>. `;
+    }
+    if (state.accusedLocation !== SOLUTION.location) {
+      explanation += `Le crime n'a pas eu lieu dans le <strong>${LOCATIONS.find(l=>l.id===state.accusedLocation).name}</strong>. C'était dans <strong style="color:var(--gold)">${loc.name}</strong>. `;
+    }
+    if (state.accusedWeapon !== SOLUTION.weapon) {
+      explanation += `L'arme n'était pas <strong>${WEAPONS.find(w=>w.id===state.accusedWeapon).name}</strong>. C'était <strong style="color:var(--gold)">${weap.name}</strong>.`;
+    }
+    document.getElementById('endingText').innerHTML = `
+      ${explanation}
+      <br><br>
+      <em>Marcus restera sans justice. Reviens en arrière, recueille plus d'indices, et accuse mieux.</em>
+    `;
+  }
+}
+
+// ====== INIT ======
+
+if (state.visited.locations.length > 0 || state.visited.suspects.length > 0) {
+  showScreen('hub');
+  renderHub();
+} else {
+  showScreen('intro');
+}
+</script>
+
+</body>
+</html>
