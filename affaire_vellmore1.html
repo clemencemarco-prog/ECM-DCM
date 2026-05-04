@@ -1,0 +1,3049 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Affaire Vellmore — Un polar financier</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0907;
+    --ink: #1a1815;
+    --paper: #ebe4d4;
+    --paper-aged: #d8cfb8;
+    --paper-stain: #c9bd9c;
+    --blood: #6b1818;
+    --blood-bright: #8b1f1f;
+    --gold: #a07825;
+    --gold-aged: #7a5a18;
+    --typewriter: #2a2520;
+    --shadow: rgba(0,0,0,0.4);
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* Texture papier vieilli + taches de café */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image:
+      radial-gradient(ellipse 600px 400px at 15% 10%, rgba(107, 24, 24, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse 400px 300px at 85% 70%, rgba(107, 24, 24, 0.03) 0%, transparent 50%),
+      radial-gradient(circle 100px at 70% 30%, rgba(107, 24, 24, 0.06) 0%, transparent 70%),
+      repeating-linear-gradient(0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,0,0,0.005) 2px,
+        rgba(0,0,0,0.005) 3px);
+  }
+
+  /* Vignettage */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: inset 0 0 120px rgba(0,0,0,0.25);
+  }
+
+  /* Barre de progression rouge sang */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(0,0,0,0.1);
+    z-index: 100;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--blood);
+    width: 0%;
+    transition: width 0.1s;
+    box-shadow: 0 0 8px var(--blood);
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 28px;
+    position: relative;
+    z-index: 3;
+  }
+
+  /* ==================== COVER NOIRE ==================== */
+  .cover {
+    min-height: 100vh;
+    background: var(--black);
+    color: var(--paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(107, 24, 24, 0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, rgba(160, 120, 37, 0.1) 0%, transparent 50%);
+  }
+
+  .cover-content {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+  }
+
+  .cover-warning {
+    font-family: 'Special Elite', monospace;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--blood-bright);
+    margin-bottom: 50px;
+    border: 1px solid var(--blood);
+    padding: 8px 16px;
+    display: inline-block;
+  }
+
+  .cover-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(3rem, 11vw, 6.5rem);
+    font-weight: 900;
+    line-height: 0.9;
+    color: var(--paper);
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+
+  .cover-title em {
+    font-style: italic;
+    color: var(--blood-bright);
+    display: block;
+    text-shadow: 0 0 30px rgba(139, 31, 31, 0.5);
+  }
+
+  .cover-subtitle {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--paper-aged);
+    margin: 30px 0;
+    line-height: 1.6;
+  }
+
+  .cover-credits {
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-top: 60px;
+  }
+
+  .cover-blood-drop {
+    width: 4px;
+    height: 30px;
+    background: linear-gradient(180deg, var(--blood-bright) 0%, transparent 100%);
+    margin: 30px auto 0;
+    border-radius: 0 0 50% 50%;
+  }
+
+  .scroll-hint {
+    margin-top: 50px;
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    animation: flicker 3s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.9; }
+  }
+
+  /* ==================== CHAPITRES ==================== */
+  .chapter {
+    padding: 100px 0 80px;
+    position: relative;
+  }
+
+  .chapter-stamp {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .stamp-mark {
+    display: inline-block;
+    border: 2px solid var(--blood);
+    color: var(--blood);
+    padding: 6px 18px;
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    transform: rotate(-2deg);
+    background: rgba(139, 31, 31, 0.04);
+  }
+
+  .chapter-number {
+    font-family: 'Crimson Pro', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--paper-stain);
+    line-height: 1;
+    text-align: center;
+    font-style: italic;
+    margin: 20px 0;
+  }
+
+  .chapter-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(2rem, 5.5vw, 3.4rem);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .chapter-title em {
+    font-style: italic;
+    color: var(--blood);
+  }
+
+  .chapter-tagline {
+    text-align: center;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.85rem;
+    color: var(--gold-aged);
+    margin-bottom: 50px;
+    letter-spacing: 0.05em;
+    padding: 0 20px;
+  }
+
+  /* Texte principal */
+  .narrative {
+    font-size: 1.18rem;
+    color: var(--ink);
+    line-height: 1.85;
+  }
+
+  .narrative p {
+    margin-bottom: 1.5em;
+  }
+
+  .narrative p:first-of-type::first-letter {
+    font-family: 'Crimson Pro', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    float: left;
+    line-height: 0.85;
+    margin: 8px 14px 0 0;
+    color: var(--blood);
+    font-style: italic;
+  }
+
+  .term-en {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.78em;
+    color: var(--gold-aged);
+    padding: 1px 6px;
+    background: rgba(160, 120, 37, 0.1);
+    border-bottom: 1px solid var(--gold-aged);
+    margin: 0 2px;
+    white-space: nowrap;
+  }
+
+  /* Dialogue */
+  .dialogue {
+    margin: 35px 0;
+    padding: 0 20px 0 28px;
+    border-left: 3px solid var(--blood);
+    font-style: italic;
+    color: var(--typewriter);
+    font-size: 1.1rem;
+  }
+
+  .dialogue-speaker {
+    display: block;
+    font-family: 'Special Elite', monospace;
+    font-style: normal;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--blood);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* Note d'enquête / dossier */
+  .case-file {
+    margin: 40px 0;
+    padding: 24px 28px;
+    background: var(--paper-aged);
+    border: 1px dashed var(--gold-aged);
+    position: relative;
+    transform: rotate(-0.4deg);
+    box-shadow: 2px 4px 12px var(--shadow);
+  }
+
+  .case-file::before {
+    content: 'PIÈCE À CONVICTION';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--paper);
+    padding: 2px 10px;
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--blood);
+    border: 1px solid var(--blood);
+  }
+
+  .case-file h4 {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .case-file p {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.85rem;
+    color: var(--typewriter);
+    line-height: 1.65;
+    margin-bottom: 8px;
+  }
+
+  /* Encart formule */
+  .formula-box {
+    margin: 35px 0;
+    padding: 24px;
+    background: var(--black);
+    color: var(--paper);
+    border: 1px solid var(--blood);
+    text-align: center;
+    box-shadow: 0 6px 20px var(--shadow);
+    position: relative;
+  }
+
+  .formula-box::before {
+    content: '⌗ ÉLÉMENT TECHNIQUE ⌗';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--black);
+    padding: 0 14px;
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--blood-bright);
+  }
+
+  .formula-box .label {
+    color: var(--gold);
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    margin: 8px 0 14px;
+    text-transform: uppercase;
+  }
+
+  .formula-box .formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--paper);
+  }
+
+  /* Citation criminelle */
+  .pullquote {
+    margin: 50px -10px;
+    padding: 30px 35px;
+    background: rgba(107, 24, 24, 0.06);
+    border-top: 2px solid var(--blood);
+    border-bottom: 2px solid var(--blood);
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.55rem;
+    line-height: 1.4;
+    color: var(--blood);
+    text-align: center;
+  }
+
+  .pullquote-attribution {
+    display: block;
+    font-style: normal;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.6em;
+    color: var(--gold-aged);
+    margin-top: 16px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* Suspects */
+  .suspect {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    padding: 20px;
+    margin: 25px 0;
+    background: rgba(0,0,0,0.04);
+    border-left: 4px solid var(--blood);
+    position: relative;
+  }
+
+  .suspect-photo {
+    width: 70px;
+    height: 90px;
+    background: var(--paper-aged);
+    border: 1px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'Crimson Pro', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--ink);
+    font-style: italic;
+    box-shadow: 2px 2px 6px var(--shadow);
+  }
+
+  .suspect-info {
+    flex: 1;
+  }
+
+  .suspect-name {
+    font-family: 'Special Elite', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--blood);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .suspect-role {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .suspect-quote {
+    font-style: italic;
+    color: var(--typewriter);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Interlude */
+  .interlude {
+    text-align: center;
+    padding: 90px 28px;
+    background: var(--black);
+    color: var(--paper);
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .interlude::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, rgba(139, 31, 31, 0.15) 0%, transparent 70%);
+  }
+
+  .interlude-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .interlude-stamp {
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--blood-bright);
+    margin-bottom: 24px;
+  }
+
+  .interlude-title {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--paper);
+  }
+
+  .interlude-text {
+    font-family: 'Special Elite', monospace;
+    opacity: 0.75;
+    max-width: 480px;
+    margin: 0 auto;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--paper-aged);
+  }
+
+  /* Calcul détaillé */
+  .calc-block {
+    margin: 30px 0;
+    padding: 20px 24px;
+    background: var(--paper-aged);
+    border: 1px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    line-height: 1.85;
+    box-shadow: 2px 3px 8px var(--shadow);
+  }
+
+  .calc-block .calc-label {
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--blood);
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 6px;
+  }
+
+  .calc-block .calc-step {
+    margin-bottom: 6px;
+  }
+
+  .calc-block .calc-result {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--blood);
+    color: var(--blood);
+    font-weight: 700;
+  }
+
+  /* Section title */
+  .scene-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.7rem;
+    font-style: italic;
+    font-weight: 700;
+    margin: 50px 0 24px;
+    color: var(--blood);
+    border-bottom: 1px solid var(--blood);
+    padding-bottom: 8px;
+  }
+
+  .scene-title::before {
+    content: '✕ ';
+    color: var(--gold);
+  }
+
+  /* Final */
+  .ending {
+    padding: 100px 28px 60px;
+    text-align: center;
+    background: var(--black);
+    color: var(--paper);
+  }
+
+  .ending h2 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 2.8rem;
+    font-style: italic;
+    color: var(--blood-bright);
+    margin-bottom: 30px;
+    line-height: 1.2;
+  }
+
+  .ending p {
+    max-width: 480px;
+    margin: 0 auto 18px;
+    font-style: italic;
+    color: var(--paper-aged);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .ending-mark {
+    color: var(--blood);
+    margin: 30px 0;
+    letter-spacing: 0.6em;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .narrative { font-size: 1.05rem; }
+    .narrative p:first-of-type::first-letter { font-size: 3.8rem; }
+    .pullquote { font-size: 1.2rem; padding: 24px 20px; margin: 40px 0; }
+    .calc-block { font-size: 0.78rem; padding: 16px 18px; }
+    .formula-box .formula { font-size: 0.85rem; }
+    .case-file { padding: 20px; }
+    .suspect { flex-direction: column; gap: 12px; }
+    .suspect-photo { width: 60px; height: 75px; }
+  }
+
+  /* Animation au scroll */
+  .fade-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.9s, transform 0.9s;
+  }
+  .fade-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ==================== GLOSSAIRE INTERACTIF ==================== */
+
+  /* Reset button -> texte inline */
+  button.keyword {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+    line-height: inherit;
+    display: inline;
+  }
+
+  /* Indice cliquable sur les keywords */
+  .keyword {
+    font-weight: 700;
+    color: var(--blood);
+    border-bottom: 1.5px solid var(--blood);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    padding: 1px 4px 1px 4px;
+    background: rgba(107, 24, 24, 0.04);
+    border-radius: 2px;
+  }
+
+  .keyword:hover, .keyword:active {
+    background: rgba(107, 24, 24, 0.18);
+    color: var(--blood-bright);
+  }
+
+  .keyword::after {
+    content: ' ⓘ';
+    font-size: 0.85em;
+    color: var(--blood);
+    margin-left: 1px;
+    opacity: 0.85;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .keyword:hover::after, .keyword:active::after {
+    opacity: 1;
+    transform: scale(1.15);
+    display: inline-block;
+  }
+
+  .keyword.studied {
+    color: var(--gold-aged);
+    border-bottom-color: var(--gold-aged);
+    background: rgba(160, 120, 37, 0.08);
+  }
+
+  .keyword.studied::after {
+    content: ' ✓';
+    color: var(--gold);
+  }
+
+  /* Bouton flottant du glossaire */
+  .glossary-toggle {
+    position: fixed;
+    bottom: 28px;
+    right: 20px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: var(--blood);
+    border: 3px solid var(--paper);
+    color: var(--paper);
+    font-family: 'Special Elite', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    z-index: 90;
+    box-shadow: 0 6px 24px rgba(107, 24, 24, 0.6), 0 0 0 0 rgba(107, 24, 24, 0.4);
+    transition: transform 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    line-height: 1;
+    animation: pulseRing 2.5s infinite;
+  }
+
+  @keyframes pulseRing {
+    0% { box-shadow: 0 6px 24px rgba(107, 24, 24, 0.6), 0 0 0 0 rgba(107, 24, 24, 0.5); }
+    70% { box-shadow: 0 6px 24px rgba(107, 24, 24, 0.6), 0 0 0 16px rgba(107, 24, 24, 0); }
+    100% { box-shadow: 0 6px 24px rgba(107, 24, 24, 0.6), 0 0 0 0 rgba(107, 24, 24, 0); }
+  }
+
+  .glossary-toggle:hover, .glossary-toggle:active {
+    transform: scale(1.1);
+    background: var(--blood-bright);
+    animation: none;
+  }
+
+  .glossary-toggle .count {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+
+  .glossary-toggle .label {
+    font-size: 8px;
+    opacity: 0.95;
+    letter-spacing: 0.15em;
+  }
+
+  /* Backdrop modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 9, 7, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Modal du terme */
+  .term-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% + 30px));
+    background: var(--paper);
+    color: var(--ink);
+    width: min(560px, calc(100vw - 40px));
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    z-index: 201;
+    padding: 32px 36px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    border: 1px solid var(--blood);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  .term-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+  }
+
+  .term-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--blood);
+  }
+
+  .term-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    width: 30px;
+    height: 30px;
+    font-family: 'Special Elite', monospace;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .term-modal-close:hover {
+    background: var(--blood);
+    color: var(--paper);
+    border-color: var(--blood);
+  }
+
+  .term-modal-stamp {
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    color: var(--blood);
+    margin-bottom: 8px;
+    margin-top: 4px;
+  }
+
+  .term-modal-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.85rem;
+    font-weight: 900;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .term-modal-en {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.78rem;
+    color: var(--gold-aged);
+    margin-bottom: 18px;
+    letter-spacing: 0.05em;
+  }
+
+  .term-modal-divider {
+    height: 1px;
+    background: var(--ink);
+    opacity: 0.15;
+    margin: 18px 0 16px;
+  }
+
+  .term-modal-section {
+    margin-bottom: 16px;
+  }
+
+  .term-modal-section-label {
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--blood);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .term-modal-definition {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.08rem;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+
+  .term-modal-definition em {
+    color: var(--blood);
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  .term-modal-formula {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    text-align: center;
+    border-left: 3px solid var(--blood);
+  }
+
+  .term-modal-trap {
+    background: rgba(107, 24, 24, 0.08);
+    border-left: 3px solid var(--blood);
+    padding: 12px 16px;
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--blood);
+  }
+
+  .term-modal-trap::before {
+    content: '⚠ ';
+  }
+
+  .term-modal-foot {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--gold-aged);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .term-modal-mark-btn {
+    flex: 1;
+    min-width: 180px;
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .term-modal-mark-btn:hover {
+    background: var(--blood);
+  }
+
+  .term-modal-mark-btn.studied {
+    background: var(--gold-aged);
+    color: var(--paper);
+  }
+
+  .term-modal-nav {
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    color: var(--gold-aged);
+    letter-spacing: 0.1em;
+  }
+
+  /* Panneau latéral du carnet */
+  .notebook-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(380px, 100vw);
+    height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    border-left: 2px solid var(--blood);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.4);
+    z-index: 202;
+    transform: translateX(100%);
+    transition: transform 0.4s ease-out;
+    overflow-y: auto;
+    padding: 28px 24px;
+  }
+
+  .notebook-panel.active {
+    transform: translateX(0);
+  }
+
+  .notebook-header {
+    border-bottom: 2px solid var(--blood);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .notebook-title {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--blood);
+    line-height: 1.1;
+  }
+
+  .notebook-subtitle {
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--gold-aged);
+    margin-top: 4px;
+  }
+
+  .notebook-close {
+    background: none;
+    border: 1px solid var(--ink);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-family: 'Special Elite', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .notebook-close:hover {
+    background: var(--blood);
+    color: var(--paper);
+    border-color: var(--blood);
+  }
+
+  .notebook-progress {
+    background: var(--paper-aged);
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    font-family: 'Special Elite', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+    border-left: 3px solid var(--gold);
+  }
+
+  .notebook-progress-bar {
+    height: 4px;
+    background: var(--paper-stain);
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .notebook-progress-fill {
+    height: 100%;
+    background: var(--blood);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .notebook-section-title {
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--blood);
+    margin: 18px 0 10px;
+    border-bottom: 1px dashed var(--blood);
+    padding-bottom: 4px;
+  }
+
+  .notebook-term {
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background: rgba(216, 207, 184, 0.4);
+    border-left: 2px solid var(--gold-aged);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.9rem;
+  }
+
+  .notebook-term:hover {
+    background: rgba(107, 24, 24, 0.06);
+    border-left-color: var(--blood);
+    transform: translateX(2px);
+  }
+
+  .notebook-term.studied {
+    background: rgba(160, 120, 37, 0.12);
+    border-left-color: var(--gold);
+  }
+
+  .notebook-term-name {
+    font-family: 'Crimson Pro', serif;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .notebook-term.studied .notebook-term-name {
+    color: var(--gold-aged);
+  }
+
+  .notebook-term.studied .notebook-term-name::before {
+    content: '✓ ';
+    color: var(--gold);
+  }
+
+  .notebook-term-cat {
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--gold-aged);
+    text-transform: uppercase;
+  }
+
+  .notebook-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .notebook-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 8px;
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    opacity: 0.5;
+    transition: all 0.2s;
+  }
+
+  .notebook-tab.active {
+    opacity: 1;
+    border-bottom-color: var(--blood);
+    color: var(--blood);
+    font-weight: bold;
+  }
+
+  .notebook-empty {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--gold-aged);
+    font-style: italic;
+    font-family: 'Crimson Pro', serif;
+  }
+
+  /* Bouton reset progression */
+  .notebook-reset {
+    width: 100%;
+    margin-top: 20px;
+    padding: 8px;
+    background: none;
+    border: 1px dashed var(--ink);
+    font-family: 'Special Elite', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--ink);
+    cursor: pointer;
+    opacity: 0.5;
+  }
+
+  .notebook-reset:hover {
+    opacity: 1;
+    border-color: var(--blood);
+    color: var(--blood);
+  }
+
+  /* Tooltip rapide au survol */
+  .quick-tooltip {
+    position: absolute;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 6px 10px;
+    font-family: 'Special Elite', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.15s;
+    transform: translate(-50%, -100%);
+    margin-top: -8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  .quick-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--ink);
+  }
+
+  .quick-tooltip.visible { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .term-modal { padding: 24px 22px; }
+    .term-modal-title { font-size: 1.5rem; }
+    .glossary-toggle { width: 50px; height: 50px; bottom: 16px; right: 16px; }
+    .notebook-panel { padding: 20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- ============== COVER ============== -->
+<section class="cover">
+  <div class="cover-content">
+    <div class="cover-warning">CLASSIFIÉ · DOSSIER N° 47-VLM-2026</div>
+    <h1 class="cover-title">L'AFFAIRE<br><em>VELLMORE</em></h1>
+    <div class="cover-blood-drop"></div>
+    <p class="cover-subtitle">Six chapitres. Un mort. Trois suspects.<br>Et toute la finance comme champ de bataille.</p>
+    <div class="cover-credits">
+      Un polar pédagogique<br>
+      ECM × DCM · Tous les concepts du cours
+    </div>
+    <div class="scroll-hint">▼ DESCENDRE POUR OUVRIR LE DOSSIER ▼</div>
+  </div>
+</section>
+
+<!-- ============== ACTE I ============== -->
+<section class="chapter fade-section">
+  <div class="container">
+    <div class="chapter-stamp"><div class="stamp-mark">CHAPITRE PREMIER</div></div>
+    <div class="chapter-number">i.</div>
+    <h2 class="chapter-title">Le cadavre <em>du parquet</em></h2>
+    <p class="chapter-tagline">— Manhattan, 14 mai. 06h12. La cloche n'a pas encore sonné. —</p>
+
+    <div style="margin: 30px auto 50px; padding: 18px 22px; background: rgba(107, 24, 24, 0.08); border: 1.5px dashed var(--blood); border-radius: 4px; text-align: center; max-width: 600px;">
+      <div style="font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 0.25em; color: var(--blood); margin-bottom: 10px; font-weight: bold;">— MODE D'EMPLOI DU DOSSIER —</div>
+      <div style="font-family: 'Crimson Pro', serif; font-style: italic; font-size: 1.05rem; color: var(--ink); line-height: 1.65;">
+        Tous les <span style="color: var(--blood); font-weight: 700; background: rgba(107, 24, 24, 0.04); padding: 1px 4px; border-bottom: 1.5px solid var(--blood);">termes en rouge ⓘ</span> sont <strong>cliquables</strong>. Touche-les pour faire apparaître la <em>définition officielle</em>, les <em>formules</em> et les <em>pièges d'examen</em>.
+        <br><br>
+        En bas à droite : un <strong style="color: var(--blood);">bouton CARNET</strong> 📓 te permet de retrouver tous les termes étudiés.
+      </div>
+    </div>
+
+    <div class="narrative">
+      <p>Le corps de <strong>Marcus Vellmore</strong> repose sur le parquet de la salle des conseils, à trois heures de la cotation officielle de sa société. La cloche du NYSE devait retentir à neuf heures trente. Désormais, elle sonnera comme un glas. <strong>Vellmore Industries</strong>, vingt ans de croissance fulgurante, devait franchir le grand passage : <button type="button" class="keyword" data-term="ipo">l'introduction en bourse</button> <span class="term-en">IPO</span>. Marcus n'y assistera pas.</p>
+
+      <p>L'inspecteur <strong>Daniela Costa</strong> — vingt ans à la Brigade des Affaires Financières — pose ses gants. Sur le bureau, une note manuscrite : <em>« Si je meurs avant la cloche, regardez l'equity story. La trahison commence là. »</em> Costa relève la tête. L'<button type="button" class="keyword" data-term="equity-story">equity story</button>, c'est le récit qu'une entreprise raconte au marché pour qu'il l'achète. Bâtir la <button type="button" class="keyword" data-term="trust">trust</button>, la confiance. Sans elle, pas d'IPO.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Inspecteur Costa</span>
+        Trois heures avant la cloche. Quelqu'un ne voulait pas qu'il y arrive. La question, c'est : qui ? Et la réponse est sûrement quelque part dans la mécanique de cette IPO.
+      </div>
+
+      <h3 class="scene-title">Première lecture — le profil de la victime</h3>
+
+      <p>Costa connaît son métier. Avant de chercher un meurtrier, on étudie la victime. Elle ouvre le dossier psychologique de Marcus Vellmore préparé par l'analyste de la brigade. Le rapport décortique l'écosystème de Vellmore Industries selon la grille classique <button type="button" class="keyword" data-term="pestel">PESTEL</button> — six dimensions de l'environnement macro qui pèsent sur toute entreprise.</p>
+
+      <div class="case-file">
+        <h4>RAPPORT D'ENVIRONNEMENT — VELLMORE INDUSTRIES</h4>
+        <p><strong>P (Politique).</strong> Réformes fiscales à venir affectant les multinationales.</p>
+        <p><strong>E (Économie).</strong> Inflation forte, hausse des taux de la Fed, tensions de financement.</p>
+        <p><strong>S (Société).</strong> Demande croissante pour des produits ESG.</p>
+        <p><strong>T (Technologie).</strong> Disruption IA dans le secteur de Vellmore.</p>
+        <p><strong>E (Environnement).</strong> Pression réglementaire carbone.</p>
+        <p><strong>L (Légal).</strong> Procès anti-trust en cours, héritage de 2024.</p>
+      </div>
+
+      <p>Puis Costa applique la grille de Porter — la <button type="button" class="keyword" data-term="value-chain">value chain</button>. Vellmore évoluait dans un écosystème compétitif intense : pouvoir des fournisseurs élevé, clients fragmentés, nouveaux entrants menaçants, substituts technologiques. Le contexte expliquait la pression de la cotation. Marcus avait besoin de cash <em>vite</em>.</p>
+
+      <h3 class="scene-title">L'équipe dirigeante — qui voulait quoi ?</h3>
+
+      <p>Costa convoque le board. Elle a appris à ses dépens que dans toute IPO, ce qui compte ce ne sont pas les chiffres mais les personnalités de l'<button type="button" class="keyword" data-term="executive-team">executive team</button>. Chaque rôle a ses intérêts, ses peurs, ses motivations.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Costa, à voix haute, devant le board</span>
+        Je vais être directe. Une IPO ne réussit que si les 8 dirigeants tirent dans la même direction : le CEO, le CFO, le COO, le VP Marketing, le Head of Investor Relations, le CPO, le CTO, le General Counsel. Je veux savoir, pour chacun de vous, si vous étiez en désaccord avec Marcus sur l'opération.
+      </div>
+
+      <p>Le silence de la salle parle. Marcus n'était pas seulement un fondateur. C'était, selon les critères classiques d'un <button type="button" class="keyword" data-term="good-ceo">bon CEO</button>, un dirigeant aux cinq qualités cardinales : <em>leadership</em>, <em>team building</em>, <em>entrepreneurship</em>, <em>change management</em>, et — le plus rare — <em>financially driven</em>. Mais quand un CEO concentre autant de qualités, il fait nécessairement de l'ombre à son entourage.</p>
+
+      <p>Costa note dans son carnet : <em>« Le mobile peut être professionnel, mais aussi personnel. Iris, sa sœur. Lazlo, son banquier. Don, son rival. Et peut-être un membre de cet executive team. »</em></p>
+
+      <p>Costa convoque les trois suspects principaux. Trois personnes qui avaient toutes une raison de vouloir Vellmore mort.</p>
+
+      <div class="suspect">
+        <div class="suspect-photo">L</div>
+        <div class="suspect-info">
+          <div class="suspect-name">Suspect №1 — Lazlo Kreutzer</div>
+          <div class="suspect-role">Banquier introducteur, Goldman Stearns</div>
+          <div class="suspect-quote">« On m'avait promis un <button type="button" class="keyword" data-term="bought-deal">bought deal</button>. La banque devait acheter tous les titres invendus — engagement maximum. Vellmore voulait basculer en <button type="button" class="keyword" data-term="best-effort">best effort</button> au dernier moment, sans garantie de succès. J'avais des centaines de millions à perdre. Mais <em>jamais</em> je ne l'aurais tué. »</div>
+        </div>
+      </div>
+
+      <div class="suspect">
+        <div class="suspect-photo">I</div>
+        <div class="suspect-info">
+          <div class="suspect-name">Suspect №2 — Iris Vellmore</div>
+          <div class="suspect-role">Sœur du défunt, hedge fund manager</div>
+          <div class="suspect-quote">« Marcus avait découvert mon manège. J'allais participer à un <button type="button" class="keyword" data-term="laddering">laddering</button> — recevoir une grosse allocation en échange d'achats programmés à prix donné. Interdit par la SEC et la FINRA. Il m'aurait dénoncée. Lui mort, l'IPO est repoussée et personne ne sait. »</div>
+        </div>
+      </div>
+
+      <div class="suspect">
+        <div class="suspect-photo">D</div>
+        <div class="suspect-info">
+          <div class="suspect-name">Suspect №3 — Don Keizer</div>
+          <div class="suspect-role">Sponsor d'un SPAC concurrent</div>
+          <div class="suspect-quote">« J'avais proposé à Marcus un <button type="button" class="keyword" data-term="spac">SPAC</button> <span class="term-en">Special Purpose Acquisition Company</span>. Il aurait été coté en deux mois pour deux à trois fois moins cher qu'une IPO. Il a refusé — il voulait le show, pas la <em>blank check company</em>. Tant pis pour lui. Mais ce n'est pas une raison de tuer. »</div>
+        </div>
+      </div>
+
+      <h3 class="scene-title">Le dossier IPO de Vellmore</h3>
+
+      <p>Costa fouille les classeurs. Vellmore avait choisi la voie classique : un long <button type="button" class="keyword" data-term="bookbuilding">bookbuilding</button>, encadré par les phases réglementaires américaines. <button type="button" class="keyword" data-term="quiet-period">Quiet period</button> avant le dépôt SEC, où aucune communication publique n'est tolérée. Puis <em>cooling off period</em> entre dépôt et approbation. Puis pricing et allocation.</p>
+
+      <div class="case-file">
+        <h4>EXTRAITS — TYPES DE PROCESSUS</h4>
+        <p><strong>Bookbuilding.</strong> La banque fait le tour des grands fonds (premarketing roadshow), collecte leurs intentions d'achat, ajuste le prix. Méthode dominante.</p>
+        <p><strong>Dutch auction.</strong> Les ordres rangés du plus haut au plus bas, allocations top-down, chacun paie son bid.</p>
+        <p><strong>Floor price.</strong> Tous les ordres collectés, fenêtre de plus forte demande choisie, prix bas de la fenêtre payé par tous.</p>
+        <p><strong>Fixed price.</strong> Prix et quantité figés. Sous-pricing fort. Démodé.</p>
+      </div>
+
+      <p>Et puis, surtout, deux mécanismes qui tournent autour du jour J. La <button type="button" class="keyword" data-term="greenshoe">Greenshoe</button> <span class="term-en">overallotment option</span> permet à la banque de placer jusqu'à <strong>15 % d'actions en plus</strong> — limité à <strong>6 mois</strong>. Si le cours monte, l'option est exercée et Vellmore lève 15 % de plus. Si le cours baisse, la banque rachète sur le marché, créant une pression acheteuse pour stabiliser le prix.</p>
+
+      <p>Le <button type="button" class="keyword" data-term="spinning">spinning</button>, lui, est strictement interdit : allouer des actions à un dirigeant en échange de futurs mandats de banque d'affaires. Du <em>quid pro quo</em>. Un délit.</p>
+
+      <p>Costa note méticuleusement. Trois suspects, trois mobiles différents. Mais tous tournent autour de la même question : <strong>qui voulait que cette IPO n'ait jamais lieu ?</strong></p>
+
+      <h3 class="scene-title">Premier indice : un fragment de mémo déchiré</h3>
+
+      <p>Sous le bureau, une feuille froissée. Costa la lisse. Trois lignes :</p>
+
+      <div class="case-file">
+        <h4>FRAGMENT TROUVÉ — 06H47</h4>
+        <p>« <em>Reverse takeover annulé. Direct listing trop risqué. ADR Level 3 — coût SEC trop élevé. Reste l'IPO classique. Voir Lazlo lundi. — M.V.</em> »</p>
+      </div>
+
+      <p>Vellmore avait étudié toutes les voies. Le <button type="button" class="keyword" data-term="reverse-takeover">reverse takeover</button> — racheter une coquille déjà cotée. Le <button type="button" class="keyword" data-term="direct-listing">direct listing</button> — coter sans bookbuilding, sans IB, sans Greenshoe : très risqué. Les <button type="button" class="keyword" data-term="adr">ADR</button> <span class="term-en">American Depositary Receipts</span> pour percer aux US — quatre niveaux, dont le Level 3 permettant de lever du capital. Il avait tout pesé. Il avait choisi. Et quelqu'un l'avait condamné.</p>
+
+      <div class="pullquote">
+        « Une IPO, c'est un mariage royal. Et certains préfèrent assassiner le roi avant le banquet. »
+        <span class="pullquote-attribution">— Carnet de Costa, 14 mai</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== INTERLUDE ============== -->
+<section class="interlude fade-section">
+  <div class="interlude-content">
+    <div class="interlude-stamp">— PIÈCE EXHUMÉE DES ARCHIVES —</div>
+    <h3 class="interlude-title">Trois ans plus tôt...</h3>
+    <p class="interlude-text">L'IPO avait finalement eu lieu, posthume, organisée par la veuve de Marcus, Helena Vellmore. Le cours d'introduction : 120 €. Vellmore Industries était devenue une princesse cotée. Mais l'enquête, elle, était classée sans suite. Jusqu'à ce qu'un nouveau cadavre apparaisse.</p>
+  </div>
+</section>
+
+<!-- ============== ACTE II ============== -->
+<section class="chapter fade-section">
+  <div class="container">
+    <div class="chapter-stamp"><div class="stamp-mark">CHAPITRE II</div></div>
+    <div class="chapter-number">ii.</div>
+    <h2 class="chapter-title">Le sang <em>de la dilution</em></h2>
+    <p class="chapter-tagline">— Trois ans plus tard. Helena Vellmore organise une augmentation de capital. —</p>
+
+    <div class="narrative">
+      <p>Helena Vellmore avait survécu. Elle avait pris la tête de l'entreprise après le meurtre de son frère et avait porté l'IPO, posthume, jusqu'à la cloche. Trois ans plus tard, elle ouvrait un nouveau front : <button type="button" class="keyword" data-term="augmentation-capital">une augmentation de capital</button> pour racheter un concurrent ouest-européen.</p>
+
+      <p>Mais l'<em>equity offering</em> n'est pas anodine. C'est mécaniquement une <strong>vente d'actions</strong> qui dilue les actionnaires existants. Le marché le sait : le cours baisse en moyenne de <strong>3 à 5 %</strong> juste après l'annonce. Helena n'était pas inquiète — son PER était élevé, l'opération serait <em>relutive</em>. Mais quelqu'un, dans l'ombre, voyait son sang couler dans cette dilution.</p>
+
+      <h3 class="scene-title">Le PER élevé : pourquoi les managers adorent émettre</h3>
+
+      <p>Le banquier d'Helena lui glisse un mot : « Si le PER est haut, l'augmentation de capital est mécaniquement relutive — l'<button type="button" class="keyword" data-term="eps">EPS</button> monte, donc le cours suit. C'est pour ça que les managers ont une incitation TRÈS FORTE à émettre quand le PER est élevé. Pas par ruse. Par mathématique. »</p>
+
+      <h3 class="scene-title">Le ballet du DPS</h3>
+
+      <p>Helena protège ses actionnaires fidèles avec un mécanisme typiquement européen : le <button type="button" class="keyword" data-term="dps">DPS</button> <span class="term-en">Droit Préférentiel de Souscription</span>. Chaque action existante donne un DPS. Avec un certain nombre, on peut souscrire à une action nouvelle au prix décoté.</p>
+
+      <p>Vellmore Industries a 12 millions d'actions à 120 €. Helena annonce : <strong>1,5 million de nouvelles actions à 105 €</strong> — décote de 12,5 %. La parité s'établit donc à <strong>8 DPS pour 1 action nouvelle</strong> (12 M / 1,5 M).</p>
+
+      <div class="formula-box">
+        <div class="label">— PRIX D'OFFRE & MARKET CAP —</div>
+        <div class="formula">
+          P_offre = 120 € × (1 − 12,5 %) = 105 €<br>
+          MC_avant = 12 M × 120 € = 1 440 M€<br>
+          Levée = 1,5 M × 105 € = 157,5 M€
+        </div>
+      </div>
+
+      <h3 class="scene-title">Le calcul du TERP — cours théorique ex-droit</h3>
+
+      <p>Le cours théorique post-opération s'appelle le <button type="button" class="keyword" data-term="terp">TERP</button> <span class="term-en">Theoretical Ex Right Price</span>. C'est une moyenne pondérée par le nombre d'actions :</p>
+
+      <div class="calc-block">
+        <div class="calc-label">CALCUL DU TERP</div>
+        <div class="calc-step">TERP = (N_anc × S₀ + N_new × P_offre) / (N_anc + N_new)</div>
+        <div class="calc-step">     = (12 × 120 + 1,5 × 105) / (12 + 1,5)</div>
+        <div class="calc-step">     = (1 440 + 157,5) / 13,5</div>
+        <div class="calc-step">     = 1 597,5 / 13,5</div>
+        <div class="calc-result">→ TERP = 118,33 €</div>
+      </div>
+
+      <p>Le <strong>prix théorique du DPS</strong> en découle :</p>
+
+      <div class="calc-block">
+        <div class="calc-label">PRIX DU DPS</div>
+        <div class="calc-step">P_DPS = S₀ − TERP</div>
+        <div class="calc-step">     = 120 − 118,33</div>
+        <div class="calc-result">→ P_DPS = 1,67 €</div>
+      </div>
+
+      <h3 class="scene-title">Les trois choix d'un actionnaire</h3>
+
+      <p>Tout détenteur de Vellmore Industries face à trois options :</p>
+
+      <div class="case-file">
+        <h4>OPTION A — SOUSCRIRE PLEINEMENT</h4>
+        <p>Sortir le cash, conserver sa quote-part, ne pas être dilué. Coûteux mais le plus protecteur.</p>
+      </div>
+
+      <div class="case-file">
+        <h4>OPTION B — TOUT VENDRE, NE RIEN SOUSCRIRE</h4>
+        <p>Encaisser le prix des DPS, accepter la dilution. Quote-part chute mécaniquement.</p>
+      </div>
+
+      <div class="case-file">
+        <h4>OPTION C — L'OPÉRATION BLANCHE</h4>
+        <p>Cash-neutre. On vend juste assez de DPS pour financer la souscription du reste. Limite la dilution sans sortir un euro.</p>
+      </div>
+
+      <h3 class="scene-title">L'opération blanche en détail</h3>
+
+      <p>Helena explique à un actionnaire stratégique : « Pour souscrire à une action nouvelle, vous devez avancer 105 €. Pour les financer en vendant des DPS, à 1,67 € pièce, il vous en faut <strong>105 / 1,67 ≈ 63</strong>. Et il vous en faut <strong>8 de plus</strong> pour exercer la souscription. Donc <strong>par bloc de 71 DPS, vous en exercez 8, vous en vendez 63</strong>. Cash-neutre. »</p>
+
+      <div class="formula-box">
+        <div class="label">— OPÉRATION BLANCHE —</div>
+        <div class="formula">71 DPS = 8 conservés + 63 vendus → 1 action nouvelle, 0 € de cash sorti</div>
+      </div>
+
+      <h3 class="scene-title">Calcul de la dilution résiduelle</h3>
+
+      <p>Un actionnaire stratégique détient 10 M d'actions. Avant : <strong>10/12 = 83,33 %</strong>. S'il vend tout sans souscrire : <strong>10/13,5 = 74,07 %</strong> (dilution de 9,26 points). En opération blanche, il peut souscrire à 10 M / 71 ≈ 140 845 actions nouvelles :</p>
+
+      <div class="calc-block">
+        <div class="calc-label">DILUTION POST-OPÉRATION BLANCHE</div>
+        <div class="calc-step">Nouvelle position = (10 000 000 + 140 845) / 13 500 000</div>
+        <div class="calc-step">                   = 10 140 845 / 13 500 000</div>
+        <div class="calc-result">→ 75,12 % (dilution = 8,21 points)</div>
+      </div>
+
+      <p>Limite la dilution mais ne l'élimine pas. Logique : il a investi 0 €.</p>
+
+      <h3 class="scene-title">Le second cadavre</h3>
+
+      <p>Helena venait de finir sa présentation au conseil quand le téléphone sonna. La voix de Costa.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Costa</span>
+        Helena, on vient de retrouver Lazlo Kreutzer dans son bureau. Il s'est <em>suicidé</em>. Avec une note. Une seule phrase. <em>« Le PER élevé n'était pas un hasard. Demandez à Iris. »</em>
+      </div>
+
+      <p>Le Price Earnings Ratio. Le ratio cours / bénéfice par action. Plus il est élevé, plus une augmentation de capital est relutive. Et si quelqu'un l'avait <em>artificiellement</em> gonflé pour préparer une opération… on entrait alors dans le territoire de la manipulation comptable. Et du mobile.</p>
+
+      <div class="pullquote">
+        « Une augmentation de capital est un transfert de richesse. La question n'est pas <em>combien</em>, mais <em>vers qui</em>. »
+        <span class="pullquote-attribution">— Maxime de Costa</span>
+      </div>
+
+      <p>En augmentant l'equity, Helena baissait mécaniquement le <button type="button" class="keyword" data-term="gearing">gearing</button>, donc le risque de crédit, donc transférait de la richesse des actionnaires vers les <strong>créanciers</strong>. Iris détenait justement de la dette Vellmore en grande quantité, via son hedge fund. Coïncidence ? Costa ne croyait plus aux coïncidences.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ACTE III ============== -->
+<section class="chapter fade-section">
+  <div class="container">
+    <div class="chapter-stamp"><div class="stamp-mark">CHAPITRE III</div></div>
+    <div class="chapter-number">iii.</div>
+    <h2 class="chapter-title">Les <em>options</em> du diable</h2>
+    <p class="chapter-tagline">— Costa découvre que Lazlo n'avait pas misé sur Vellmore. Il avait misé contre. —</p>
+
+    <div class="narrative">
+      <p>Costa épluche les comptes du défunt banquier. Lazlo Kreutzer, à la veille de l'IPO de Marcus Vellmore, avait acheté massivement des <button type="button" class="keyword" data-term="put">puts</button> — le droit de <em>vendre</em> les actions Vellmore à un prix donné. Et des puts <em>out of the money</em> très loin du strike, donc presque gratuits. Puis Marcus est mort, l'IPO a été retardée, le cours a plongé, les puts ont explosé en valeur. Lazlo s'était enrichi de 47 millions de dollars. Mais l'argent n'était pas son.</p>
+
+      <h3 class="scene-title">Une option, c'est un droit, pas une obligation</h3>
+
+      <p>Une <button type="button" class="keyword" data-term="option">option</button> donne le droit — pas l'obligation — d'acheter ou de vendre un sous-jacent à un prix donné <button type="button" class="keyword" data-term="strike">strike</button>, à une date donnée. <button type="button" class="keyword" data-term="call">Call</button> = droit d'acheter. <button type="button" class="keyword" data-term="put">Put</button> = droit de vendre. <em>Long</em> = on achète l'option ; <em>short</em> = on la vend.</p>
+
+      <p>La perte est limitée à la <button type="button" class="keyword" data-term="prime">prime</button> payée. Le gain peut être quasi-illimité. La valeur d'une option a deux composantes : la <button type="button" class="keyword" data-term="valeur-intrinseque">valeur intrinsèque</button> (max(S − K, 0) pour un call) et la <button type="button" class="keyword" data-term="valeur-temps">valeur temps</button>. Cette dernière fond rapidement à mesure qu'on s'approche de l'expiration.</p>
+
+      <h3 class="scene-title">La parité call-put — première loi gravée</h3>
+
+      <div class="formula-box">
+        <div class="label">— PUT-CALL PARITY —</div>
+        <div class="formula">LONG CALL + SHORT PUT = LONG FORWARD</div>
+      </div>
+
+      <p>Acheter un call et vendre un put au même strike, c'est exactement comme prendre une position forward. Identité d'arbitrage absolue.</p>
+
+      <h3 class="scene-title">Black, Scholes, Merton — le triangle des sorciers</h3>
+
+      <p>Comment évaluer une option ? Trois physiciens ont changé la finance en 1973. Leur intuition : on peut <strong>répliquer dynamiquement</strong> le payoff d'une option avec un portefeuille de stock et de cash. Si on peut le répliquer, alors par <em>absence d'arbitrage</em>, valeur option = valeur portefeuille répliquant.</p>
+
+      <div class="case-file">
+        <h4>LES QUATRE VOIES VERS BLACK-SCHOLES</h4>
+        <p><strong>1. Réplication dynamique.</strong> Portefeuille delta-neutre qui copie le payoff. AOA → V_option = V_portefeuille. Voie textbook.</p>
+        <p><strong>2. Mesure risque-neutre.</strong> On change de probabilité (théorème de Girsanov). Dans cet univers, tout actif rapporte le taux sans risque. V₀ = E^Q[e^(−rT) × Payoff_T]. Résolution via Feynman-Kac.</p>
+        <p><strong>3. Égalité des Sharpe.</strong> Option et stock partagent le même risque sous-jacent → même rendement ajusté. Démonstration de Derman-Wilmott.</p>
+        <p><strong>4. Limite continue du binomial.</strong> Quand dt → 0, le binomial à un pas converge vers Black-Scholes.</p>
+      </div>
+
+      <h3 class="scene-title">Le panthéon des Grecs — chaque suspect a son alibi</h3>
+
+      <p>Costa interroge un trader de la maison. « Pour comprendre comment Lazlo a structuré sa position, il faut connaître les <button type="button" class="keyword" data-term="grecques">grecques</button> — les sensibilités. »</p>
+
+      <div class="suspect">
+        <div class="suspect-photo">Δ</div>
+        <div class="suspect-info">
+          <div class="suspect-name">Témoin Δ — Le Delta</div>
+          <div class="suspect-role">Sensibilité au sous-jacent</div>
+          <div class="suspect-quote">« Quand le sous-jacent bouge d'1 €, je bouge de combien ? Proche de 1 quand l'option est ITM, proche de 0 quand elle est OTM. À l'expiration, ma forme devient de plus en plus pentue. »</div>
+        </div>
+      </div>
+
+      <div class="suspect">
+        <div class="suspect-photo">Γ</div>
+        <div class="suspect-info">
+          <div class="suspect-name">Témoin Γ — Le Gamma</div>
+          <div class="suspect-role">Convexité du Delta</div>
+          <div class="suspect-quote">« Je suis la dérivée du Delta. La convexité. Maximum à la monnaie (ATM). Si vous voulez un Delta nerveux, sachez que je suis derrière. »</div>
+        </div>
+      </div>
+
+      <div class="suspect">
+        <div class="suspect-photo">V</div>
+        <div class="suspect-info">
+          <div class="suspect-name">Témoin V — Le Vega</div>
+          <div class="suspect-role">Sensibilité à la volatilité implicite</div>
+          <div class="suspect-quote">« <em>Attention au piège.</em> Je mesure la sensibilité à la vol IMPLICITE — pas réalisée, pas forward. La vol implicite, c'est celle qu'il faut entrer dans Black-Scholes pour retrouver le prix de marché. Mathématiquement, c'est la vol moyenne intégrée jusqu'à maturité. »</div>
+        </div>
+      </div>
+
+      <div class="suspect">
+        <div class="suspect-photo">θ</div>
+        <div class="suspect-info">
+          <div class="suspect-name">Témoin θ — Le Theta</div>
+          <div class="suspect-role">Sensibilité au temps</div>
+          <div class="suspect-quote">« Chaque jour qui passe, l'option longue saigne. Toujours négatif. Les traders m'appellent le <em>theta bleeding</em>. Vellmore aussi a saigné. Question de timing. »</div>
+        </div>
+      </div>
+
+      <h3 class="scene-title">Les Grecs cachés — où Lazlo s'est exposé</h3>
+
+      <p>Costa découvre que Lazlo s'était exposé via les Grecs cachés. Le <button type="button" class="keyword" data-term="vanna">Vanna</button> : sensibilité du Vega au sous-jacent (= sensibilité du Delta à la vol). Le <button type="button" class="keyword" data-term="volga">Volga</button> : convexité du Vega par rapport à la vol. Et le mystérieux <button type="button" class="keyword" data-term="omicron">Omicron</button>, qui mesure la sensibilité au spread crédit. Lazlo avait construit une position à très haut Vega et Volga — il pariait sur une explosion de la volatilité. Et la mort de Marcus a fait exploser la vol.</p>
+
+      <div class="pullquote">
+        « La volatilité implicite n'est pas la vol forward. C'est la vol moyenne intégrée jusqu'à maturité. »
+        <span class="pullquote-attribution">— Le piège classique d'entretien</span>
+      </div>
+
+      <h3 class="scene-title">Européenne ou américaine ?</h3>
+
+      <p>Lazlo détenait des puts <strong>américains</strong>, pas européens. Différence cruciale : une option <button type="button" class="keyword" data-term="option-americaine">américaine</button> peut s'exercer à tout moment ; une <button type="button" class="keyword" data-term="option-europeenne">européenne</button>, seulement à maturité. Un put américain ITM vaut <em>plus</em> que son jumeau européen — on peut l'exercer plus tôt et placer le cash.</p>
+
+      <p>Lazlo, en achetant des puts américains, gardait la flexibilité d'exercer dès que la vol exploserait. Ce qu'il a fait dans les heures qui ont suivi la mort de Marcus.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Costa, à voix basse</span>
+        Donc Lazlo n'a peut-être pas tué Marcus. Mais il savait. Il <em>savait</em> que ça allait arriver. Quelqu'un l'a prévenu. Et ce quelqu'un, c'est probablement le meurtrier.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ACTE IV ============== -->
+<section class="chapter fade-section">
+  <div class="container">
+    <div class="chapter-stamp"><div class="stamp-mark">CHAPITRE IV</div></div>
+    <div class="chapter-number">iv.</div>
+    <h2 class="chapter-title">Les <em>obligations</em> de la trahison</h2>
+    <p class="chapter-tagline">— Iris Vellmore, hedge fund manager. Reine du marché obligataire. Et possible meurtrière. —</p>
+
+    <div class="narrative">
+      <p>Iris Vellmore, la sœur de Marcus, dirigeait le fonds <strong>Black Coupon Capital</strong>. Spécialité : les obligations corporate exotiques, le crédit, les structures complexes. Costa entre dans ses bureaux feutrés du 47e étage. Iris l'attend, calme, un verre de scotch à la main.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Iris Vellmore</span>
+        Inspecteur. Vous voulez parler obligations ? Asseyez-vous. Mais vous risquez d'apprendre des choses qui ne vous plairont pas.
+      </div>
+
+      <h3 class="scene-title">Anatomie d'une obligation</h3>
+
+      <p>Iris commence par les bases. Une <button type="button" class="keyword" data-term="obligation">obligation</button> est un instrument de dette émis sur un marché. Plusieurs caractéristiques : devise, maturité, taux de coupon, prix (toujours en pourcentage du nominal !), spread, yield. Les émetteurs sont multiples — supranationaux (Banque mondiale, BEI), souverains, locaux, quasi-gouvernementaux (La Poste), et bien sûr les corporates.</p>
+
+      <p>Maturité courte (< 1 an) → <em>money market securities</em> (commercial papers, certificats de dépôt). Plus long → <em>capital market securities</em>. Et puis il y a les exotiques — Disney a déjà émis une obligation à 100 ans. Certaines sont même <button type="button" class="keyword" data-term="perpetuelle">perpétuelles</button>.</p>
+
+      <div class="case-file">
+        <h4>FRÉQUENCES DE COUPONS — TOUR DU MONDE</h4>
+        <p><strong>Annuel.</strong> Bunds allemands, OAT français.</p>
+        <p><strong>Semi-annuel.</strong> US bonds, Gilts britanniques.</p>
+        <p><strong>Trimestriel.</strong> QUIBS de Morgan Stanley, QUIDS de Goldman Sachs.</p>
+        <p><strong>Mensuel.</strong> Mortgage Backed Securities (MBS).</p>
+      </div>
+
+      <h3 class="scene-title">Le spread — signal du risque</h3>
+
+      <p>Quand un émetteur veut obtenir de la dette, on compare son rendement à celui d'une bond souveraine de même maturité. La différence — le <button type="button" class="keyword" data-term="spread">spread</button> — capture trois choses : risque de défaut, risque de recovery, risque de liquidité.</p>
+
+      <div class="formula-box">
+        <div class="label">— SPREAD —</div>
+        <div class="formula">Spread = Yield bond − Référence sans risque</div>
+      </div>
+
+      <p>Iris explique : « Sur une <button type="button" class="keyword" data-term="frn">FRN</button> <span class="term-en">Floating Rate Note</span>, le coupon est indexé. Exemple : maturité 2030, coupon semi-annuel, Libor 6M + 150 bps. Si le Libor 6M est à 3,25 %, le prochain coupon est à 4,75 %. Souvent, on met des floors et des caps sur le Libor. »</p>
+
+      <h3 class="scene-title">Sensibilité, duration, convexité</h3>
+
+      <p>Une obligation est un flux de cash flows actualisés. Quand le yield monte, ces flux sont plus actualisés, donc le prix baisse. Cette sensibilité est mesurée par la <button type="button" class="keyword" data-term="duration">duration</button>.</p>
+
+      <div class="formula-box">
+        <div class="label">— RELATIONS FONDAMENTALES —</div>
+        <div class="formula">
+          Sensibilité = Modified Duration<br>
+          Duration = (1 + Yield) × Sensibilité<br>
+          Convexité = curvature (positive pour bond classique)
+        </div>
+      </div>
+
+      <p>Règle d'or : sensibilité ÉLEVÉE quand maturité longue, coupon faible, yield faible. Une zéro-coupon longue est ultra-sensible. Iris en détenait beaucoup. Pour des raisons que Costa allait découvrir.</p>
+
+      <h3 class="scene-title">Les bonds cachées d'options</h3>
+
+      <p>Iris devient plus nerveuse quand Costa pose la question.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Costa</span>
+        Vous déteniez beaucoup d'obligations <em>callable</em> de Vellmore Industries. Pouvez-vous m'expliquer ce que c'est ?
+      </div>
+
+      <p>Une <button type="button" class="keyword" data-term="callable">callable bond</button> donne à l'<em>émetteur</em> le droit de rappeler la dette anticipativement, typiquement quand les taux baissent — pour refinancer moins cher. Du point de vue de l'investisseur :</p>
+
+      <div class="formula-box">
+        <div class="label">— DÉCOMPOSITION CALLABLE —</div>
+        <div class="formula">Callable Bond = Bond classique − Call américain (vendu à l'émetteur)</div>
+      </div>
+
+      <p>L'investisseur a vendu (implicitement) à l'émetteur une option d'achat américaine sur la dette. C'est pourquoi le coupon est plus généreux : il rémunère le risque d'être remboursé trop tôt.</p>
+
+      <p>Une <button type="button" class="keyword" data-term="puttable">puttable bond</button> donne le droit inverse à l'<em>investisseur</em>. La <button type="button" class="keyword" data-term="pik">pay-in-kind</button> paie ses coupons en obligations supplémentaires plutôt qu'en cash — utile pour les firmes en distress.</p>
+
+      <h3 class="scene-title">Le schéma d'amortissement — la trace cachée</h3>
+
+      <p>Iris ouvre un classeur. « Inspecteur, regardez. Voici quatre types d'<button type="button" class="keyword" data-term="amortization">amortissement</button> qu'on rencontre couramment. Et selon ce qu'a choisi Marcus, vous saurez quelle était son anticipation de cash flows. »</p>
+
+      <div class="case-file">
+        <h4>SCHÉMAS D'AMORTISSEMENT</h4>
+        <p><strong>Zero coupon.</strong> Aucun coupon. Remboursement total <em>in fine</em>.</p>
+        <p><strong>Bullet / In fine.</strong> Coupons périodiques + 100 % du principal remboursé à maturité. <em>Le standard pour les corporates</em>.</p>
+        <p><strong>Partially amortized.</strong> Remboursement progressif < 100 %. Un <em>balloon payment</em> à maturité paie le solde.</p>
+        <p><strong>Fully amortized.</strong> Le principal est intégralement remboursé sur la durée de vie. Plus de balloon.</p>
+        <p><strong>Constant annuity.</strong> Cas particulier du fully amortized : (amortissement + coupon) constant chaque période. Exemple typique : crédit immobilier.</p>
+      </div>
+
+      <h3 class="scene-title">Le time path d'une obligation — quand le temps trahit</h3>
+
+      <p>Iris révèle alors un détail que peu d'enquêteurs maîtrisent : <em>même si le yield ne bouge pas</em>, le prix d'une obligation évolue avec le temps. C'est le <button type="button" class="keyword" data-term="time-path">time path</button>.</p>
+
+      <div class="formula-box">
+        <div class="label">— RÈGLE DU TIME PATH —</div>
+        <div class="formula">
+          Coupon rate = Yield → Bond <em>at par</em> → prix constant<br>
+          Coupon rate < Yield → Bond <em>below par</em> → prix monte avec le temps<br>
+          Coupon rate > Yield → Bond <em>above par</em> → prix descend avec le temps
+        </div>
+      </div>
+
+      <p>« Si vous trouvez une bond <em>below par</em> dans le portefeuille de quelqu'un, c'est que l'investisseur a parié sur la stabilité des taux et l'appréciation mécanique du prix. Trace de stratégie. »</p>
+
+      <h3 class="scene-title">La dividend protection — petite subtilité, gros mobile</h3>
+
+      <p>Iris conclut sur un point souvent négligé. « Quand une firme verse un dividende, le cours de l'action baisse mécaniquement. Pour un détenteur de convertible, c'est un drame : la probabilité de conversion baisse aussi. »</p>
+
+      <p>D'où la <button type="button" class="keyword" data-term="dividend-protection">dividend protection</button>, clause de compensation pour le détenteur de convertible. Soit par <em>dividend pass-through</em> (chaque dividende versé aux actionnaires est aussi versé proportionnellement aux CB holders), soit par <em>dividend threshold</em> (un seuil de dividendes prévus à l'émission est intégré au pricing — seul l'excès donne lieu à compensation).</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Iris, à voix basse</span>
+        Les CoCo bonds émises par Helena n'avaient AUCUNE clause de dividend protection. C'était l'anomalie qui m'avait alertée. Quelqu'un voulait que les détenteurs perdent. Quelqu'un de l'intérieur.
+      </div>
+
+      <h3 class="scene-title">Spot vs forward — voyage dans le temps</h3>
+
+      <p>Iris bascule sur un autre sujet. « Le marché propose deux types de taux. Le <button type="button" class="keyword" data-term="taux-spot">taux spot</button> R(T) = taux d'aujourd'hui pour T années. Le <button type="button" class="keyword" data-term="taux-forward">taux forward</button> F(x,y) = dans x années, pour y années supplémentaires. »</p>
+
+      <div class="formula-box">
+        <div class="label">— FORMULE FORWARD (PAR NO-ARBITRAGE) —</div>
+        <div class="formula">
+          (1 + R<sub>x+y</sub>)<sup>x+y</sup> = (1 + R<sub>x</sub>)<sup>x</sup> × (1 + F(x,y))<sup>y</sup><br><br>
+          F(x,y) = [(1 + R<sub>x+y</sub>)<sup>x+y</sup> / (1 + R<sub>x</sub>)<sup>x</sup>]<sup>1/y</sup> − 1
+        </div>
+      </div>
+
+      <p><strong>ATTENTION AU PIÈGE :</strong> F(3,2) ≠ F(2,3). « Dans 3 ans pour 2 ans » n'est pas « Dans 2 ans pour 3 ans ». Chaque mot compte.</p>
+
+      <p>Si la courbe spot est croissante, la courbe forward est <em>au-dessus</em>. Si elle est décroissante, la forward est <em>en dessous</em>. Le spot est une moyenne pondérée des forwards successifs.</p>
+
+      <h3 class="scene-title">Exercice — Costa fait le calcul</h3>
+
+      <p>Costa retrouve dans les dossiers d'Iris une note avec une courbe : R₁=9 %, R₂=10 %, R₃=11 %. Iris devait calculer F(1,1).</p>
+
+      <div class="calc-block">
+        <div class="calc-label">CALCUL DE F(1,1)</div>
+        <div class="calc-step">(1 + R₂)² = (1 + R₁) × (1 + F(1,1))</div>
+        <div class="calc-step">(1,10)² = (1,09) × (1 + F(1,1))</div>
+        <div class="calc-step">1,21 / 1,09 = 1 + F(1,1)</div>
+        <div class="calc-result">→ F(1,1) ≈ 11,01 %</div>
+      </div>
+
+      <h3 class="scene-title">Le yield-to-maturity</h3>
+
+      <p>Le <button type="button" class="keyword" data-term="ytm">YTM</button> est le taux constant qui fait coller le PV des cash flows au prix de marché. Toujours <strong>entre</strong> le min et le max des spots — c'est une moyenne pondérée par les cash flows.</p>
+
+      <h3 class="scene-title">L'IR swap — couverture parfaite</h3>
+
+      <p>Pour gérer son exposition aux taux, Vellmore utilisait des <button type="button" class="keyword" data-term="ir-swap">interest rate swaps</button> : échange de flux entre une jambe fixe et une jambe flottante. À l'inception, la valeur du swap est <strong>zéro</strong> par construction — le PV de la jambe fixe égale le PV attendu de la jambe flottante. Iris en avait des centaines en portefeuille.</p>
+
+      <h3 class="scene-title">L'aveu partiel</h3>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Iris</span>
+        D'accord, j'avais shorté des CDS sur Vellmore. J'avais misé sur sa chute. Mais je ne l'ai pas tué. Mon frère m'a appelée la veille pour me dire qu'il avait trouvé qui le menaçait. Quelqu'un dans son entourage très proche. Quelqu'un dont personne ne soupçonnait l'existence.
+      </div>
+
+      <div class="pullquote">
+        « En finance comme dans le crime, la première règle, c'est de regarder qui profite. »
+        <span class="pullquote-attribution">— Costa, en sortant de l'immeuble</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== INTERLUDE ============== -->
+<section class="interlude fade-section">
+  <div class="interlude-content">
+    <div class="interlude-stamp">— PIÈCE TROUVÉE DANS UN COFFRE BANCAIRE —</div>
+    <h3 class="interlude-title">Un nom est apparu.</h3>
+    <p class="interlude-text">Dans un coffre suisse au nom de Marcus Vellmore, Costa a trouvé un dossier. Une seule mention : « Convertible Series 2024. Voir Helena. » Le matin même, un nouveau cadavre. Cette fois, dans le penthouse d'Iris.</p>
+  </div>
+</section>
+
+<!-- ============== ACTE V ============== -->
+<section class="chapter fade-section">
+  <div class="container">
+    <div class="chapter-stamp"><div class="stamp-mark">CHAPITRE V</div></div>
+    <div class="chapter-number">v.</div>
+    <h2 class="chapter-title">Le <em>convertible</em> assassin</h2>
+    <p class="chapter-tagline">— Iris est morte. Le dossier convertible mène vers Helena. La bonne sœur ? —</p>
+
+    <div class="narrative">
+      <p>Helena Vellmore, désormais seule à la tête de Vellmore Industries, accepte de recevoir Costa. Elle apporte un dossier d'obligations. Des <button type="button" class="keyword" data-term="convertible">convertible bonds</button> émises par sa firme deux ans après l'IPO posthume de son frère.</p>
+
+      <h3 class="scene-title">L'art de la convertible</h3>
+
+      <p>Une convertible bond, c'est une obligation classique <strong>plus</strong> une option américaine forward-start de conversion en actions. Le coupon est plus faible qu'une bond classique — l'investisseur accepte moins de revenu en échange d'un upside actions.</p>
+
+      <p>Le payoff suit quatre zones selon le cours de l'action :</p>
+
+      <div class="case-file">
+        <h4>LES QUATRE ZONES DE PAYOFF</h4>
+        <p><strong>1. Zone risque crédit.</strong> Cours bas, conversion improbable, vaut comme une bond risquée.</p>
+        <p><strong>2. Zone bond sans risque.</strong> Conversion improbable mais crédit OK.</p>
+        <p><strong>3. Zone hybride.</strong> Cours moyen, l'option a une vraie valeur.</p>
+        <p><strong>4. Zone pure equity.</strong> Cours très haut, conversion quasi certaine, le titre se comporte comme l'action.</p>
+      </div>
+
+      <p>Subtilités à connaître : <button type="button" class="keyword" data-term="soft-call">soft call</button> (l'émetteur peut rappeler si le cours dépasse un trigger) ; <button type="button" class="keyword" data-term="hard-call">hard call</button> (rappel inconditionnel) ; <button type="button" class="keyword" data-term="contingent-conversion">contingent conversion</button> (conversion bloquée tant qu'un seuil n'est pas atteint) ; <button type="button" class="keyword" data-term="cash-settlement">cash settlement</button> (l'émetteur livre du cash plutôt que des actions pour limiter la dilution) ; et les <button type="button" class="keyword" data-term="coco">CoCo bonds</button> qui se convertissent obligatoirement quand un événement déclencheur se produit.</p>
+
+      <p>L'arbitrage convertible : long la convertible, short le stock (delta hedge). On parie que la <strong>vol future réalisée</strong> sera supérieure à la <strong>vol implicite</strong> pricée à l'émission. Le risque principal : le crédit du <em>bond floor</em>.</p>
+
+      <h3 class="scene-title">La courbe des taux — prophète du marché</h3>
+
+      <p>Helena pointe vers un graphique sur le mur. La courbe des taux. Elle raconte l'avenir économique :</p>
+
+      <div class="case-file">
+        <h4>FORMES DE COURBE — DIAGNOSTIC</h4>
+        <p><strong>Normale (légèrement croissante).</strong> Inflation modérée, perspectives claires, conditions stables.</p>
+        <p><strong>Steep (très croissante).</strong> Inflation et croissance fortes anticipées.</p>
+        <p><strong>Flat.</strong> Incertitude, manque de visibilité.</p>
+        <p><strong>Inversée.</strong> Récession imminente ou peur de spirale déflationniste.</p>
+      </div>
+
+      <p>Pour gérer un portefeuille obligataire, on suppose souvent un <button type="button" class="keyword" data-term="parallel-shift">parallel shift</button> : la courbe se translate uniformément. C'est faux dans la réalité — corrélations imparfaites entre maturités. Mais c'est utile pour simplifier.</p>
+
+      <h3 class="scene-title">L'audit forensique — bootstrap pas-à-pas</h3>
+
+      <p>Costa appelle son équipe d'auditeurs. Le criminologue spécialisé en crime financier, <strong>Aaron Brentwood</strong>, ancien quant chez Goldman, étale sur la table cinq obligations saisies dans le coffre de Marcus. La courbe des taux que Marcus pricait se reconstruit ligne par ligne, par <button type="button" class="keyword" data-term="bootstrapping">bootstrapping</button>.</p>
+
+      <div class="case-file">
+        <h4>OBLIGATIONS SAISIES — DOSSIER 47-VLM-VAULT</h4>
+        <p><strong>Bond A.</strong> Maturité 3 mois — Zéro-coupon — Prix : 99,42</p>
+        <p><strong>Bond B.</strong> Maturité 6 mois — Zéro-coupon — Prix : 98,83</p>
+        <p><strong>Bond C.</strong> Maturité 1 an — Zéro-coupon — Prix : 97,72</p>
+        <p><strong>Bond D.</strong> Maturité 2 ans — Coupon 2,25 % annuel — Prix : 100,00</p>
+        <p><strong>Bond E.</strong> Maturité 3 ans — Coupon 2,125 % annuel — Prix : 100,05</p>
+      </div>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Aaron Brentwood</span>
+        Inspecteur, on attaque maturité courte d'abord. Toujours. Si on saute une étape, tout s'effondre. C'est la loi du bootstrap.
+      </div>
+
+      <h3 class="scene-title">Étape 1 — Le taux 3 mois (R₃ₘ)</h3>
+
+      <p>L'obligation A est un zéro-coupon : un seul cash flow de 100 dans 3 mois, soit ¼ d'année.</p>
+
+      <div class="calc-block">
+        <div class="calc-label">CALCUL R₃ₘ</div>
+        <div class="calc-step">99,42 = 100 / (1 + R₃ₘ)^(1/4)</div>
+        <div class="calc-step">(1 + R₃ₘ)^(1/4) = 100 / 99,42 = 1,005835</div>
+        <div class="calc-step">1 + R₃ₘ = (1,005835)^4 = 1,02355</div>
+        <div class="calc-result">→ R₃ₘ ≈ 2,36 %</div>
+      </div>
+
+      <h3 class="scene-title">Étape 2 — Le taux 6 mois (R₆ₘ)</h3>
+
+      <p>Pareil pour l'obligation B, sauf que la maturité est ½ an.</p>
+
+      <div class="calc-block">
+        <div class="calc-label">CALCUL R₆ₘ</div>
+        <div class="calc-step">98,83 = 100 / (1 + R₆ₘ)^(1/2)</div>
+        <div class="calc-step">(1 + R₆ₘ)^(1/2) = 100 / 98,83 = 1,011838</div>
+        <div class="calc-step">1 + R₆ₘ = (1,011838)² = 1,02382</div>
+        <div class="calc-result">→ R₆ₘ ≈ 2,38 %</div>
+      </div>
+
+      <h3 class="scene-title">Étape 3 — Le taux 1 an (R₁)</h3>
+
+      <p>Encore un zéro-coupon. Le plus simple de tous.</p>
+
+      <div class="calc-block">
+        <div class="calc-label">CALCUL R₁</div>
+        <div class="calc-step">97,72 = 100 / (1 + R₁)</div>
+        <div class="calc-step">1 + R₁ = 100 / 97,72 = 1,02333</div>
+        <div class="calc-result">→ R₁ ≈ 2,33 %</div>
+      </div>
+
+      <h3 class="scene-title">Étape 4 — Le taux 2 ans (R₂)</h3>
+
+      <p>Là, ça se complique. L'obligation D a un coupon de 2,25 % annuel sur 2 ans. Deux flux : un coupon dans 1 an, et un coupon + remboursement dans 2 ans. On utilise R₁ déjà calculé pour isoler R₂.</p>
+
+      <div class="calc-block">
+        <div class="calc-label">CALCUL R₂</div>
+        <div class="calc-step">100 = 2,25/(1 + R₁) + 102,25/(1 + R₂)²</div>
+        <div class="calc-step">2,25 / 1,02333 = 2,1987 (terme 1 connu)</div>
+        <div class="calc-step">100 − 2,1987 = 97,8013 (reste à isoler)</div>
+        <div class="calc-step">102,25 / 97,8013 = 1,04549 = (1 + R₂)²</div>
+        <div class="calc-step">1 + R₂ = √1,04549 = 1,02249</div>
+        <div class="calc-result">→ R₂ ≈ 2,25 %</div>
+      </div>
+
+      <h3 class="scene-title">Étape 5 — Le taux 3 ans (R₃)</h3>
+
+      <p>L'obligation E a un coupon de 2,125 % sur 3 ans. Trois flux. R₁ et R₂ déjà connus. On isole R₃.</p>
+
+      <div class="calc-block">
+        <div class="calc-label">CALCUL R₃</div>
+        <div class="calc-step">100,05 = 2,125/(1+R₁) + 2,125/(1+R₂)² + 102,125/(1+R₃)³</div>
+        <div class="calc-step">Terme 1 : 2,125 / 1,02333 = 2,0766</div>
+        <div class="calc-step">Terme 2 : 2,125 / 1,04549 = 2,0325</div>
+        <div class="calc-step">100,05 − 2,0766 − 2,0325 = 95,9409</div>
+        <div class="calc-step">102,125 / 95,9409 = 1,06446 = (1 + R₃)³</div>
+        <div class="calc-step">1 + R₃ = (1,06446)^(1/3) = 1,02103</div>
+        <div class="calc-result">→ R₃ ≈ 2,10 %</div>
+      </div>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Aaron Brentwood</span>
+        On a la courbe ZC complète. Maintenant, les anomalies se voient à l'œil nu. Si Marcus utilisait des taux qui ne respectent PAS cette courbe pour pricer ses propres convertibles, on a la trace d'une manipulation.
+      </div>
+
+      <h3 class="scene-title">Le risque crédit — l'art du défaut</h3>
+
+      <p>Quand on prête, deux risques. Le <button type="button" class="keyword" data-term="default-risk">default risk</button> — quelle est la probabilité d'être payé ? Le <button type="button" class="keyword" data-term="recovery-risk">recovery risk</button> — si on n'est pas payé, combien on récupère ?</p>
+
+      <p>La <button type="button" class="keyword" data-term="lgd">Loss Given Default</button> est souvent modélisée par une distribution Beta en U — les recoveries sont rarement « moyennes ». Soit on récupère beaucoup, soit presque rien. Quatre agences gouvernent les ratings : Standard & Poor's, Moody's, Fitch, Dagong. Frontière critique : <strong>BBB-</strong>. Au-dessus = investment grade. En dessous (BB+ et moins) = speculative grade, high yield, junk bonds.</p>
+
+      <div class="formula-box">
+        <div class="label">— EXPECTED LOSS ACTUALISÉE —</div>
+        <div class="formula">
+          EL = Σ<sub>t</sub> [PD<sub>t</sub> × LGD<sub>t</sub> × EAD<sub>t</sub>] / (1 + r<sub>f</sub>)<sup>t</sup><br><br>
+          Bond risquée = Bond sans risque − EL actualisée
+        </div>
+      </div>
+
+      <h3 class="scene-title">Le CVA — la trace fantôme</h3>
+
+      <p>Brentwood désigne une ligne dans le bilan de Vellmore. « Voici le <button type="button" class="keyword" data-term="cva">Credit Value Adjustment</button>. C'est l'ajustement comptable qui matérialise l'EL. Toute bond risquée doit afficher un CVA. Si Marcus le sous-estimait, ses convertibles étaient surévaluées au bilan. »</p>
+
+      <div class="case-file">
+        <h4>EXEMPLE CHIFFRÉ — CVA ZC 5 ANS</h4>
+        <p><strong>Hypothèses.</strong> Zero-coupon 5 ans, taux sans risque flat 3 %, recovery 40 %, probabilité conditionnelle de défaut 1,25 % par an.</p>
+        <p><strong>Calcul.</strong> Bond sans risque (1 / 1,03⁵ × 100) = 86,2609. Le CVA actualisé sur les 5 années = 3,1549.</p>
+        <p><strong>Bond risquée.</strong> 86,2609 − 3,1549 = 83,106.</p>
+        <p><strong>Yield to maturity implicite.</strong> 3,77 %. Spread = 0,77 %.</p>
+      </div>
+
+      <h3 class="scene-title">L'arbre de défaut — sous probabilité risque-neutre</h3>
+
+      <p>Pour pricer la dette risquée, on utilise un <button type="button" class="keyword" data-term="default-tree">arbre de défaut</button> sous <button type="button" class="keyword" data-term="rn-default">probabilité risque-neutre P*</button>. À chaque période :</p>
+
+      <div class="formula-box">
+        <div class="label">— ARBRE DE DÉFAUT —</div>
+        <div class="formula">
+          Probabilité de survie = 1 − Cumulated default probability<br>
+          Exposure at default = CF actualisés au taux sans risque<br>
+          Recovery = 1 − LGD<br>
+          P* = probabilité risque-neutre (≠ probabilité historique)
+        </div>
+      </div>
+
+      <p>« P* inclut une <em>prime de risque de défaut</em>. C'est ce qui la distingue de la probabilité historique. C'est exactement comme la mesure risque-neutre Q en options : on ne raisonne pas sur ce qui va arriver dans la réalité, mais sur ce que les acteurs valorisent. »</p>
+
+      <h3 class="scene-title">Application — Bond 3 ans 5 % à 104</h3>
+
+      <div class="case-file">
+        <h4>EXERCICE FORENSIQUE</h4>
+        <p><strong>Hypothèses.</strong> Bond 3 ans, coupon annuel 5 %, prix marché 104. PD risque-neutre flat 1,5 %/an, recovery 40 %, taux sans risque flat 2,5 %.</p>
+        <p><strong>Question.</strong> Cette obligation est-elle <em>sous-évaluée</em> ou <em>surévaluée</em> par le marché ?</p>
+      </div>
+
+      <p>Au niveau du portefeuille, le risque principal n'est <em>pas</em> la somme des risques individuels — c'est le <button type="button" class="keyword" data-term="risque-correlation">risque de corrélation</button>. C'est ce qu'on a oublié en 2008.</p>
+
+      <h3 class="scene-title">Le matrix pricing</h3>
+
+      <p>Pour estimer le prix d'une obligation pas encore émise, on regarde des obligations comparables (même qualité crédit) et on interpole linéairement les yields. Une bond 3 ans entre une 2 ans (yield 5,5 %) et une 5 ans (yield 6,5 %) ?</p>
+
+      <div class="calc-block">
+        <div class="calc-label">INTERPOLATION LINÉAIRE</div>
+        <div class="calc-step">Y(3) = Y(2) + (Y(5) − Y(2)) / (5 − 2) × (3 − 2)</div>
+        <div class="calc-step">     = 5,5 % + (6,5 − 5,5)/3 × 1</div>
+        <div class="calc-step">     = 5,5 % + 0,333 %</div>
+        <div class="calc-result">→ Y(3) ≈ 5,833 %</div>
+      </div>
+
+      <h3 class="scene-title">L'audit ROE / Levier — l'enquête sur l'augmentation de capital</h3>
+
+      <p>Aaron Brentwood déroule une autre opération de Vellmore Industries : une augmentation de capital exécutée juste après l'IPO. Tous les chiffres sont là, à analyser un à un.</p>
+
+      <div class="case-file">
+        <h4>OPÉRATION VELLMORE — AUGMENTATION DE CAPITAL POSTHUME</h4>
+        <p><strong>Net income initial.</strong> 1 687,5 M€</p>
+        <p><strong>Equity initial.</strong> 13 500 M€</p>
+        <p><strong>Nombre d'actions.</strong> 150 M</p>
+        <p><strong>Cours.</strong> 135 €</p>
+        <p><strong>EBITDA.</strong> 2 750 M€</p>
+        <p><strong>Dette.</strong> 5 500 M€</p>
+        <p><strong>Levée totale visée.</strong> 8 000 M€</p>
+        <p><strong>ROE marginal sur nouvel investissement.</strong> 9,5 %</p>
+        <p><strong>Coût de la nouvelle dette après impôt.</strong> 4,5 %</p>
+        <p><strong>Levier cible.</strong> 3,5× EBITDA</p>
+        <p><strong>Prix d'émission des nouvelles actions.</strong> 120 €</p>
+      </div>
+
+      <h3 class="scene-title">Étape 1 — ROE et levier initiaux</h3>
+
+      <div class="calc-block">
+        <div class="calc-label">RATIOS DE DÉPART</div>
+        <div class="calc-step">ROE = Net Income / Equity = 1 687,5 / 13 500</div>
+        <div class="calc-result">→ ROE = 12,5 %</div>
+        <div class="calc-step" style="margin-top: 12px;">Levier = Dette / EBITDA = 5 500 / 2 750</div>
+        <div class="calc-result">→ Levier = 2,0×</div>
+        <div class="calc-step" style="margin-top: 12px;">EPS = Net Income / Nb actions = 1 687,5 / 150</div>
+        <div class="calc-result">→ EPS initial = 11,25 €</div>
+      </div>
+
+      <h3 class="scene-title">Étape 2 — Répartition Dette / Equity</h3>
+
+      <p>Marcus voulait monter à 3,5× EBITDA pour limiter la dilution. La dette levée est donc de 1,5 × EBITDA supplémentaires.</p>
+
+      <div class="calc-block">
+        <div class="calc-label">RÉPARTITION DE LA LEVÉE</div>
+        <div class="calc-step">Nouvelle dette = 1,5 × 2 750 = 4 125 M€</div>
+        <div class="calc-step">Equity levé = 8 000 − 4 125 = 3 875 M€</div>
+        <div class="calc-step">Nb nouvelles actions = 3 875 / 120 = 32,29 M actions</div>
+        <div class="calc-result">→ 32,29 M nouvelles actions émises</div>
+      </div>
+
+      <h3 class="scene-title">Étape 3 — Nouveau Net Income</h3>
+
+      <p>Trois effets à intégrer. Et comme le rappelle Brentwood : <em>« L'argent levé n'attend pas. Les 8 milliards entiers sont investis, pas seulement la part en dette. »</em></p>
+
+      <div class="calc-block">
+        <div class="calc-label">NOUVEAU NET INCOME</div>
+        <div class="calc-step">+ Ancien NI : 1 687,5 M€</div>
+        <div class="calc-step">− Coût après impôt nouvelle dette : 4,5 % × 4 125 = −185,6 M€</div>
+        <div class="calc-step">+ Retour ROE marginal sur 8 Md€ : 9,5 % × 8 000 = +760 M€</div>
+        <div class="calc-step">────────────────────</div>
+        <div class="calc-step">Total = 1 687,5 − 185,6 + 760</div>
+        <div class="calc-result">→ Nouveau NI = 2 261,9 M€</div>
+      </div>
+
+      <h3 class="scene-title">Étape 4 — Nouvel EPS et nouveau Share Price</h3>
+
+      <div class="calc-block">
+        <div class="calc-label">EPS ET COURS APRÈS OPÉRATION</div>
+        <div class="calc-step">Nouveau nb d'actions = 150 + 32,29 = 182,29 M</div>
+        <div class="calc-step">Nouveau EPS = 2 261,9 / 182,29 = 12,41 €</div>
+        <div class="calc-step">PER initial = 135 / 11,25 = 12</div>
+        <div class="calc-step">Nouveau cours (PER constant) = 12 × 12,41</div>
+        <div class="calc-result">→ Nouveau Share Price ≈ 148,9 €</div>
+      </div>
+
+      <p>Le cours <em>monte</em> mécaniquement de 135 € à 148,9 €. L'opération est <strong>relutive</strong> car le ROE marginal (9,5 %) > coût après impôt de la dette (4,5 %), même si elle dilue (32,29 M nouvelles actions).</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Brentwood, après deux heures de calculs</span>
+        Inspecteur, l'opération elle-même est saine. Mais regardez les <em>conditions</em> : la levée a eu lieu trois semaines après le décès de Marcus. Quelqu'un s'est précipité. Quelqu'un savait que Marcus opposerait son veto si l'opération avait lieu de son vivant.
+      </div>
+
+      <h3 class="scene-title">La règle de Taylor — l'ange gardien</h3>
+
+      <p>Pourquoi les taux changent-ils ? Parce que les banques centrales pilotent, selon la <button type="button" class="keyword" data-term="taylor-rule">règle de Taylor</button> :</p>
+
+      <div class="formula-box">
+        <div class="label">— RÈGLE DE TAYLOR —</div>
+        <div class="formula">i<sub>t</sub> = r* + π<sub>t</sub> + a × (π<sub>t</sub> − π*) + b × (output gap)</div>
+      </div>
+
+      <p>Pour la BCE, l'inflation prime. Politique <em>contracyclique</em> : inflation forte → taux montent → économie freine → inflation baisse. Récession (output gap négatif) → taux descendent → emprunts moins chers → relance.</p>
+
+      <h3 class="scene-title">Le paradoxe de la liquidité</h3>
+
+      <div class="pullquote">
+        « La liquidité protège de la volatilité — mais elle est aussi son contraire. »
+        <span class="pullquote-attribution">— Helena Vellmore, 23h47</span>
+      </div>
+
+      <p>Helena s'arrête. « Un actif liquide est par définition plus volatile, parce que n'importe qui peut entrer ou sortir. Un actif illiquide MASQUE sa vraie volatilité, parce que la NAV est une <em>estimation</em>, pas un mark-to-market. La vraie valeur n'existe que le jour de la cession. »</p>
+
+      <p>Le mécanisme de <button type="button" class="keyword" data-term="gating">gating</button> protège les investisseurs en évitant les ventes forcées avec décote massive. Mais il peut aussi piéger : si un émetteur cache la vraie valeur derrière une NAV optimiste, les investisseurs sont condamnés à attendre la révélation.</p>
+
+      <h3 class="scene-title">La révélation</h3>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Helena, lentement</span>
+        Inspecteur. Les convertibles que j'ai émises l'année dernière étaient des CoCo bonds liées à un trigger crédit caché. Si Vellmore Industries franchissait un seuil de défaut technique, elles se convertissaient automatiquement — diluant massivement les actionnaires existants. <em>Mais permettant à un détenteur de prendre le contrôle de la firme</em>.
+      </div>
+
+      <p>Costa comprend. La personne qui détenait ces convertibles depuis le début, dans l'ombre, c'était quelqu'un qui avait acheté le silence. Quelqu'un qui voulait Marcus mort, Iris morte, et bientôt, peut-être, Helena.</p>
+
+      <p>Don Keizer. Le sponsor du SPAC concurrent. Le seul à n'avoir aucun mobile apparent. Et donc le mobile parfait.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ACTE VI ============== -->
+<section class="chapter fade-section">
+  <div class="container">
+    <div class="chapter-stamp"><div class="stamp-mark">CHAPITRE FINAL</div></div>
+    <div class="chapter-number">vi.</div>
+    <h2 class="chapter-title">L'<em>ESG</em>, le levier et la <em>magie noire</em></h2>
+    <p class="chapter-tagline">— Don Keizer, sponsor de SPAC. Roi de la titrisation. Maître de l'ombre. —</p>
+
+    <div class="narrative">
+      <p>Costa traque Don Keizer jusqu'à un appartement vide à Tribeca. Sur la table, des dossiers. Des montagnes de dossiers. Et une lettre, encore chaude.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Lettre de Don Keizer</span>
+        Inspecteur, le temps que vous lisiez ceci, je serai loin. Mais je veux que vous compreniez. Marcus m'avait découvert. Il avait trouvé comment je structurais mes opérations. Tout est dans ces dossiers. Lisez-les. Et vous comprendrez pourquoi il fallait qu'il meure.
+      </div>
+
+      <h3 class="scene-title">Première chemise — la finance verte</h3>
+
+      <p>Costa ouvre la première chemise. Des Sustainability-Linked Bonds. Costa découvre la finance durable — et son potentiel d'abus.</p>
+
+      <p>La <button type="button" class="keyword" data-term="finance-durable">finance durable</button> repose sur l'agenda 2030 et les <button type="button" class="keyword" data-term="sdg">Sustainable Development Goals</button> — 17 objectifs définis par l'ONU couvrant la pauvreté, l'éducation, le climat, l'égalité des genres. Marcus avait également signé les <button type="button" class="keyword" data-term="un-pri">Principles for Responsible Investments</button>, six engagements dont notamment l'incorporation des questions ESG dans les analyses d'investissement et le reporting régulier des progrès.</p>
+
+      <div class="case-file">
+        <h4>LES SIX PRINCIPES UN-PRI</h4>
+        <p><strong>1.</strong> Incorporer les questions ESG dans les analyses et décisions d'investissement.</p>
+        <p><strong>2.</strong> Être un actionnaire actif et incorporer l'ESG dans les politiques d'ownership.</p>
+        <p><strong>3.</strong> Demander la disclosure ESG des entités investies.</p>
+        <p><strong>4.</strong> Promouvoir l'acceptation et l'implémentation de ces principes dans l'industrie.</p>
+        <p><strong>5.</strong> Travailler ensemble pour renforcer leur efficacité.</p>
+        <p><strong>6.</strong> Reporter les activités et les progrès vers ces principes.</p>
+      </div>
+
+      <div class="case-file">
+        <h4>LES TROIS FAMILLES DE BONDS DURABLES</h4>
+        <p><strong>Green Bond.</strong> Fonds levés exclusivement utilisés pour des projets verts (renouvelables, efficacité énergétique, transport propre). Quatre principes : use of proceeds, evaluation/selection, management of proceeds, reporting.</p>
+        <p><strong>Sustainability Bond.</strong> Plus large : projets verts ET sociaux. Inclut les social bonds.</p>
+        <p><strong>Sustainability-Linked Bond (SLB).</strong> Le coupon est DIRECTEMENT lié à des KPIs ESG. Si l'émetteur rate ses objectifs, le coupon monte (pénalité financière). Cinq principes, dont la SPT (Sustainability Performance Target) : ambitieuse, benchmarkée, publique.</p>
+      </div>
+
+      <p>Comment l'ESG crée-t-il de la valeur ? Théoriquement : lower sales et lower margins, plus de capex, mais aussi <em>lower WACC</em> et <em>higher growth rate</em>. Les firmes ESG les plus avancées arrivent même à pricer plus haut.</p>
+
+      <p>Don, lui, avait monté des SLB <em>truqués</em> — des KPIs si faciles à atteindre que les coupons ne montaient jamais. Greenwashing institutionnalisé. Marcus l'avait découvert.</p>
+
+      <h3 class="scene-title">Deuxième chemise — le territoire LevFin</h3>
+
+      <p>Don explorait aussi le <button type="button" class="keyword" data-term="lev-fin">leveraged finance</button>, géré par les groupes LevFin des banques. Deux instruments majeurs.</p>
+
+      <div class="case-file">
+        <h4>LEVERAGED LOAN</h4>
+        <p>Prêt bancaire (donc un contrat) rated BB+ ou inférieur. Spread minimum SFOR + 230 bps. Sécurisé par first ou second lien. Maturité 5-7 ans. Floater avec floor sur le Libor. Amortissement lent (1 % par an). Non callable par l'émetteur.</p>
+      </div>
+
+      <div class="case-file">
+        <h4>HIGH YIELD BOND</h4>
+        <p>Bond rated sous BBB-. Coupon de 6-12 %, semi-annuel. Maturité 7-10 ans. Callable avec un lockup de la moitié de la maturité. Schedule typique : Par + 50 % du coupon en année 5, dégressif après.</p>
+      </div>
+
+      <p>Curiosités que Don exploitait :</p>
+      <ul style="margin: 20px 0 30px 30px; line-height: 1.9; font-style: italic; color: var(--typewriter);">
+        <li><strong>Make whole call</strong> — éviter le call à un prix donné en payant un premium = NPV des coupons jusqu'au premier call + 50 bps.</li>
+        <li><strong>Equity clawback</strong> — si la firme fait une IPO ensuite, elle peut racheter une partie de sa dette HY avec le cash levé.</li>
+        <li><strong>Equity warrants</strong> — pour les bonds très spéculatives, des warrants pour acheter 2-5 % (jusqu'à 15-20 %).</li>
+        <li><strong>Escrow account</strong> — compte bloqué pour couvrir 3 à 6 coupons d'avance.</li>
+      </ul>
+
+      <h3 class="scene-title">Troisième chemise — la titrisation, alchimie financière</h3>
+
+      <p>La dernière chemise est la plus épaisse. La <button type="button" class="keyword" data-term="titrisation">titrisation</button> <span class="term-en">securitization</span>. Le pic de la complexité — transformer des actifs <strong>illiquides</strong> en titres <strong>négociables</strong>.</p>
+
+      <p>Le mécanisme : on crée un <button type="button" class="keyword" data-term="spv">SPV</button> <span class="term-en">Special Purpose Vehicle</span>, une entité juridique séparée, <em>bankruptcy-remote</em>. Le SPV achète des actifs (créances, prêts, obligations) et émet des titres adossés à ces actifs.</p>
+
+      <p>L'innovation, c'est le <button type="button" class="keyword" data-term="tranchage">tranchage</button> : on découpe le pool en tranches avec des risques différents.</p>
+
+      <div class="formula-box">
+        <div class="label">— STRUCTURE TRANCHÉE TYPIQUE —</div>
+        <div class="formula" style="text-align: left; font-size: 0.92rem;">
+          Senior AAA — $1200 M — Libor + 25 bps<br>
+          Mezzanine AA — $225 M — Libor + 85 bps<br>
+          Junior BBB — $45 M — Libor + 350 bps<br>
+          Equity — $30 M — Unrated<br>
+          ────────────────────<br>
+          Pool de prêts total : $1500 M
+        </div>
+      </div>
+
+      <p>Le <button type="button" class="keyword" data-term="waterfall">waterfall</button> : les Senior sont payés en premier, puis Mezzanine, puis Junior, et l'Equity ramasse les miettes — ou les pertes. Plus on descend dans la hiérarchie, plus le rendement est élevé. Et le risque, brutal.</p>
+
+      <p>Tout est titrisable :</p>
+      <ul style="margin: 20px 0 30px 30px; line-height: 1.9; color: var(--typewriter);">
+        <li><strong>MBS</strong> (Mortgage Backed) — créances immobilières.</li>
+        <li><strong>CBO</strong> (Bond Obligation) — obligations.</li>
+        <li><strong>CLO</strong> (Loan) — prêts bancaires.</li>
+        <li><strong>CDO</strong> — mix d'actifs.</li>
+        <li><strong>Whole Business Securitization</strong> — cash flows industriels.</li>
+        <li><strong>SBO</strong> (Securitization Buy Out) — titrisation de LBO.</li>
+      </ul>
+
+      <h3 class="scene-title">La vérité finale</h3>
+
+      <p>Costa retourne la dernière page de la lettre. L'écriture devient saccadée.</p>
+
+      <div class="dialogue">
+        <span class="dialogue-speaker">— Don Keizer (suite)</span>
+        Marcus avait découvert que mes structures de titrisation n'étaient pas adossées aux actifs déclarés. Le SPV achetait des créances pourries, je les retranchais en AAA via du <em>tranching</em> agressif et des CDS structurels. Une nouvelle bulle subprime, mais sur du corporate.
+      </div>
+
+      <p>Le risque principal d'un portefeuille de crédit, c'est le <strong>risque de corrélation</strong>. Don l'avait gommé sur le papier en supposant des défauts indépendants. Mais en réalité, tous ses actifs étaient corrélés aux mêmes mouvements macro. Si un événement déclencheur survenait — récession, hausse des taux, choc inflationniste — toute la pyramide s'effondrait. Et lui s'enrichissait en shortant ses propres tranches.</p>
+
+      <p>Marcus l'avait découvert. Il avait préparé un dossier pour la SEC. Don avait commandité son meurtre. Iris, qui en savait trop, avait été éliminée ensuite. Helena, désormais menacée, avait collaboré avec Costa pour piéger Don à travers ses CoCo bonds.</p>
+
+      <div class="pullquote">
+        « En finance, comme dans le crime, ce qui ne se voit pas est souvent ce qui tue. »
+        <span class="pullquote-attribution">— Carnet de Costa, dernière entrée</span>
+      </div>
+
+      <h3 class="scene-title">Épilogue</h3>
+
+      <p>Don Keizer est arrêté à l'aéroport de Genève. Helena Vellmore reste à la tête de Vellmore Industries, désormais firmement engagée dans la finance durable — pour de vrai. Costa range le dossier dans un classeur épais. Affaire close.</p>
+
+      <p>Mais sur son bureau, une nouvelle enveloppe. Un nouveau dossier. Une obligation perpétuelle. Un coupon en kind. Un SPV au Luxembourg. Et un nom qu'elle ne connaissait pas. <em>Encore</em>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============== END ============== -->
+<section class="ending fade-section">
+  <div class="ending-mark">◆ ◆ ◆</div>
+  <h2>FIN<br>de l'Affaire Vellmore</h2>
+  <p>Vous venez de traverser tous les concepts du cours, de l'IPO à la titrisation, en passant par les Grecs, le bootstrapping, les courbes de taux, le risque crédit, l'ESG et la magie noire de la structured finance.</p>
+  <p>Chaque assassinat a été motivé par un mécanisme financier. Chaque suspect avait un mobile lié à un concept. Chaque calcul a été posé pour de vrai.</p>
+  <p style="margin-top: 30px; font-family: 'Special Elite', monospace; font-size: 0.9rem; opacity: 0.6;">— Bonne chance pour l'examen, inspecteur. —</p>
+  <div class="ending-mark" style="margin-top: 40px;">◆ ◆ ◆</div>
+</section>
+
+<script>
+  // Progress bar
+  const progressFill = document.getElementById('progressFill');
+  window.addEventListener('scroll', () => {
+    const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    progressFill.style.width = scrolled + '%';
+  });
+
+  // Fade-in au scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.fade-section').forEach(el => observer.observe(el));
+</script>
+
+<!-- ============== GLOSSAIRE INTERACTIF ============== -->
+
+<!-- Bouton flottant -->
+<button class="glossary-toggle" id="glossaryToggle" aria-label="Ouvrir le carnet d'enquête">
+  <span class="count" id="studiedCount">0</span>
+  <span class="label">CARNET</span>
+</button>
+
+<!-- Backdrop -->
+<div class="modal-backdrop" id="modalBackdrop"></div>
+
+<!-- Modal du terme -->
+<div class="term-modal" id="termModal" role="dialog" aria-modal="true">
+  <button class="term-modal-close" id="termModalClose" aria-label="Fermer">×</button>
+  <div class="term-modal-stamp" id="termCategory">— DÉFINITION OFFICIELLE —</div>
+  <h3 class="term-modal-title" id="termTitle">Titre</h3>
+  <div class="term-modal-en" id="termEn"></div>
+
+  <div class="term-modal-divider"></div>
+
+  <div class="term-modal-section">
+    <div class="term-modal-section-label">Définition</div>
+    <div class="term-modal-definition" id="termDefinition"></div>
+  </div>
+
+  <div class="term-modal-section" id="termFormulaSection" style="display:none">
+    <div class="term-modal-section-label">Formule</div>
+    <div class="term-modal-formula" id="termFormula"></div>
+  </div>
+
+  <div class="term-modal-section" id="termTrapSection" style="display:none">
+    <div class="term-modal-section-label">Piège à connaître</div>
+    <div class="term-modal-trap" id="termTrap"></div>
+  </div>
+
+  <div class="term-modal-foot">
+    <button class="term-modal-mark-btn" id="termMarkBtn">MARQUER COMME ÉTUDIÉ</button>
+    <span class="term-modal-nav" id="termNav"></span>
+  </div>
+</div>
+
+<!-- Panneau latéral du carnet -->
+<aside class="notebook-panel" id="notebookPanel">
+  <div class="notebook-header">
+    <div>
+      <div class="notebook-title">Carnet d'enquête</div>
+      <div class="notebook-subtitle">— GLOSSAIRE TECHNIQUE —</div>
+    </div>
+    <button class="notebook-close" id="notebookClose" aria-label="Fermer">×</button>
+  </div>
+
+  <div class="notebook-progress">
+    <div>PROGRESSION : <span id="progressText">0 / 0 termes</span></div>
+    <div class="notebook-progress-bar"><div class="notebook-progress-fill" id="progressFill2"></div></div>
+  </div>
+
+  <div class="notebook-tabs">
+    <button class="notebook-tab active" data-tab="all">TOUS</button>
+    <button class="notebook-tab" data-tab="studied">✓ ÉTUDIÉS</button>
+    <button class="notebook-tab" data-tab="todo">À VOIR</button>
+  </div>
+
+  <div id="notebookList"></div>
+
+  <button class="notebook-reset" id="notebookReset">↺ RÉINITIALISER LA PROGRESSION</button>
+</aside>
+
+<!-- Tooltip rapide -->
+<div class="quick-tooltip" id="quickTooltip"></div>
+
+<script>
+  // =============================================
+  // GLOSSAIRE COMPLET
+  // =============================================
+  const GLOSSARY = {
+    // ===== ACTE I — IPO & MARCHÉ PRIMAIRE =====
+    "ipo": {
+      cat: "IPO",
+      title: "Introduction en bourse",
+      en: "Initial Public Offering",
+      def: "Opération par laquelle une société non cotée fait son entrée sur un marché public en émettant des actions au public pour la première fois. Permet à la société de lever du capital et aux actionnaires existants de céder une partie de leur participation.",
+    },
+    "equity-story": {
+      cat: "IPO",
+      title: "Equity Story",
+      en: "Le récit stratégique de l'entreprise",
+      def: "Le récit que l'entreprise raconte au marché pour convaincre d'investir. Articule la <em>vision</em>, le <em>positionnement compétitif</em>, le <em>business model</em> et la <em>trajectoire financière</em>. C'est l'un des deux piliers de l'IPO selon le cours, avec la confiance.",
+    },
+    "trust": {
+      cat: "IPO",
+      title: "Trust (confiance)",
+      en: "Trust",
+      def: "Selon le cours, c'est le mot-clé absolu des marchés financiers. Sans confiance des investisseurs, aucune IPO n'est possible. Repose sur la qualité du management, la transparence financière et la cohérence de l'equity story.",
+    },
+    "bought-deal": {
+      cat: "IPO",
+      title: "Bought Deal",
+      en: "Underwritten issue / firm commitment transaction",
+      def: "Engagement maximum de la banque introductrice : elle <em>achète elle-même</em> toutes les actions qu'elle ne parvient pas à placer auprès des investisseurs. Très protecteur pour l'émetteur, très risqué pour la banque.",
+    },
+    "best-effort": {
+      cat: "IPO",
+      title: "Best Effort",
+      en: "Standby agreement",
+      def: "Engagement minimum de la banque : elle fait son <em>possible</em> pour placer les actions, sans aucune garantie de succès. Si l'opération rate, l'émetteur n'est pas indemnisé.",
+    },
+    "spinning": {
+      cat: "IPO",
+      title: "Spinning",
+      en: "Pratique INTERDITE par SEC/FINRA",
+      def: "Allouer des actions IPO à un dirigeant d'entreprise <em>en échange de futurs mandats</em> de banque d'affaires. C'est une forme de corruption (quid pro quo) strictement interdite par la SEC et la FINRA.",
+      trap: "Ne pas confondre avec un placement légitime auprès de family offices ou d'investisseurs stratégiques.",
+    },
+    "laddering": {
+      cat: "IPO",
+      title: "Laddering",
+      en: "Pratique INTERDITE par SEC/FINRA",
+      def: "Allouer une grosse quantité d'actions à certains investisseurs <em>en échange de leur engagement à racheter à un prix donné après l'IPO</em>. Crée une demande artificielle qui fait monter le cours frauduleusement.",
+    },
+    "quiet-period": {
+      cat: "IPO",
+      title: "Quiet Period",
+      en: "Période de silence",
+      def: "Période <em>avant le filing SEC</em> pendant laquelle l'émetteur ne peut pas communiquer publiquement sur l'opération à venir. Sa violation (donner sélectivement des informations à certains investisseurs) est interdite.",
+    },
+    "greenshoe": {
+      cat: "IPO",
+      title: "Option Greenshoe",
+      en: "Overallotment option",
+      def: "Mécanisme de stabilisation du cours après IPO. La banque place jusqu'à <em>15% d'actions en plus</em> que prévu (limite : 6 mois). Si le cours monte → l'émetteur lève 15% supplémentaires. Si le cours baisse → la banque rachète sur le marché pour soutenir le prix.",
+      formula: "Maximum : 15% du nominal de la levée\nDurée maximale : 6 mois",
+    },
+    "spac": {
+      cat: "IPO",
+      title: "SPAC",
+      en: "Special Purpose Acquisition Company",
+      def: "Coquille cotée créée par des sponsors financiers pour acquérir une société non cotée non identifiée au départ. Une fois l'acquisition réalisée, le SPAC absorbe la cible qui se retrouve cotée. Surnommé <em>blank check company</em>.",
+      trap: "Avantages : frais 2-3× moins chers qu'une IPO. Inconvénient : on ne sait pas a priori quelle sera la cible — confiance totale dans les sponsors.",
+    },
+    "bookbuilding": {
+      cat: "IPO",
+      title: "Bookbuilding",
+      en: "Construction du livre d'ordres",
+      def: "Méthode standard de placement où la banque fait un <em>premarketing roadshow</em> auprès des grands investisseurs pour collecter leurs intentions d'achat avant de fixer le prix final. Méthode dominante au détriment des enchères.",
+    },
+    "reverse-takeover": {
+      cat: "IPO",
+      title: "Reverse Takeover",
+      en: "Cotation par fusion inversée",
+      def: "Une firme privée <em>rachète une firme cotée</em> et fusionne avec elle. Résultat : la firme privée devient cotée sans passer par une IPO classique.",
+    },
+    "direct-listing": {
+      cat: "IPO",
+      title: "Direct Listing",
+      en: "Cotation directe",
+      def: "Cotation FULL secondary <em>sans bookbuilding</em>, <em>sans IB</em>, <em>sans Greenshoe</em>, sans allocation aux long-term investors. Très risqué — réservé aux entreprises déjà très connues du grand public (ex : Spotify, Slack).",
+    },
+    "adr": {
+      cat: "IPO",
+      title: "ADR",
+      en: "American Depositary Receipts",
+      def: "Titres représentant un panier d'actions étrangères, listés aux US. Permet à une firme étrangère de toucher les investisseurs américains <em>en plus</em> de son marché domestique. Quatre niveaux : Unsponsored, Level 1 (non listé), Level 2 (full SEC), Level 3 (permet de lever du capital aux US).",
+    },
+
+    // ===== ACTE II — DPS / EQUITY OFFERING =====
+    "augmentation-capital": {
+      cat: "DPS",
+      title: "Augmentation de capital",
+      en: "Equity offering",
+      def: "Vente de nouvelles actions par une société cotée pour lever du capital. Mécaniquement <em>dilutive</em> pour les actionnaires existants. Provoque en moyenne une baisse de cours de <em>3 à 5%</em> à l'annonce (signal de surévaluation possible).",
+    },
+    "eps": {
+      cat: "DPS",
+      title: "EPS",
+      en: "Earnings Per Share",
+      def: "Bénéfice net divisé par le nombre d'actions. Indicateur clé suivi par les investisseurs. Une opération est dite <em>relutive</em> (accretive) si elle fait monter l'EPS.",
+      formula: "EPS = Net Income / Nombre d'actions",
+    },
+    "dps": {
+      cat: "DPS",
+      title: "DPS",
+      en: "Droit Préférentiel de Souscription",
+      def: "Droit attaché à chaque action existante permettant de souscrire à l'augmentation de capital sans être dilué. L'actionnaire peut soit <em>exercer</em> ses DPS pour souscrire, soit les <em>vendre</em> sur le marché.",
+    },
+    "terp": {
+      cat: "DPS",
+      title: "TERP",
+      en: "Theoretical Ex-Right Price",
+      def: "Cours théorique de l'action <em>après l'exercice de tous les DPS</em>. C'est une moyenne pondérée par le nombre d'actions. Le prix théorique du DPS correspond à l'écart entre le cours avant opération et le TERP.",
+      formula: "TERP = (N_anc × S₀ + N_new × P_émission) / (N_anc + N_new)\n\nP_DPS = S₀ − TERP",
+    },
+    "gearing": {
+      cat: "Ratios",
+      title: "Gearing",
+      en: "Ratio d'endettement",
+      def: "Rapport entre la dette et les capitaux propres. Mesure le degré d'endettement d'une entreprise. Une augmentation de capital fait <em>baisser</em> le gearing, donc baisse le risque crédit, donc transfère de la richesse des actionnaires vers les créanciers.",
+      formula: "Gearing = Dette / Equity (souvent net debt / equity)",
+    },
+
+    // ===== ACTE III — OPTIONS & GREEKS =====
+    "option": {
+      cat: "Options",
+      title: "Option",
+      en: "Option",
+      def: "Le <em>droit</em> — pas l'obligation — d'acheter ou de vendre un sous-jacent à un prix donné (strike) à une date donnée. La perte est limitée à la prime payée, le gain peut être quasi-illimité.",
+    },
+    "strike": {
+      cat: "Options",
+      title: "Strike",
+      en: "Prix d'exercice",
+      def: "Le prix auquel le détenteur de l'option peut acheter (call) ou vendre (put) le sous-jacent. C'est le prix fixé à l'émission de l'option.",
+    },
+    "call": {
+      cat: "Options",
+      title: "Call",
+      en: "Option d'achat",
+      def: "Le droit (pas l'obligation) d'<em>acheter</em> le sous-jacent au strike. Long call = on achète l'option. Short call = on la vend (potentiellement très risqué : perte non bornée si le sous-jacent monte).",
+    },
+    "put": {
+      cat: "Options",
+      title: "Put",
+      en: "Option de vente",
+      def: "Le droit (pas l'obligation) de <em>vendre</em> le sous-jacent au strike. Permet de se protéger contre une baisse. Acheté massivement par les hedgers et les pessimistes.",
+    },
+    "prime": {
+      cat: "Options",
+      title: "Prime (premium)",
+      en: "Premium",
+      def: "Prix payé par l'acheteur au vendeur de l'option. C'est la perte maximale possible pour l'acheteur. Composée de la valeur intrinsèque + valeur temps.",
+    },
+    "valeur-intrinseque": {
+      cat: "Options",
+      title: "Valeur intrinsèque",
+      en: "Intrinsic Value",
+      def: "Ce que l'option vaudrait si on l'exerçait <em>maintenant</em>. Pour un call : max(S − K, 0). Pour un put : max(K − S, 0). Toujours ≥ 0.",
+    },
+    "valeur-temps": {
+      cat: "Options",
+      title: "Valeur temps",
+      en: "Time Value",
+      def: "Valeur de l'option − valeur intrinsèque. Représente la possibilité que le marché bouge favorablement avant l'expiration. <em>Décroît rapidement à l'approche de l'expiration</em>.",
+    },
+    "grecques": {
+      cat: "Options",
+      title: "Grecques",
+      en: "Greeks",
+      def: "Sensibilités du prix d'une option à différents paramètres. Les principales : <em>Delta</em> (sous-jacent), <em>Gamma</em> (convexité du delta), <em>Vega</em> (vol implicite), <em>Theta</em> (temps), <em>Rho</em> (taux). Les avancées : <em>Vanna, Volga, Omicron</em>.",
+    },
+    "vanna": {
+      cat: "Options",
+      title: "Vanna",
+      en: "Vanna",
+      def: "Sensibilité du <em>Vega au sous-jacent</em>, ou de manière équivalente, sensibilité du <em>Delta à la volatilité</em>. Une grecque de second ordre, importante pour les structures vol-sensibles.",
+      formula: "Vanna = ∂²V / (∂σ ∂S)",
+    },
+    "volga": {
+      cat: "Options",
+      title: "Volga (Vomma)",
+      en: "Volga / Vomma",
+      def: "Convexité du <em>Vega par rapport à la volatilité</em>. Mesure comment le Vega change quand la vol implicite change. Critique pour le pricing des produits exotiques sur la vol.",
+      formula: "Volga = ∂²V / ∂σ²",
+    },
+    "omicron": {
+      cat: "Options",
+      title: "Omicron",
+      en: "Omicron",
+      def: "Sensibilité au <em>spread de crédit</em>. Critique pour le pricing des convertibles et des produits hybrides où le risque crédit est central. Souvent oubliée par les débutants.",
+    },
+    "option-americaine": {
+      cat: "Options",
+      title: "Option américaine",
+      en: "American option",
+      def: "Option exerçable <em>à tout moment</em> entre l'émission et la maturité. La difficulté principale est de décider du moment optimal d'exercice.",
+      trap: "Un put américain <em>in the money</em> vaut plus que son jumeau européen — on peut l'exercer plus tôt et placer le cash récupéré.",
+    },
+    "option-europeenne": {
+      cat: "Options",
+      title: "Option européenne",
+      en: "European option",
+      def: "Option exerçable <em>uniquement à maturité</em>. Plus simple à pricer (formule de Black-Scholes directe pour vanilla).",
+    },
+
+    // ===== ACTE IV — BONDS =====
+    "obligation": {
+      cat: "Bonds",
+      title: "Obligation (bond)",
+      en: "Bond",
+      def: "Instrument de dette émis sur les marchés. Caractéristiques : devise, maturité, taux de coupon, prix (toujours en % du nominal), spread, yield. Émetteurs : États, supranationaux, collectivités, corporates, SPV.",
+    },
+    "perpetuelle": {
+      cat: "Bonds",
+      title: "Obligation perpétuelle",
+      en: "Perpetual / consol bond",
+      def: "Obligation <em>sans maturité</em> — l'émetteur n'est jamais obligé de rembourser le nominal, il paie seulement les coupons à l'infini. Aussi appelée « pers » ou « consol ».",
+    },
+    "spread": {
+      cat: "Bonds",
+      title: "Spread",
+      en: "Credit spread",
+      def: "Différence entre le yield de l'obligation et un taux de référence sans risque. Reflète trois risques : <em>défaut</em>, <em>recovery</em> et <em>liquidité</em>. C'est la rémunération supplémentaire du créancier pour ces risques.",
+      formula: "Spread = Yield bond − Référence sans risque",
+    },
+    "frn": {
+      cat: "Bonds",
+      title: "FRN",
+      en: "Floating Rate Note",
+      def: "Obligation à taux variable. Le coupon est indexé sur un taux de référence + un spread. Exemple : <em>Libor 6M + 150 bps</em>. Souvent assortie de floors et de caps.",
+    },
+    "duration": {
+      cat: "Bonds",
+      title: "Duration",
+      en: "Duration / Modified Duration",
+      def: "Mesure de sensibilité du prix d'une obligation au yield. La <em>Modified Duration</em> est la sensibilité (variation relative). La <em>Duration de Macaulay</em> est une lifetime moyenne pondérée des cash flows.",
+      formula: "Duration = (1 + Yield) × Sensibilité\n\nSensibilité ÉLEVÉE quand maturité longue, coupon faible, yield faible",
+    },
+    "callable": {
+      cat: "Bonds",
+      title: "Callable bond",
+      en: "Obligation rappelable",
+      def: "Bond avec option <em>embedded</em> permettant à l'<em>émetteur</em> de rembourser anticipativement, typiquement quand les taux baissent (refinancement à coût plus faible). Décomposable comme : Bond classique − Call américain (vendu à l'émetteur).",
+      trap: "Coupon plus généreux qu'une bond classique pour rémunérer le risque d'être remboursé trop tôt.",
+    },
+    "puttable": {
+      cat: "Bonds",
+      title: "Puttable bond",
+      en: "Obligation à option de vente",
+      def: "Bond avec option <em>embedded</em> permettant à l'<em>investisseur</em> d'exiger un remboursement anticipé à des dates données. Protège l'investisseur contre la hausse des taux.",
+    },
+    "pik": {
+      cat: "Bonds",
+      title: "Pay-In-Kind (PIK)",
+      en: "Pay-in-kind",
+      def: "Obligation dont les coupons sont payés <em>en obligations supplémentaires</em> plutôt qu'en cash. Aucun cash n'est versé jusqu'au remboursement final. Utilisée principalement par les firmes en distress qui ne peuvent pas payer en cash.",
+    },
+    "taux-spot": {
+      cat: "Forwards",
+      title: "Taux spot",
+      en: "Spot rate",
+      def: "Taux d'aujourd'hui pour une maturité donnée T. C'est le taux observable directement sur le marché pour un emprunt qui débute immédiatement.",
+    },
+    "taux-forward": {
+      cat: "Forwards",
+      title: "Taux forward",
+      en: "Forward rate F(x,y)",
+      def: "Taux <em>aujourd'hui</em> pour un emprunt qui débuterait <em>dans x ans</em>, pour une durée de y ans. Lien rigide avec les spots par no-arbitrage.",
+      formula: "(1 + R_(x+y))^(x+y) = (1 + R_x)^x × (1 + F(x,y))^y\n\nF(x,y) = [(1 + R_(x+y))^(x+y) / (1 + R_x)^x]^(1/y) − 1",
+      trap: "ATTENTION : F(3,2) ≠ F(2,3). Ce sont les facteurs (1+R) qui sont à la puissance, pas les taux. Le « -1 » est en dehors de la racine.",
+    },
+    "ytm": {
+      cat: "Bonds",
+      title: "Yield to Maturity",
+      en: "Yield to Maturity (YTM)",
+      def: "Taux constant qui fait coller le PV des cash flows futurs au prix de marché actuel. C'est l'<em>IRR</em> implicite de l'obligation. Toujours <em>entre</em> le min et le max des taux spots — moyenne pondérée par les cash flows.",
+    },
+    "ir-swap": {
+      cat: "Swaps",
+      title: "Interest Rate Swap",
+      en: "IR swap",
+      def: "Échange de flux entre une jambe <em>fixe</em> et une jambe <em>flottante</em>. Sert à couvrir le risque de taux. Sa <em>valeur à l'inception est zéro</em> par construction — le PV de la jambe fixe égale le PV attendu de la jambe flottante.",
+    },
+
+    // ===== ACTE V — HYBRIDES, CRÉDIT =====
+    "convertible": {
+      cat: "Convert",
+      title: "Convertible bond",
+      en: "Convertible bond",
+      def: "Hybride = obligation classique + option américaine forward-start de conversion en actions. Coupon plus faible qu'une bond classique (l'investisseur accepte moins de revenu en échange d'un upside actions). Maturité < 10 ans.",
+      formula: "CB ≈ Straight Bond + Call long-terme sur action\n\nConversion ratio = nb d'actions / convertible\nConversion price = nominal / conversion ratio",
+    },
+    "soft-call": {
+      cat: "Convert",
+      title: "Soft Call",
+      en: "Soft call",
+      def: "Le rappel par l'émetteur n'est possible que si le cours de l'action <em>dépasse un seuil</em> (trigger / call hurdle). Si l'émetteur rappelle, le détenteur convertit automatiquement.",
+    },
+    "hard-call": {
+      cat: "Convert",
+      title: "Hard Call",
+      en: "Hard call",
+      def: "Rappel <em>inconditionnel</em> par l'émetteur — pas de trigger sur le cours. Plus pénalisant pour le détenteur, donc l'option vaut plus.",
+    },
+    "contingent-conversion": {
+      cat: "Convert",
+      title: "Contingent Conversion",
+      en: "Contingent conversion",
+      def: "La conversion est <em>bloquée</em> tant que le cours n'a pas atteint un certain seuil. Limite le coût pour l'émetteur si l'action ne monte pas franchement.",
+    },
+    "cash-settlement": {
+      cat: "Convert",
+      title: "Cash Settlement",
+      en: "Cash settlement clause",
+      def: "Au moment de la conversion, l'émetteur peut <em>livrer du cash</em> reflétant la valeur de l'action plutôt que des actions. Réduit la dilution pour l'émetteur.",
+    },
+    "coco": {
+      cat: "Convert",
+      title: "CoCo Bond",
+      en: "Contingent Convertible bond",
+      def: "Obligation <em>mandatoirement convertible</em> en actions si un événement déclencheur (trigger event) se produit. Très utilisée par les banques pour leur capital prudentiel : conversion automatique si le ratio réglementaire passe sous un seuil.",
+    },
+    "parallel-shift": {
+      cat: "Curve",
+      title: "Parallel Shift",
+      en: "Translation parallèle de la courbe",
+      def: "Hypothèse simplificatrice : la courbe des taux se translate uniformément (toutes les maturités bougent ensemble). Faux dans la réalité (corrélation imparfaite entre maturités) mais utile pour simplifier la gestion de portefeuille.",
+    },
+    "bootstrapping": {
+      cat: "Curve",
+      title: "Bootstrapping",
+      en: "Bootstrap method",
+      def: "Méthode de reconstruction de la <em>courbe zéro-coupon</em> à partir des prix de marché des obligations à coupons. Procède par récurrence en partant de la maturité la plus courte, en calculant une inconnue à la fois.",
+      trap: "Discipline absolue : il faut TOUJOURS partir de la maturité courte vers la longue. Si on saute une étape, on est bloqué.",
+    },
+    "default-risk": {
+      cat: "Credit",
+      title: "Default Risk",
+      en: "Risque de défaut",
+      def: "Risque que l'émetteur ne respecte pas ses obligations de paiement. Quantifié par la <em>PD</em> (Probability of Default). Une des deux composantes principales du risque crédit.",
+    },
+    "recovery-risk": {
+      cat: "Credit",
+      title: "Recovery Risk",
+      en: "Risque de recovery",
+      def: "Risque sur le <em>montant récupéré</em> en cas de défaut. Exprimé via le <em>Recovery Rate</em> ou son complémentaire <em>LGD</em>. Deuxième composante majeure du risque crédit.",
+    },
+    "lgd": {
+      cat: "Credit",
+      title: "Loss Given Default",
+      en: "LGD",
+      def: "Pourcentage de perte sur l'exposition en cas de défaut. LGD = 1 − Recovery Rate. Souvent modélisée par une <em>distribution Beta en U</em> : recoveries rarement « moyennes » (soit on récupère beaucoup, soit presque rien).",
+      formula: "LGD = 1 − Recovery Rate\n\nExpected Loss = Σ_t (PD_t × LGD_t × EAD_t) / (1+r_f)^t",
+    },
+    "risque-correlation": {
+      cat: "Credit",
+      title: "Risque de corrélation",
+      en: "Correlation risk",
+      def: "Le <em>vrai</em> risque d'un portefeuille de crédit. Si tous les actifs sont corrélés aux mêmes mouvements macro (récession, choc inflation), un événement déclencheur fait s'effondrer toute la pyramide. <em>C'est ce qu'on a oublié en 2008</em>.",
+    },
+    "taylor-rule": {
+      cat: "Macro",
+      title: "Règle de Taylor",
+      en: "Taylor rule",
+      def: "Règle qui relie le taux directeur cible d'une banque centrale à l'écart d'inflation et à l'output gap. Politique <em>contracyclique</em> : freine quand l'économie surchauffe, relance en récession. Pour la BCE, l'inflation prime sur l'output gap.",
+      formula: "i_t = r* + π_t + a × (π_t − π*) + b × output gap\n\noù π* = cible d'inflation et output gap = PIB réel − PIB potentiel",
+    },
+    "gating": {
+      cat: "Liquidité",
+      title: "Gating",
+      en: "Gating mechanism",
+      def: "Mécanisme dans les fonds privés (PE, dette privée) qui <em>limite les retraits</em> en cas de demande excessive. Protège paradoxalement les investisseurs en évitant les ventes forcées avec décote massive de la NAV.",
+    },
+
+    // ===== ACTE VI — LEVFIN & STRUCTURED =====
+    "lev-fin": {
+      cat: "LevFin",
+      title: "Leveraged Finance",
+      en: "Leveraged finance",
+      def: "Dette pour entreprises à fort effet de levier ou rating spéculatif. Deux instruments principaux : <em>leveraged loans</em> (rated BB+ ou moins, spread SFOR+230 bps min, secured) et <em>high yield bonds</em> (rated < BBB-, coupon 6-12%, callable).",
+    },
+    "titrisation": {
+      cat: "Securit",
+      title: "Titrisation",
+      en: "Securitization",
+      def: "Transformation d'<em>actifs illiquides</em> (créances, prêts, mortgages) en <em>titres négociables</em>. Domaine de la structured finance. Hautement complexe — créances d'origine quasiment toujours portées par un SPV.",
+    },
+    "spv": {
+      cat: "Securit",
+      title: "SPV",
+      en: "Special Purpose Vehicle",
+      def: "Entité juridique séparée, <em>bankruptcy-remote</em>, créée pour porter une dette non-recours. Sépare le risque de l'émetteur d'origine. Émet les tranches de la titrisation aux investisseurs.",
+    },
+    "tranchage": {
+      cat: "Securit",
+      title: "Tranchage",
+      en: "Tranching",
+      def: "Découpage d'un pool d'actifs en <em>tranches</em> avec profils de risque différents : Senior AAA, Mezzanine, Junior, Equity. Chaque tranche est indexée sur Libor + un spread croissant avec le risque.",
+    },
+    "waterfall": {
+      cat: "Securit",
+      title: "Waterfall",
+      en: "Cash flow waterfall",
+      def: "Ordre de paiement dans une structure tranchée. Les <em>Senior</em> sont payés en premier, puis Mezzanine, puis Junior. L'<em>Equity</em> ramasse les miettes — ou les pertes en premier.",
+    },
+
+    // ===== AJOUTS DE COUVERTURE COMPLÈTE =====
+    "pestel": {
+      cat: "Stratégie",
+      title: "PESTEL",
+      en: "Political, Economic, Social, Technological, Environmental, Legal",
+      def: "Grille d'analyse de l'environnement macro d'une entreprise selon six dimensions : <em>Politique</em>, <em>Économique</em>, <em>Sociétale</em>, <em>Technologique</em>, <em>Environnementale</em>, <em>Légale</em>. Permet d'identifier les forces externes qui influencent une stratégie d'entreprise et notamment la pertinence d'une IPO.",
+    },
+    "value-chain": {
+      cat: "Stratégie",
+      title: "Value Chain (Porter)",
+      en: "Chaîne de valeur de Porter",
+      def: "Modèle d'analyse de la position concurrentielle d'une entreprise. Examine cinq forces : <em>pouvoir des fournisseurs</em>, <em>pouvoir des clients</em>, <em>menace de nouveaux entrants</em>, <em>menace des substituts</em>, et <em>intensité de la rivalité concurrentielle</em>. Critique pour bâtir l'equity story.",
+    },
+    "executive-team": {
+      cat: "Stratégie",
+      title: "Executive Team",
+      en: "Top management team",
+      def: "Équipe dirigeante d'une entreprise. Les 8 rôles clés à connaître : <em>CEO</em> (Chief Executive Officer), <em>CFO</em> (Chief Financial Officer), <em>VP Marketing/Sales</em>, <em>COO</em> (Chief Operating Officer), <em>Head of Investor Relations</em>, <em>CPO</em> (Chief People Officer), <em>CTO/Head of R&D</em>, <em>General Counsel</em> (juridique).",
+    },
+    "good-ceo": {
+      cat: "Stratégie",
+      title: "Bon CEO",
+      en: "Good CEO traits",
+      def: "Selon le cours, les cinq qualités cardinales d'un bon CEO sont : <em>leadership</em>, <em>team building</em>, <em>entrepreneurship</em>, <em>change management</em>, et <em>financially driven</em> — vision financière forte. C'est cette dernière qui distingue les CEO d'entreprises cotées des autres.",
+    },
+    "amortization": {
+      cat: "Bonds",
+      title: "Schémas d'amortissement",
+      en: "Amortization schedule",
+      def: "Façon dont le principal d'une obligation est remboursé. Cinq types : <em>zero coupon</em> (in fine, sans coupon), <em>bullet/in fine</em> (100% à maturité, standard corporate), <em>partially amortized</em> (avec balloon payment), <em>fully amortized</em> (sans balloon), <em>constant annuity</em> (amortissement + coupon constant — modèle crédit immo).",
+    },
+    "time-path": {
+      cat: "Bonds",
+      title: "Time Path d'une obligation",
+      en: "Time path of a bond",
+      def: "Évolution du prix d'une obligation avec le temps, <em>même à yield constant</em>. Trois cas : <em>at par</em> (coupon = yield, prix constant), <em>below par</em> (coupon < yield, prix monte avec le temps vers le par), <em>above par</em> (coupon > yield, prix descend vers le par).",
+      formula: "Si Coupon = Yield → prix constant\nSi Coupon < Yield → prix monte\nSi Coupon > Yield → prix baisse",
+    },
+    "dividend-protection": {
+      cat: "Convert",
+      title: "Dividend Protection",
+      en: "Dividend protection clause",
+      def: "Clause protégeant le détenteur d'une convertible contre les dividendes versés aux actionnaires (qui font baisser le cours et donc la probabilité de conversion). Deux mécanismes : <em>dividend pass-through</em> (dividende versé proportionnellement aux CB holders) ou <em>dividend threshold</em> (seuil intégré au pricing, seul l'excès est compensé).",
+    },
+    "cva": {
+      cat: "Credit",
+      title: "Credit Value Adjustment",
+      en: "CVA",
+      def: "Ajustement de valeur reflétant le risque de crédit. C'est l'écart entre le prix d'une bond <em>sans risque</em> et le prix d'une bond <em>risquée</em>. Égale l'<em>Expected Loss actualisée</em>. Critique pour la valorisation comptable des dérivés et des obligations.",
+      formula: "Bond risquée = Bond sans risque − CVA\nCVA = Σ_t (PD_t × LGD_t × EAD_t) / (1+r_f)^t",
+    },
+    "default-tree": {
+      cat: "Credit",
+      title: "Arbre de défaut",
+      en: "Default tree",
+      def: "Modélisation arborescente du risque de défaut période par période. À chaque nœud, deux branches : <em>survie</em> (probabilité 1 − PD) et <em>défaut</em> (probabilité PD). Les cash flows sont actualisés au taux sans risque sous probabilité <em>risque-neutre</em>.",
+      formula: "Probabilité de survie = 1 − Cumulated default probability\nExposure at default = CF actualisés au taux sans risque\nRecovery = 1 − LGD",
+    },
+    "rn-default": {
+      cat: "Credit",
+      title: "Probabilité risque-neutre P*",
+      en: "Risk-neutral default probability",
+      def: "Probabilité de défaut <em>incluant une prime de risque de défaut</em>. Diffère de la probabilité historique : c'est celle implicite dans les prix de marché. Permet de valoriser les bonds risquées par espérance actualisée au taux sans risque, comme on le fait pour les options sous Q.",
+      trap: "P* > Probabilité historique en général. La différence est la prime de risque que les investisseurs exigent pour porter le risque de défaut.",
+    },
+    "finance-durable": {
+      cat: "ESG",
+      title: "Finance durable",
+      en: "Sustainable finance",
+      def: "Selon la Commission Européenne : <em>« processus de prise en compte des considérations environnementales et sociales lors des décisions d'investissement, conduisant à des investissements accrus dans des activités durables et de long terme »</em>. Liée à l'agenda 2030 des Nations Unies.",
+    },
+    "sdg": {
+      cat: "ESG",
+      title: "SDG",
+      en: "Sustainable Development Goals",
+      def: "17 objectifs de développement durable définis par les Nations Unies en 2015 dans le cadre de l'agenda 2030. Couvrent : pauvreté, faim, santé, éducation, égalité des genres, eau, énergie propre, croissance, industrie, inégalités, villes, consommation responsable, climat, vie aquatique, vie terrestre, paix, partenariats.",
+    },
+    "un-pri": {
+      cat: "ESG",
+      title: "UN Principles for Responsible Investment",
+      en: "UN-PRI",
+      def: "Six principes définis par les Nations Unies pour guider l'investissement responsable : (1) incorporer ESG aux décisions d'investissement, (2) être un actionnaire actif, (3) demander la disclosure ESG des entités investies, (4) promouvoir l'acceptation des principes, (5) collaborer pour leur efficacité, (6) reporter les progrès.",
+    },
+  };
+
+  // =============================================
+  // ÉTAT
+  // =============================================
+  const STORAGE_KEY = 'vellmore_studied_terms';
+  let studiedTerms = new Set();
+
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) studiedTerms = new Set(JSON.parse(saved));
+  } catch (e) {
+    studiedTerms = new Set();
+  }
+
+  let currentTab = 'all';
+  let currentTerm = null;
+
+  // =============================================
+  // ÉLÉMENTS
+  // =============================================
+  const backdrop = document.getElementById('modalBackdrop');
+  const modal = document.getElementById('termModal');
+  const modalClose = document.getElementById('termModalClose');
+  const termTitle = document.getElementById('termTitle');
+  const termEn = document.getElementById('termEn');
+  const termCat = document.getElementById('termCategory');
+  const termDef = document.getElementById('termDefinition');
+  const termFormulaSection = document.getElementById('termFormulaSection');
+  const termFormula = document.getElementById('termFormula');
+  const termTrapSection = document.getElementById('termTrapSection');
+  const termTrap = document.getElementById('termTrap');
+  const termMarkBtn = document.getElementById('termMarkBtn');
+  const termNav = document.getElementById('termNav');
+
+  const glossaryToggle = document.getElementById('glossaryToggle');
+  const studiedCount = document.getElementById('studiedCount');
+  const notebookPanel = document.getElementById('notebookPanel');
+  const notebookClose = document.getElementById('notebookClose');
+  const notebookList = document.getElementById('notebookList');
+  const progressText = document.getElementById('progressText');
+  const progressFill2 = document.getElementById('progressFill2');
+  const notebookReset = document.getElementById('notebookReset');
+  const notebookTabs = document.querySelectorAll('.notebook-tab');
+  const quickTooltip = document.getElementById('quickTooltip');
+
+  // =============================================
+  // FONCTIONS
+  // =============================================
+  function saveStudied() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...studiedTerms]));
+    } catch (e) {}
+  }
+
+  function updateStudiedUI() {
+    // Marquer les keywords dans le texte
+    document.querySelectorAll('button.keyword[data-term]').forEach(btn => {
+      const term = btn.getAttribute('data-term');
+      if (studiedTerms.has(term)) {
+        btn.classList.add('studied');
+      } else {
+        btn.classList.remove('studied');
+      }
+    });
+
+    // Compteur
+    const totalInGlossary = Object.keys(GLOSSARY).length;
+    studiedCount.textContent = studiedTerms.size;
+    progressText.textContent = `${studiedTerms.size} / ${totalInGlossary} termes`;
+    progressFill2.style.width = `${(studiedTerms.size / totalInGlossary) * 100}%`;
+
+    // Mettre à jour la liste
+    renderNotebook();
+  }
+
+  function showTerm(slug) {
+    const data = GLOSSARY[slug];
+    if (!data) {
+      console.warn('Term inconnu:', slug);
+      return;
+    }
+    currentTerm = slug;
+
+    termTitle.textContent = data.title;
+    termCat.textContent = `— ${data.cat.toUpperCase()} · DÉFINITION OFFICIELLE —`;
+
+    if (data.en) {
+      termEn.textContent = data.en;
+      termEn.style.display = '';
+    } else {
+      termEn.style.display = 'none';
+    }
+
+    termDef.innerHTML = data.def || '';
+
+    if (data.formula) {
+      termFormulaSection.style.display = '';
+      termFormula.textContent = data.formula;
+      termFormula.style.whiteSpace = 'pre-wrap';
+    } else {
+      termFormulaSection.style.display = 'none';
+    }
+
+    if (data.trap) {
+      termTrapSection.style.display = '';
+      termTrap.innerHTML = data.trap;
+    } else {
+      termTrapSection.style.display = 'none';
+    }
+
+    // Bouton "marquer comme étudié"
+    if (studiedTerms.has(slug)) {
+      termMarkBtn.textContent = '✓ ÉTUDIÉ — RETIRER';
+      termMarkBtn.classList.add('studied');
+    } else {
+      termMarkBtn.textContent = 'MARQUER COMME ÉTUDIÉ';
+      termMarkBtn.classList.remove('studied');
+    }
+
+    // Navigation contextuelle
+    const allSlugs = Object.keys(GLOSSARY);
+    const idx = allSlugs.indexOf(slug);
+    termNav.textContent = `${idx + 1} / ${allSlugs.length}`;
+
+    backdrop.classList.add('active');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    backdrop.classList.remove('active');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    currentTerm = null;
+  }
+
+  function toggleStudied() {
+    if (!currentTerm) return;
+    if (studiedTerms.has(currentTerm)) {
+      studiedTerms.delete(currentTerm);
+    } else {
+      studiedTerms.add(currentTerm);
+    }
+    saveStudied();
+    updateStudiedUI();
+    // Re-afficher pour mettre à jour le bouton
+    showTerm(currentTerm);
+  }
+
+  function renderNotebook() {
+    // Grouper par catégorie
+    const allSlugs = Object.keys(GLOSSARY);
+    let filtered;
+    if (currentTab === 'studied') {
+      filtered = allSlugs.filter(s => studiedTerms.has(s));
+    } else if (currentTab === 'todo') {
+      filtered = allSlugs.filter(s => !studiedTerms.has(s));
+    } else {
+      filtered = allSlugs;
+    }
+
+    if (filtered.length === 0) {
+      notebookList.innerHTML = `<div class="notebook-empty">${currentTab === 'studied' ? 'Aucun terme étudié pour l\'instant.' : currentTab === 'todo' ? '🎉 Tous les termes sont étudiés !' : 'Aucun terme.'}</div>`;
+      return;
+    }
+
+    // Grouper par catégorie
+    const byCategory = {};
+    filtered.forEach(slug => {
+      const cat = GLOSSARY[slug].cat;
+      if (!byCategory[cat]) byCategory[cat] = [];
+      byCategory[cat].push(slug);
+    });
+
+    let html = '';
+    Object.keys(byCategory).forEach(cat => {
+      html += `<div class="notebook-section-title">${cat}</div>`;
+      byCategory[cat].forEach(slug => {
+        const term = GLOSSARY[slug];
+        const isStudied = studiedTerms.has(slug);
+        html += `
+          <div class="notebook-term ${isStudied ? 'studied' : ''}" data-term="${slug}">
+            <div class="notebook-term-name">${term.title}</div>
+            ${term.en ? `<div class="notebook-term-cat">${term.en}</div>` : ''}
+          </div>
+        `;
+      });
+    });
+
+    notebookList.innerHTML = html;
+
+    // Bind clicks
+    notebookList.querySelectorAll('.notebook-term').forEach(el => {
+      el.addEventListener('click', () => {
+        const slug = el.getAttribute('data-term');
+        // Fermer le panneau d'abord pour la lisibilité
+        notebookPanel.classList.remove('active');
+        showTerm(slug);
+      });
+    });
+  }
+
+  // =============================================
+  // EVENT LISTENERS
+  // =============================================
+
+  // Click sur les keywords dans le texte
+  function bindKeywordEvents() {
+    const keywords = document.querySelectorAll('button.keyword[data-term]');
+    console.log(`[Vellmore] ${keywords.length} termes cliquables détectés`);
+
+    keywords.forEach(btn => {
+      // Click classique
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const term = btn.getAttribute('data-term');
+        console.log(`[Vellmore] Clic sur: ${term}`);
+        showTerm(term);
+      });
+
+      // Touch pour mobile (au cas où le click ne déclenche pas)
+      btn.addEventListener('touchend', (e) => {
+        // Ne pas dupliquer avec le click
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+        const term = btn.getAttribute('data-term');
+        console.log(`[Vellmore] Touch sur: ${term}`);
+        showTerm(term);
+      }, { passive: false });
+
+      // Tooltip rapide au survol (desktop seulement)
+      btn.addEventListener('mouseenter', (e) => {
+        if ('ontouchstart' in window) return; // Skip sur mobile
+        quickTooltip.textContent = `↑ Cliquer pour la définition`;
+        const rect = btn.getBoundingClientRect();
+        quickTooltip.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
+        quickTooltip.style.top = `${rect.top + window.scrollY}px`;
+        quickTooltip.classList.add('visible');
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        quickTooltip.classList.remove('visible');
+      });
+    });
+  }
+
+  bindKeywordEvents();
+
+  // Modal close
+  modalClose.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+
+  // Mark as studied
+  termMarkBtn.addEventListener('click', toggleStudied);
+
+  // Toggle panneau
+  glossaryToggle.addEventListener('click', () => {
+    notebookPanel.classList.toggle('active');
+  });
+
+  notebookClose.addEventListener('click', () => {
+    notebookPanel.classList.remove('active');
+  });
+
+  // Tabs
+  notebookTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      notebookTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentTab = tab.getAttribute('data-tab');
+      renderNotebook();
+    });
+  });
+
+  // Reset
+  notebookReset.addEventListener('click', () => {
+    if (confirm('Réinitialiser tous les termes étudiés ?')) {
+      studiedTerms.clear();
+      saveStudied();
+      updateStudiedUI();
+    }
+  });
+
+  // ESC pour fermer
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (modal.classList.contains('active')) closeModal();
+      else if (notebookPanel.classList.contains('active')) notebookPanel.classList.remove('active');
+    }
+  });
+
+  // Init
+  updateStudiedUI();
+</script>
+
+</body>
+</html>
