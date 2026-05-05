@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPTIONS DESK — Simulateur de trading</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;0,900;1,400&family=Special+Elite&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg-dark: #050810;
+  --bg-medium: #0d1320;
+  --panel: #141b2d;
+  --panel-light: #1e2840;
+  --gold: #f4c430;
+  --gold-dim: #b8920f;
+  --green: #4ade80;
+  --green-dim: #16a34a;
+  --red: #ef4444;
+  --red-dim: #b91c1c;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --orange: #fb923c;
+  --text: #e6e9f0;
+  --text-dim: #94a3b8;
+  --text-mute: #64748b;
+  --border: #1e293b;
+}
+
+html, body { height: 100%; overflow-x: hidden; }
+
+body {
+  font-family: 'Crimson Pro', Georgia, serif;
+  background:
+    radial-gradient(ellipse 800px 600px at 30% 0%, rgba(244, 196, 48, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 600px 400px at 70% 100%, rgba(96, 165, 250, 0.03) 0%, transparent 60%),
+    var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.screen { display: none; min-height: 100vh; padding: 16px; }
+.screen.active { display: block; animation: fadeIn 0.4s; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container { max-width: 760px; margin: 0 auto; }
+
+/* ================== HEADER ================== */
+.header {
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.header-mark {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.header h1 {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.header h1 em {
+  display: block;
+  font-style: italic;
+  color: var(--gold);
+  margin-top: 4px;
+}
+
+.header-sub {
+  font-style: italic;
+  color: var(--text-dim);
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
+/* ================== INTRO ================== */
+.intro-rules {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 22px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.intro-rules h3 {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.intro-rules ul { list-style: none; }
+.intro-rules li {
+  padding: 7px 0;
+  padding-left: 28px;
+  position: relative;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+.intro-rules li::before {
+  content: '▸';
+  position: absolute;
+  left: 8px;
+  color: var(--gold);
+  font-weight: 900;
+}
+
+/* ================== CONTROLS ================== */
+.btn {
+  display: inline-block;
+  padding: 14px 22px;
+  background: var(--gold);
+  color: var(--bg-dark);
+  border: 2px solid var(--gold);
+  font-family: 'Special Elite', monospace;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  margin: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-weight: bold;
+}
+
+.btn:hover, .btn:active {
+  background: #ffd84d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(244, 196, 48, 0.3);
+}
+
+.btn:disabled {
+  background: var(--panel-light);
+  color: var(--text-dim);
+  border-color: var(--border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--panel);
+  border-color: var(--gold);
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+}
+
+/* ================== HUD TRADER DESK ================== */
+.hud {
+  background: linear-gradient(180deg, var(--panel-light) 0%, var(--panel) 100%);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.hud-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.hud-stat {
+  text-align: center;
+  padding: 6px;
+  border-right: 1px solid var(--border);
+}
+
+.hud-stat:last-child { border-right: none; }
+
+.hud-stat-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: var(--text-mute);
+  margin-bottom: 4px;
+}
+
+.hud-stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.hud-stat-value.green { color: var(--green); }
+.hud-stat-value.red { color: var(--red); }
+
+@media (max-width: 480px) {
+  .hud-stat-value { font-size: 0.95rem; }
+  .hud-stat-label { font-size: 7px; }
+  .hud-grid { gap: 6px; }
+}
+
+/* ================== ROLE BADGE ================== */
+.role-badge {
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.role-badge.market-maker { border-color: var(--blue); }
+.role-badge.prop-trader { border-color: var(--purple); }
+
+.role-badge-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+}
+
+.role-badge.market-maker .role-badge-label { color: var(--blue); }
+.role-badge.prop-trader .role-badge-label { color: var(--purple); }
+
+.role-badge-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  margin-top: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+/* ================== SCENARIO CARD ================== */
+.scenario-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px;
+  margin-bottom: 16px;
+}
+
+.scenario-meta {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.scenario-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.scenario-text {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.scenario-text strong { color: var(--gold); }
+.scenario-text em { color: var(--blue); font-style: italic; }
+
+/* ================== MARKET DATA / TICKER ================== */
+.ticker {
+  background: var(--bg-medium);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin: 14px 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.ticker-header {
+  font-family: 'Special Elite', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.ticker-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 0.88rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.ticker-row:last-child { border-bottom: none; }
+
+.ticker-label {
+  color: var(--text-dim);
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+}
+
+.ticker-value {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.ticker-value.up { color: var(--green); }
+.ticker-value.down { color: var(--red); }
+
+/* ================== CALC BLOCK ================== */
+.calc-block {
+  background: var(--bg-medium);
+  border-left: 3px solid var(--gold);
+  padding: 16px 18px;
+  margin: 16px 0;
+  border-radius: 4px;
+}
+
+.calc-question {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.calc-formula {
+  background: rgba(244, 196, 48, 0.06);
+  padding: 10px 12px;
+  margin: 10px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--text-dim);
+  border-radius: 3px;
+  white-space: pre-wrap;
+  border-left: 2px solid var(--gold-dim);
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.calc-input {
+  flex: 1;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  color: var(--gold);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  outline: none;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.calc-input:focus { border-color: var(--gold); }
+.calc-input.success { border-color: var(--green); color: var(--green); }
+.calc-input.error { border-color: var(--red); color: var(--red); }
+
+.calc-submit {
+  padding: 12px 18px;
+  background: var(--gold);
+  color: var(--bg-dark);
+  border: none;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.calc-hint {
+  font-size: 0.82rem;
+  color: var(--text-mute);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.calc-feedback {
+  margin-top: 12px;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  border-radius: 4px;
+  display: none;
+}
+
+.calc-feedback.show { display: block; animation: fadeIn 0.3s; }
+.calc-feedback.success { background: rgba(74, 222, 128, 0.12); border-left: 3px solid var(--green); color: var(--text); }
+.calc-feedback.error { background: rgba(239, 68, 68, 0.12); border-left: 3px solid var(--red); color: var(--text); }
+.calc-feedback strong { color: var(--gold); }
+
+/* ================== CHOICES ================== */
+.choices-block { margin: 16px 0; }
+
+.choice-prompt {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--gold);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.choice {
+  background: var(--bg-medium);
+  border: 2px solid var(--border);
+  padding: 12px 14px;
+  margin: 7px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.choice:hover {
+  border-color: var(--gold);
+  background: rgba(244, 196, 48, 0.04);
+  transform: translateX(3px);
+}
+
+.choice-letter {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  background: var(--panel-light);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.choice-content { flex: 1; }
+
+.choice-title {
+  font-weight: 700;
+  margin-bottom: 3px;
+  color: var(--text);
+  font-size: 0.97rem;
+}
+
+.choice-detail {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.choice.optimal {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: var(--green);
+}
+.choice.optimal .choice-letter { background: var(--green); color: var(--bg-dark); }
+
+.choice.bad {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--red);
+}
+.choice.bad .choice-letter { background: var(--red); color: white; }
+
+.choice.dim { opacity: 0.5; pointer-events: none; }
+
+/* ================== OUTCOME ================== */
+.outcome-block {
+  background: linear-gradient(135deg, var(--panel), var(--panel-light));
+  border-left: 4px solid var(--gold);
+  padding: 18px;
+  margin: 16px 0;
+  border-radius: 6px;
+  display: none;
+}
+
+.outcome-block.show { display: block; animation: fadeIn 0.5s; }
+
+.outcome-banner {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.outcome-block.win .outcome-banner { color: var(--green); }
+.outcome-block.lose .outcome-banner { color: var(--red); }
+.outcome-block.win { border-left-color: var(--green); }
+.outcome-block.lose { border-left-color: var(--red); }
+
+.outcome-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: var(--gold);
+}
+
+.outcome-block.win .outcome-title { color: var(--green); }
+.outcome-block.lose .outcome-title { color: var(--red); }
+
+.outcome-text {
+  font-size: 0.97rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.outcome-impact {
+  background: var(--bg-dark);
+  padding: 10px 14px;
+  margin-top: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+}
+
+.outcome-impact .impact-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+}
+
+.impact-positive { color: var(--green); }
+.impact-negative { color: var(--red); }
+
+/* ================== PROGRESS BAR ================== */
+.progress-bar {
+  height: 5px;
+  background: var(--panel);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  transition: width 0.5s ease;
+}
+
+.progress-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text-mute);
+  text-align: center;
+}
+
+/* ================== SCENARIO PICKER ================== */
+.scenario-pick {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+  margin: 10px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scenario-pick:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.scenario-pick.completed {
+  border-color: var(--green);
+  background: rgba(74, 222, 128, 0.04);
+}
+
+.scenario-pick-num {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.8rem;
+  color: var(--gold);
+  line-height: 1;
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+
+.scenario-pick.completed .scenario-pick-num { color: var(--green); }
+
+.scenario-pick-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 6px 0 3px;
+  color: var(--text);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.scenario-pick-detail {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.scenario-pick-tags {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-family: 'Special Elite', monospace;
+  font-size: 7px;
+  letter-spacing: 0.15em;
+  padding: 3px 7px;
+  background: var(--bg-medium);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.tag.greek { color: var(--purple); border-color: var(--purple); }
+.tag.bs { color: var(--blue); border-color: var(--blue); }
+.tag.calc { color: var(--orange); border-color: var(--orange); }
+
+/* ================== ENDING ================== */
+.ending-screen {
+  text-align: center;
+  padding: 50px 20px;
+  display: none;
+}
+
+.ending-screen.active { display: block; }
+
+.ending-stamp {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.ending-title {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2.6rem;
+  margin-bottom: 24px;
+  line-height: 1.05;
+}
+
+.ending-stats {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 22px;
+  border-radius: 12px;
+  max-width: 480px;
+  margin: 24px auto;
+}
+
+.ending-stats h3 {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.ending-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ending-stat-row:last-child { border-bottom: none; }
+
+.ending-rating {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  margin-top: 24px;
+  color: var(--gold);
+  line-height: 1.5;
+}
+
+/* ================== KNOWLEDGE BOX ================== */
+.knowledge-box {
+  background: rgba(96, 165, 250, 0.06);
+  border-left: 3px solid var(--blue);
+  padding: 14px 16px;
+  margin: 14px 0;
+  border-radius: 4px;
+}
+
+.knowledge-box-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+
+.knowledge-box-text {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.knowledge-box-text strong { color: var(--blue); }
+
+/* ================== Specific to options trading ================== */
+.greek-display {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.greek-card {
+  background: var(--bg-medium);
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.greek-name {
+  font-family: 'Special Elite', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.greek-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+@media (max-width: 480px) {
+  .greek-display { grid-template-columns: repeat(2, 1fr); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ========== INTRO ========== -->
+<div class="screen active" id="intro">
+  <div class="container">
+    <div class="header">
+      <div class="header-mark">— TRADING DESK SIMULATOR —</div>
+      <h1>OPTIONS<em>DESK</em></h1>
+      <p class="header-sub">Tu es trader options. 6 journées. 6 dossiers à clôturer. Tout le cours mobilisé.</p>
+    </div>
+
+    <div class="intro-rules">
+      <h3>— LE BRIEFING —</h3>
+      <ul>
+        <li>Tu démarres avec un <strong>book de 5 M€</strong> et un <strong>P&L à 0</strong></li>
+        <li>6 scénarios indépendants couvrant tout le cours options</li>
+        <li>Tu alternes entre <strong>market maker</strong> (tu pricies), <strong>prop trader</strong> (tu prends des positions directionnelles), et <strong>structureur</strong> (tu construis des stratégies)</li>
+        <li>À chaque étape : un calcul à effectuer ou une décision à prendre</li>
+        <li>Mauvais calcul → tu reprends. Mauvais choix → tu vis les conséquences chiffrées (perte de P&L)</li>
+        <li>Greeks, Black-Scholes, parité put-call, vol implicite, hedging delta-neutre, options US, exercice anticipé : tout y passe</li>
+        <li>À la fin : <strong>P&L final</strong>, ratio de Sharpe et classement</li>
+      </ul>
+    </div>
+
+    <button class="btn btn-block" onclick="startGame()">▶ OUVRIR LA SESSION DE TRADING</button>
+    <button class="btn btn-secondary btn-block" onclick="resetGame()">↺ NOUVELLE SESSION</button>
+  </div>
+</div>
+
+<!-- ========== HUB ========== -->
+<div class="screen" id="hub">
+  <div class="container">
+    <div class="header">
+      <div class="header-mark">— TRADING DESK · STATUS —</div>
+      <h1>Options <em>Desk</em></h1>
+    </div>
+
+    <div class="hud">
+      <div class="hud-grid">
+        <div class="hud-stat">
+          <div class="hud-stat-label">BOOK</div>
+          <div class="hud-stat-value" id="hudBook">5,00 M€</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">P&L</div>
+          <div class="hud-stat-value green" id="hudPnL">+0</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">SHARPE</div>
+          <div class="hud-stat-value" id="hudSharpe">—</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">DOSSIERS</div>
+          <div class="hud-stat-value" id="hudCount">0/6</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0/6 DOSSIERS CLÔTURÉS</div>
+
+    <div style="height: 16px"></div>
+
+    <div id="scenariosList"></div>
+
+    <div style="height: 16px"></div>
+
+    <button class="btn btn-secondary btn-block" onclick="showScreen('intro')">↺ NOUVELLE SESSION</button>
+  </div>
+</div>
+
+<!-- ========== SCENARIO ========== -->
+<div class="screen" id="scenarioScreen">
+  <div class="container">
+    <button class="btn btn-secondary" onclick="showHub()" style="margin-bottom: 12px; padding: 6px 12px; font-size: 9px;">← TRADING DESK</button>
+
+    <div class="hud">
+      <div class="hud-grid">
+        <div class="hud-stat">
+          <div class="hud-stat-label">BOOK</div>
+          <div class="hud-stat-value" id="scBook">5,00 M€</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">P&L</div>
+          <div class="hud-stat-value green" id="scPnL">+0</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">SHARPE</div>
+          <div class="hud-stat-value" id="scSharpe">—</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">DOSSIERS</div>
+          <div class="hud-stat-value" id="scCount">0/6</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scenarioContent"></div>
+  </div>
+</div>
+
+<!-- ========== ENDING ========== -->
+<div class="screen ending-screen" id="endingScreen">
+  <div class="container">
+    <div class="ending-stamp" id="endingStamp">— FIN DE SESSION —</div>
+    <h1 class="ending-title" id="endingTitle">Verdict du desk</h1>
+
+    <div class="ending-stats">
+      <h3>BILAN DE TRADING</h3>
+      <div class="ending-stat-row"><span>Book final</span><span class="ticker-value" id="endBook">—</span></div>
+      <div class="ending-stat-row"><span>P&L total</span><span class="ticker-value" id="endPnL">—</span></div>
+      <div class="ending-stat-row"><span>Calculs corrects</span><span class="ticker-value" id="endCalcs">—</span></div>
+      <div class="ending-stat-row"><span>Décisions optimales</span><span class="ticker-value" id="endChoices">—</span></div>
+      <div class="ending-stat-row" style="border-top: 2px solid var(--gold); padding-top: 12px; margin-top: 6px;">
+        <span><strong>SCORE GLOBAL</strong></span>
+        <span class="ticker-value" id="endScore" style="font-size: 1.3rem;">—</span>
+      </div>
+    </div>
+
+    <div class="ending-rating" id="endingRating"></div>
+
+    <button class="btn btn-block" onclick="resetGame()" style="max-width: 480px; margin: 20px auto 0;">↺ NOUVELLE SESSION DE TRADING</button>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// DONNÉES — 6 SCÉNARIOS COUVRANT TOUTES LES OPTIONS
+// =====================================================
+
+const SCENARIOS = [
+
+  // ================ SCÉNARIO 1 — Pricing & Put-Call Parity ================
+  {
+    id: 1,
+    title: "L'arbitrage du matin",
+    subtitle: "Test de la parité put-call sur un titre tech. Détecte l'opportunité ou crame ton book.",
+    tags: [{label: 'Put-Call Parity', t: 'bs'}, {label: 'Arbitrage', t: 'calc'}, {label: 'Strike', t: 'bs'}],
+    steps: [
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Tu es prop trader sur le desk options de TechBank. Il est 9h32. Le marché vient d'ouvrir. Sur ton écran, des prix d'options sur l'action <strong>NeoTech</strong> (NEO) clignotent."
+      },
+      {
+        type: 'ticker',
+        title: 'TICKER NEOTECH (NEO)',
+        rows: [
+          { l: 'Cours spot S₀', v: '100,00 €' },
+          { l: 'Strike K (call & put)', v: '100,00 €' },
+          { l: 'Maturité T', v: '6 mois (0,5 an)' },
+          { l: 'Taux sans risque r', v: '4 %' },
+          { l: 'Prix call (offert)', v: '7,50 €' },
+          { l: 'Prix put (offert)', v: '5,00 €' }
+        ]
+      },
+      {
+        type: 'knowledge',
+        text: "<strong>Rappel — Parité put-call :</strong><br>C − P = S − K·e<sup>−rT</sup><br>Long Call + Short Put = Long Forward synthétique. Identité d'arbitrage absolue."
+      },
+      {
+        type: 'calc',
+        question: "Calcule la valeur théorique de C − P selon la parité put-call.",
+        formula: "C − P = S − K·e^(−rT)\n      = 100 − 100 × e^(−0,04 × 0,5)\n      = 100 − 100 × e^(−0,02)\n      = 100 − 100 × 0,9802\n      = 100 − 98,02",
+        answer: 1.98,
+        tolerance: 0.05,
+        unit: '€',
+        hint: "Réponse en € avec 2 décimales (ex : 1.98)",
+        success: "<strong>C − P théorique = 1,98 €</strong>. Mais le marché affiche : 7,50 − 5,00 = <strong>2,50 €</strong>. Écart de 0,52 € = OPPORTUNITÉ D'ARBITRAGE !",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'choice',
+        prompt: "Le marché donne C − P = 2,50 € alors que la parité dit 1,98 €. Que fais-tu ?",
+        options: [
+          {
+            title: "Vendre le call (cher) + acheter le put (juste) + acheter l'action + emprunter K·e^(−rT)",
+            detail: "Construction du portefeuille d'arbitrage exact selon la parité (Reverse conversion).",
+            optimal: true,
+            outcome: "Excellent. Tu vends C à 7,50, achètes P à 5,00, achètes S à 100, empruntes 98,02. Cash net en t=0 : 7,50 − 5,00 − 100 + 98,02 = 0,52 € par lot. Sur 1 000 lots de 100 actions = 52 000 € sans risque.",
+            impact: { pnl: 52000, rep: +15 }
+          },
+          {
+            title: "Acheter le call (cher) et vendre le put (juste)",
+            detail: "Stratégie directionnelle haussière simple.",
+            optimal: false,
+            outcome: "Tu confonds arbitrage et directionnel. Tu te positionnes long-haussier au lieu de capturer l'écart sans risque. Le cours stagne à 100 € pendant 6 mois → tu perds le temps de la prime.",
+            impact: { pnl: -25000, rep: -8 }
+          },
+          {
+            title: "Ne rien faire — l'écart est dans le bid-ask, pas exploitable",
+            detail: "Les bid-ask spreads et frais consomment la marge.",
+            optimal: false,
+            outcome: "Trop prudent. 0,52 € d'écart est largement au-dessus du bid-ask spread normal sur des options liquides. Tu rates 52 K€.",
+            impact: { rep: -3 }
+          }
+        ]
+      },
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Tu as encaissé 52 K€ d'arbitrage. Mais les juniors du desk te demandent : 'Et si on n'avait pas vu les prix du put ?' Tu peux retrouver le prix du put depuis la parité."
+      },
+      {
+        type: 'calc',
+        question: "Si C = 7,50 €, S = 100, K = 100, r = 4 %, T = 0,5, quelle est la valeur THÉORIQUE du put selon la parité ?",
+        formula: "P = C − S + K·e^(−rT)\n  = 7,50 − 100 + 98,02",
+        answer: 5.52,
+        tolerance: 0.05,
+        unit: '€',
+        hint: "Réponse en € avec 2 décimales",
+        success: "<strong>P théorique = 5,52 €</strong>. Le marché l'offrait à 5,00 € — donc le put était sous-évalué. L'arbitrage venait de là.",
+        impact: { rep: +5 }
+      }
+    ]
+  },
+
+  // ================ SCÉNARIO 2 — Black-Scholes & Volatilité ================
+  {
+    id: 2,
+    title: "Le pari sur la volatilité",
+    subtitle: "Tu pricies un call ATM et tu dois décider de la vol implicite à utiliser.",
+    tags: [{label: 'Black-Scholes', t: 'bs'}, {label: 'Vol implicite', t: 'bs'}, {label: 'Vega', t: 'greek'}],
+    steps: [
+      {
+        type: 'role',
+        role: 'market-maker',
+        text: "Tu es <strong>market maker</strong>. Un client institutionnel demande un quote sur un call ATM à 1 an sur l'action <strong>StarCorp</strong>. Tu dois pricer à partir de Black-Scholes."
+      },
+      {
+        type: 'ticker',
+        title: 'PARAMÈTRES STARCORP',
+        rows: [
+          { l: 'Cours spot S₀', v: '100,00 €' },
+          { l: 'Strike K', v: '100,00 € (ATM)' },
+          { l: 'Maturité T', v: '1 an' },
+          { l: 'Taux sans risque r', v: '2 %' },
+          { l: 'Vol historique 90 jours', v: '18 %' },
+          { l: 'Vol implicite des options voisines', v: '25 %' }
+        ]
+      },
+      {
+        type: 'knowledge',
+        text: "<strong>Approximation pratique pour un call ATM :</strong><br>C ≈ 0,4 × S × σ × √T<br>(quand le strike = spot et avec r faible)"
+      },
+      {
+        type: 'choice',
+        prompt: "Quelle volatilité utilises-tu pour pricer ce call ?",
+        options: [
+          {
+            title: "Vol implicite (25%)",
+            detail: "Reflète l'opinion forward du marché sur la volatilité future. C'est la convention market maker.",
+            optimal: true,
+            outcome: "Bonne décision. La vol implicite est par définition celle que le marché 'paie' aujourd'hui pour cette maturité. Pricer en vol historique te ferait sous-vendre.",
+            impact: { rep: +10 }
+          },
+          {
+            title: "Vol historique (18%)",
+            detail: "Reflète ce qui s'est passé sur les 90 derniers jours.",
+            optimal: false,
+            outcome: "Erreur classique. La vol historique est descriptive (passé), pas prédictive. Tu vends tes calls trop cher pour le marché OU les sous-vends si la vol implicite explose ensuite. Tu perds 30 K€ sur le hedge.",
+            impact: { pnl: -30000, rep: -10 }
+          },
+          {
+            title: "Moyenne des deux (21,5%)",
+            detail: "Mix entre passé et présent.",
+            optimal: false,
+            outcome: "Compromis tiède. Le marché te price à 25%, tes concurrents aussi. À 21,5% tu es 14% en dessous du marché — tu bradezhttps tes calls aux clients qui les revendent immédiatement à 25%.",
+            impact: { pnl: -15000, rep: -5 }
+          }
+        ]
+      },
+      {
+        type: 'calc',
+        question: "Avec σ = 25 %, calcule le prix du call ATM via l'approximation 0,4 × S × σ × √T.",
+        formula: "C ≈ 0,4 × 100 × 0,25 × √1\n  = 0,4 × 100 × 0,25 × 1\n  = 10",
+        answer: 10,
+        tolerance: 0.5,
+        unit: '€',
+        hint: "Réponse en € (ex : 10)",
+        success: "<strong>C ≈ 10 €</strong>. Ton quote au client : achat 9,90 / vente 10,10 (avec 20 cts de spread).",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'role',
+        role: 'market-maker',
+        text: "Ton client achète 1 000 calls. Tu es maintenant <strong>short 1 000 calls</strong>. Question critique : ta position est-elle Vega-positive ou Vega-négative ?"
+      },
+      {
+        type: 'choice',
+        prompt: "Tu es short 1000 calls. Si la vol implicite monte de 25% à 30%, que se passe-t-il sur ton P&L ?",
+        options: [
+          {
+            title: "Mon P&L baisse — short call = short Vega",
+            detail: "Toute option longue est Vega-positive. Donc short option = Vega-négatif.",
+            optimal: true,
+            outcome: "Correct. Vega ≈ S × √T / √(2π) ≈ 40 par option ATM. Pour 1000 calls et +5pts de vol : −1000 × 40 × 0,05 = −2 000 € par point... Tu perds en réalité ~20 K€. Tu dois te hedger.",
+            impact: { rep: +10 }
+          },
+          {
+            title: "Mon P&L monte — la hausse de vol fait monter le prix de mes calls vendus",
+            detail: "Hausse de vol = hausse du prix du call.",
+            optimal: false,
+            outcome: "Mauvais signe. Tu confonds long et short. Si tu es SHORT call et que le call vaut plus cher, tu DOIS le racheter plus cher pour clôturer ta position → tu perds.",
+            impact: { pnl: -20000, rep: -10 }
+          }
+        ]
+      },
+      {
+        type: 'calc',
+        question: "Calcule la valeur du Vega d'un call ATM 1 an avec S = 100, T = 1. (formule simplifiée : Vega ≈ S × √T / √(2π))",
+        formula: "Vega ≈ 100 × √1 / √(2π)\n     ≈ 100 × 1 / 2,5066\n     ≈ 39,89",
+        answer: 40,
+        tolerance: 1.5,
+        unit: '€/pt vol',
+        hint: "Réponse arrondie (ex : 40)",
+        success: "<strong>Vega ≈ 40 €</strong>. Pour 1 point de vol qui bouge, le call gagne/perd 0,40 € (Vega exprimé en %).",
+        impact: { rep: +5 }
+      }
+    ]
+  },
+
+  // ================ SCÉNARIO 3 — Greeks et hedging delta-neutre ================
+  {
+    id: 3,
+    title: "Le hedging dynamique",
+    subtitle: "Tu maintiens un portefeuille delta-neutre. Le sous-jacent bouge, tu dois rebalancer.",
+    tags: [{label: 'Delta', t: 'greek'}, {label: 'Gamma', t: 'greek'}, {label: 'Hedging', t: 'calc'}],
+    steps: [
+      {
+        type: 'role',
+        role: 'market-maker',
+        text: "Tu as vendu 1 000 calls hier. Tu es <strong>short 1000 calls</strong>. Tu dois rester <strong>delta-neutre</strong> : ton P&L doit être insensible aux petits mouvements du sous-jacent."
+      },
+      {
+        type: 'ticker',
+        title: 'POSITION ACTUELLE',
+        rows: [
+          { l: 'Position', v: 'Short 1 000 calls' },
+          { l: 'Strike', v: '100 €' },
+          { l: 'Cours sous-jacent S', v: '100 €' },
+          { l: 'Delta du call (Δ)', v: '0,55' },
+          { l: 'Gamma (Γ)', v: '0,03' },
+          { l: 'Maturité restante', v: '6 mois' }
+        ]
+      },
+      {
+        type: 'knowledge',
+        text: "<strong>Hedging delta-neutre :</strong><br>Si tu vends N calls de delta Δ, tu dois <strong>acheter N × Δ actions</strong> pour neutraliser ton exposition au prix du sous-jacent."
+      },
+      {
+        type: 'calc',
+        question: "Combien d'actions dois-tu acheter pour rester delta-neutre ?",
+        formula: "Actions à acheter = N_calls × Δ\n                  = 1 000 × 0,55",
+        answer: 550,
+        tolerance: 5,
+        unit: 'actions',
+        hint: "Réponse en nombre d'actions (ex : 550)",
+        success: "<strong>550 actions à acheter</strong>. Ton portefeuille : −1000 calls (delta total −550) + 550 actions (delta total +550) = delta net 0.",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'role',
+        role: 'market-maker',
+        text: "Tu as acheté 550 actions à 100 €. Une heure plus tard, le cours monte à <strong>105 €</strong>. Le delta du call est passé à 0,68."
+      },
+      {
+        type: 'calc',
+        question: "Tu dois ajuster ton hedge. Combien d'actions supplémentaires dois-tu acheter ?",
+        formula: "Nouveau besoin total = 1 000 × 0,68 = 680\nActions déjà détenues = 550\nÀ ajouter = 680 − 550",
+        answer: 130,
+        tolerance: 3,
+        unit: 'actions',
+        hint: "Réponse en nombre d'actions",
+        success: "<strong>130 actions supplémentaires à acheter</strong> à 105 €. Tu as maintenant 680 actions, position re-delta-neutralisée.",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'choice',
+        prompt: "Tu rebalances en achetant haut (105 €) et auras à vendre bas si le cours redescend. C'est le coût du gamma. Comment l'interprètes-tu ?",
+        options: [
+          {
+            title: "Je suis short gamma → je perds en rebalansant. Le P&L vient de la prime collectée à la vente initiale.",
+            detail: "Vendre des options = être short gamma = payer pour le rebalansement.",
+            optimal: true,
+            outcome: "Excellente analyse. La prime du call (vendue 7-10€) compense ces ajustements de hedging. Le market maker fait son P&L sur le bid-ask et la valeur temps qui décroît (theta positif quand short).",
+            impact: { rep: +15, pnl: 8000 }
+          },
+          {
+            title: "Je devrais arrêter de hedger pour limiter les frais",
+            detail: "Le hedging coûte cher en commissions et écarts de prix.",
+            optimal: false,
+            outcome: "Désastreux. Sans hedge, tu es exposé directionnel. Si le cours monte à 120 €, tu perds 1000 × 20 = 20 K€ sur les calls vendus.",
+            impact: { pnl: -20000, rep: -15 }
+          },
+          {
+            title: "Je devrais acheter plus que 130 actions pour me protéger d'une hausse plus forte",
+            detail: "Anticiper la hausse en sur-hedgeant.",
+            optimal: false,
+            outcome: "Tu n'es plus delta-neutre, tu es directionnel. Si le cours redescend, tu perds sur l'excès d'actions. Discipline = strict delta-neutre.",
+            impact: { pnl: -5000, rep: -5 }
+          }
+        ]
+      },
+      {
+        type: 'role',
+        role: 'market-maker',
+        text: "Le cours redescend à <strong>98 €</strong>. Le delta retombe à 0,48."
+      },
+      {
+        type: 'calc',
+        question: "Combien d'actions dois-tu vendre pour re-neutraliser ?",
+        formula: "Nouveau besoin = 1 000 × 0,48 = 480\nActions actuelles = 680\nÀ vendre = 680 − 480",
+        answer: 200,
+        tolerance: 5,
+        unit: 'actions',
+        hint: "Vente nette en actions",
+        success: "<strong>200 actions à vendre</strong> à 98 €. Tu vends moins cher que ton prix d'achat moyen → c'est le coût du gamma. Mais ton theta court (vendeur d'option) compense.",
+        impact: { rep: +5, pnl: -1500 }
+      }
+    ]
+  },
+
+  // ================ SCÉNARIO 4 — Greeks de second ordre ================
+  {
+    id: 4,
+    title: "Vanna, Volga, Theta",
+    subtitle: "Un client veut une option exotique. Tu dois pricer en intégrant les Greeks de second ordre.",
+    tags: [{label: 'Vanna', t: 'greek'}, {label: 'Volga', t: 'greek'}, {label: 'Theta', t: 'greek'}],
+    steps: [
+      {
+        type: 'role',
+        role: 'market-maker',
+        text: "Un hedge fund te demande de pricer une option exotique sur l'EUR/USD. Avec ces produits, les Greeks de second ordre comptent autant que le Vega de premier ordre."
+      },
+      {
+        type: 'knowledge',
+        text: "<strong>Les Greeks de second ordre :</strong><br>• <strong>Vanna</strong> = ∂²V/(∂σ ∂S) — sensibilité du Vega au sous-jacent (= sensibilité du Delta à la vol)<br>• <strong>Volga (Vomma)</strong> = ∂²V/∂σ² — convexité du Vega par rapport à la vol<br>• <strong>Charm</strong> = ∂²V/(∂t ∂S) — vitesse de variation du Delta avec le temps"
+      },
+      {
+        type: 'choice',
+        prompt: "Le client demande une option exotique sensible aux mouvements EXTRÊMES de vol. Quel Greek devrait-tu surveiller en priorité ?",
+        options: [
+          {
+            title: "Volga — convexité du Vega à la vol",
+            detail: "Volga capte le fait que la sensibilité à la vol n'est pas linéaire.",
+            optimal: true,
+            outcome: "Exact. Une option avec Volga élevée gagne plus que prévu si la vol explose à 50% (et perd plus si elle s'effondre à 5%). C'est crucial pour les barrières et binaires.",
+            impact: { rep: +10 }
+          },
+          {
+            title: "Vanna — sensibilité du Vega au sous-jacent",
+            detail: "Vanna est utile mais pas pour des mouvements extrêmes de vol seuls.",
+            optimal: false,
+            outcome: "Vanna est important quand le sous-jacent ET la vol bougent ensemble (smile dynamics). Pour des mouvements purs de vol, c'est Volga.",
+            impact: { rep: -5 }
+          },
+          {
+            title: "Theta — décroissance temporelle",
+            detail: "Theta concerne le passage du temps, pas la vol.",
+            optimal: false,
+            outcome: "Hors sujet. Theta n'a rien à voir avec les mouvements de vol.",
+            impact: { rep: -8 }
+          }
+        ]
+      },
+      {
+        type: 'role',
+        role: 'market-maker',
+        text: "Tu pricies l'exotique à 12 € avec un Vega de 35 et une Volga de 8. Si la vol passe de 25 % à 30 % (variation +5pts), quel est l'impact total approximatif sur le prix ?"
+      },
+      {
+        type: 'calc',
+        question: "Approxime la variation de prix avec un dévelop. de Taylor : ΔV ≈ Vega × Δσ + ½ × Volga × (Δσ)²",
+        formula: "ΔV ≈ Vega × Δσ + 0,5 × Volga × Δσ²\n   ≈ 35 × 0,05 + 0,5 × 8 × (0,05)²\n   ≈ 1,75 + 0,01\n   ≈ 1,76",
+        answer: 1.76,
+        tolerance: 0.05,
+        unit: '€',
+        hint: "Réponse en € avec 2 décimales (ex : 1.76)",
+        success: "<strong>ΔV ≈ 1,76 €</strong>. Le terme Volga (0,01) est petit ici. Mais sur des mouvements de vol plus larges (+15pts), le terme quadratique devient déterminant.",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Maintenant, sur ton portefeuille personnel, tu as long 100 calls qui valent 5 € pièce. Theta = −0,02 €/jour par call."
+      },
+      {
+        type: 'calc',
+        question: "Combien perds-tu chaque jour en valeur temps (theta bleeding) sur ces 100 calls ?",
+        formula: "Perte/jour = N × |Theta|\n          = 100 × 0,02",
+        answer: 2,
+        tolerance: 0.1,
+        unit: '€',
+        hint: "Simple multiplication (ex : 2)",
+        success: "<strong>2 €/jour de perte mécanique</strong>. Sur 30 jours sans bouger, tu auras perdu 60 € de valeur temps. Le 'theta bleeding' est le coût de tenir des options longues.",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'choice',
+        prompt: "Tu es long 100 calls. Le sous-jacent ne bouge pas pendant 2 mois. Que se passe-t-il ?",
+        options: [
+          {
+            title: "Mes calls perdent ~120 € de valeur temps (60 jours × 2 €)",
+            detail: "Theta bleeding cumulatif sans compensation.",
+            optimal: true,
+            outcome: "Correct. Sans mouvement, le theta consomme la prime. C'est la lèpre du long-options.",
+            impact: { rep: +5 }
+          },
+          {
+            title: "Mes calls gardent leur valeur tant que la vol reste constante",
+            detail: "Pas de mouvement = pas de changement.",
+            optimal: false,
+            outcome: "Erreur. Le temps qui passe FAIT BAISSER la prime même si tout le reste est constant. C'est le theta bleeding.",
+            impact: { rep: -10 }
+          }
+        ]
+      }
+    ]
+  },
+
+  // ================ SCÉNARIO 5 — Options US et exercice anticipé ================
+  {
+    id: 5,
+    title: "Le put américain ITM",
+    subtitle: "Un client te demande s'il faut exercer son put américain en avance. Argumente.",
+    tags: [{label: 'Option US', t: 'bs'}, {label: 'Exercice anticipé', t: 'calc'}, {label: 'Put-Call US', t: 'bs'}],
+    steps: [
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Un client institutionnel détient un put américain profondément <strong>ITM</strong> (in-the-money). Il hésite à l'exercer maintenant ou à attendre la maturité. Tu dois le conseiller."
+      },
+      {
+        type: 'ticker',
+        title: 'POSITION CLIENT',
+        rows: [
+          { l: 'Type', v: 'Put américain' },
+          { l: 'Strike K', v: '100 €' },
+          { l: 'Cours actuel S', v: '70 €' },
+          { l: 'Maturité restante', v: '4 mois' },
+          { l: 'Taux sans risque', v: '4 %' },
+          { l: 'Vol implicite', v: '20 %' },
+          { l: 'Prime du put US sur le marché', v: '32 €' },
+          { l: 'Valeur intrinsèque', v: '100 − 70 = 30 €' }
+        ]
+      },
+      {
+        type: 'knowledge',
+        text: "<strong>Put américain ITM :</strong><br>Pour un put profondément ITM, l'exercice anticipé peut être OPTIMAL. Pourquoi ? En exerçant, tu reçois K maintenant, que tu peux placer au taux sans risque. Plus K est grand et r élevé, plus l'incitation est forte. C'est l'asymétrie put US vs put EU."
+      },
+      {
+        type: 'choice',
+        prompt: "Le client doit-il exercer son put américain maintenant ?",
+        options: [
+          {
+            title: "Oui, exercer maintenant : il reçoit 100 € qu'il peut placer 4 mois à 4%",
+            detail: "L'exercice immédiat capture les 30 € intrinsèques + permet de placer K.",
+            optimal: false,
+            outcome: "Pas si vite. Exercer maintenant te donne 30 € (K-S = 100-70). Mais le put SE VEND à 32 € sur le marché → tu obtiendrais 2 € de plus en le revendant. La règle : si le put a une valeur temps positive, vendre > exercer.",
+            impact: { pnl: -2000, rep: -5 }
+          },
+          {
+            title: "Non, vendre le put sur le marché à 32 € — capture les 2 € de valeur temps en plus",
+            detail: "Vente sur marché > exercice si valeur temps > 0.",
+            optimal: true,
+            outcome: "Excellent. Vendre = 32 €/put. Exercer = 30 €/put. Vendre est meilleur de 2 €. Sur 1 000 puts = 2 000 € de différence. Règle : exercer un put US n'est optimal QUE si pas de marché secondaire ou prime = intrinsèque.",
+            impact: { pnl: 2000, rep: +15 }
+          },
+          {
+            title: "Attendre la maturité — la valeur intrinsèque ne peut que monter",
+            detail: "Le cours pourrait baisser encore, et le put gagnerait plus.",
+            optimal: false,
+            outcome: "Attention. Le cours peut aussi remonter à 90 € → tu ne ferais que 10 € au lieu de 32 € en vendant maintenant. Tu prends un risque directionnel non rémunéré.",
+            impact: { pnl: -5000, rep: -8 }
+          }
+        ]
+      },
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Le client te demande pourquoi un put US peut justement avoir une valeur supérieure à son jumeau européen."
+      },
+      {
+        type: 'choice',
+        prompt: "Pour deux puts identiques (un US, un EU) sur le même sous-jacent, quel est le rapport de valeur ?",
+        options: [
+          {
+            title: "Put US = Put EU (ils ont la même valeur)",
+            detail: "Le droit d'exercice anticipé n'a pas de valeur additionnelle.",
+            optimal: false,
+            outcome: "Faux pour les puts. Pour les calls SUR ACTION SANS DIVIDENDE, c'est vrai. Mais pour les puts (et calls avec dividende), l'exercice anticipé peut créer de la valeur additionnelle.",
+            impact: { rep: -10 }
+          },
+          {
+            title: "Put US > Put EU (le droit d'exercice anticipé a une valeur)",
+            detail: "Pour un put profondément ITM, exercer anticipé permet de placer K au taux sans risque.",
+            optimal: true,
+            outcome: "Correct. Le put US offre TOUT ce que fait le put EU + l'option d'exercice anticipé. Cette flexibilité a forcément une valeur ≥ 0.",
+            impact: { rep: +10 }
+          },
+          {
+            title: "Put US < Put EU",
+            detail: "Le put US perd de la valeur car son acheteur peut être tenté d'exercer trop tôt.",
+            optimal: false,
+            outcome: "Logique inversée. C'est l'acheteur qui décide d'exercer, donc c'est SON option. Plus de flexibilité = plus de valeur.",
+            impact: { rep: -8 }
+          }
+        ]
+      },
+      {
+        type: 'calc',
+        question: "Approximation du gain d'exercice anticipé sur 4 mois : Gain ≈ K × r × T = 100 × 0,04 × (4/12)",
+        formula: "Gain anticipé ≈ K × r × T\n             = 100 × 0,04 × 0,333\n             ≈ ?",
+        answer: 1.33,
+        tolerance: 0.1,
+        unit: '€',
+        hint: "Réponse en € avec 2 décimales",
+        success: "<strong>Gain ≈ 1,33 €</strong>. C'est la valeur d'avoir K en main 4 mois plus tôt. Cohérent avec l'écart entre le put US et son jumeau EU.",
+        impact: { rep: +5 }
+      }
+    ]
+  },
+
+  // ================ SCÉNARIO 6 — Synthèse stratégique : volatility play ================
+  {
+    id: 6,
+    title: "Le grand pari sur la volatilité",
+    subtitle: "Une grosse annonce arrive. Tu structures une stratégie d'options. Cas final synthétique.",
+    tags: [{label: 'Stratégie', t: 'calc'}, {label: 'Straddle', t: 'bs'}, {label: 'Vol implicite', t: 'bs'}],
+    steps: [
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Une grande pharma <strong>BioMex</strong> annonce dans 1 mois les résultats d'un essai clinique. Le résultat fera bouger le cours <strong>dans un sens ou l'autre</strong>, mais tu ignores lequel. Tu veux parier sur la VOLATILITÉ, pas sur la direction."
+      },
+      {
+        type: 'ticker',
+        title: 'PARAMÈTRES BIOMEX',
+        rows: [
+          { l: 'Cours actuel', v: '100 €' },
+          { l: 'Vol implicite des options 1M', v: '60 % (élevée — annonce attendue)' },
+          { l: 'Vol historique 90j', v: '25 %' },
+          { l: 'Maturité visée', v: '1 mois (0,083 an)' },
+          { l: 'Taux r', v: '2 %' },
+          { l: 'Mouvement attendu', v: '±15 % à ±25 % selon le résultat' }
+        ]
+      },
+      {
+        type: 'knowledge',
+        text: "<strong>Stratégies sur la volatilité :</strong><br>• <strong>Long straddle</strong> = long call ATM + long put ATM. Profite des mouvements dans les deux sens.<br>• <strong>Short straddle</strong> = inverse. Profite si le cours bouge peu.<br>Le straddle est <em>delta-neutre</em> au départ et long Vega + long Gamma."
+      },
+      {
+        type: 'calc',
+        question: "Calcule le prix d'un straddle ATM (call + put) avec S=K=100, σ=60%, T=1/12, en utilisant 0,4 × S × σ × √T pour chaque option.",
+        formula: "C ≈ P ≈ 0,4 × 100 × 0,60 × √(1/12)\n         = 0,4 × 100 × 0,60 × 0,2887\n         ≈ 6,93\n\nStraddle = C + P ≈ 13,86",
+        answer: 13.86,
+        tolerance: 0.5,
+        unit: '€',
+        hint: "Réponse en € (ex : 13.86)",
+        success: "<strong>Straddle ≈ 13,86 €</strong>. Cher : il faut un mouvement de ±13,86 € (soit ±13,86 %) pour être break-even.",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'choice',
+        prompt: "La vol implicite est 60% mais tu penses que la vol RÉALISÉE sera 70% (le résultat sera énorme). Quelle stratégie ?",
+        options: [
+          {
+            title: "Long straddle — j'achète à 60 % de vol implicite, la vol réalisée sera 70 %",
+            detail: "Long Vega : tu profites si la vol réalisée dépasse la vol implicite.",
+            optimal: true,
+            outcome: "Bonne stratégie. Si l'annonce fait bouger le cours de ±20 %, tu gagnes massivement. Coût du straddle : 13,86 € × 100 = 1 386 €. Si le cours monte à 125 € : payoff = 25 € − 13,86 = 11,14 €/lot. Pour 100 lots : 11 140 €.",
+            impact: { pnl: 11000, rep: +15 }
+          },
+          {
+            title: "Short straddle — vendre la vol surpaye",
+            detail: "Encaisser la prime si rien ne bouge.",
+            optimal: false,
+            outcome: "Risqué. Tu prends une vol implicite de 60% à laquelle TOUT LE MONDE est déjà long, parce qu'une grosse annonce arrive. Si le cours bouge de ±25 %, tu perds 11 €/lot. La vol implicite à 60% PRICE déjà l'événement.",
+            impact: { pnl: -11000, rep: -15 }
+          },
+          {
+            title: "Long call seul",
+            detail: "Pari directionnel haussier.",
+            optimal: false,
+            outcome: "Pari directionnel. Si l'essai échoue et le cours plonge à 75 €, tu perds toute la prime. Tu voulais parier sur la vol, pas sur la direction.",
+            impact: { pnl: -5000, rep: -8 }
+          }
+        ]
+      },
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Tu prends un long straddle. Le verdict tombe : l'essai est un succès. Le cours saute à <strong>125 €</strong>."
+      },
+      {
+        type: 'calc',
+        question: "Payoff du straddle à maturité (avec S = 125, K = 100). Calcule la valeur intrinsèque totale (call + put).",
+        formula: "Call payoff = max(S − K, 0) = max(125 − 100, 0) = 25\nPut payoff = max(K − S, 0) = max(100 − 125, 0) = 0\nTotal payoff = 25 + 0",
+        answer: 25,
+        tolerance: 0.5,
+        unit: '€',
+        hint: "Réponse en € (ex : 25)",
+        success: "<strong>Payoff = 25 €</strong>. Coût initial 13,86 €. Profit net = 11,14 €/lot.",
+        impact: { rep: +5 }
+      },
+      {
+        type: 'calc',
+        question: "Sur 100 lots de straddle achetés, quel est ton P&L total ? (Coût initial 13,86 €/lot, payoff final 25 €/lot)",
+        formula: "P&L par lot = 25 − 13,86 = 11,14\nP&L total = 100 lots × 11,14",
+        answer: 1114,
+        tolerance: 10,
+        unit: '€',
+        hint: "Multiplication simple",
+        success: "<strong>P&L = 1 114 €</strong>. Le pari sur la vol a payé. Tu as correctement estimé que la vol implicite (60%) sous-estimait la vol réalisée du jour de l'annonce.",
+        impact: { pnl: 1114, rep: +10 }
+      },
+      {
+        type: 'role',
+        role: 'prop-trader',
+        text: "Tu clôtures la session. Bilan : tu as exploité tout le cours options, des arbitrages basiques aux paris sophistiqués sur la volatilité. Le desk te respecte."
+      }
+    ]
+  }
+];
+
+// =====================================================
+// STATE
+// =====================================================
+
+const STATE_KEY = 'options_desk_v1';
+
+function defaultState() {
+  return {
+    book: 5000000,
+    pnl: 0,
+    rep: 100,
+    completed: [],
+    correctCalcs: 0,
+    totalCalcs: 0,
+    optimalChoices: 0,
+    totalChoices: 0,
+    currentScenario: null,
+    currentStep: 0,
+    scenarioStarted: false
+  };
+}
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STATE_KEY);
+    if (s) return { ...defaultState(), ...JSON.parse(s) };
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function resetGame() {
+  state = defaultState();
+  saveState();
+  showScreen('intro');
+}
+
+// =====================================================
+// NAV
+// =====================================================
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startGame() {
+  if (state.completed.length === 0 && !state.scenarioStarted) {
+    state = defaultState();
+    saveState();
+  }
+  showHub();
+}
+
+function showHub() {
+  if (state.completed.length === 6) {
+    showEnding();
+    return;
+  }
+  updateHUD();
+  renderScenariosList();
+  showScreen('hub');
+}
+
+// =====================================================
+// HUD
+// =====================================================
+
+function formatMoney(v) {
+  if (Math.abs(v) >= 1000000) return (v >= 0 ? '+' : '') + (v/1000000).toFixed(2) + ' M€';
+  if (Math.abs(v) >= 10000) return (v >= 0 ? '+' : '') + Math.round(v/1000) + ' K€';
+  if (Math.abs(v) >= 1000) return (v >= 0 ? '+' : '') + (v/1000).toFixed(1) + ' K€';
+  return (v >= 0 ? '+' : '') + Math.round(v) + ' €';
+}
+
+function formatBook(v) {
+  return (v/1000000).toFixed(2) + ' M€';
+}
+
+function updateHUD() {
+  ['hudBook','scBook'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = formatBook(state.book + state.pnl);
+  });
+  ['hudPnL','scPnL'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = formatMoney(state.pnl);
+      el.className = 'hud-stat-value ' + (state.pnl >= 0 ? 'green' : 'red');
+    }
+  });
+  ['hudCount','scCount'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `${state.completed.length}/6`;
+  });
+  ['hudSharpe','scSharpe'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      // Pseudo-sharpe : pnl / volatility (simulated)
+      const sharpe = state.pnl === 0 ? '—' : (state.pnl / Math.max(1, Math.abs(state.pnl) * 0.3)).toFixed(2);
+      el.textContent = sharpe;
+      el.className = 'hud-stat-value ' + (state.pnl > 0 ? 'green' : state.pnl < 0 ? 'red' : '');
+    }
+  });
+}
+
+function renderScenariosList() {
+  const container = document.getElementById('scenariosList');
+  container.innerHTML = '';
+
+  const pct = (state.completed.length / 6) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${state.completed.length}/6 DOSSIERS CLÔTURÉS`;
+
+  SCENARIOS.forEach(sc => {
+    const isCompleted = state.completed.includes(sc.id);
+    const div = document.createElement('div');
+    div.className = 'scenario-pick' + (isCompleted ? ' completed' : '');
+    div.innerHTML = `
+      <div>
+        <span class="scenario-pick-num">${sc.id}${isCompleted ? ' ✓' : ''}</span>
+        <span class="scenario-pick-title">${sc.title}</span>
+      </div>
+      <div class="scenario-pick-detail">${sc.subtitle}</div>
+      <div class="scenario-pick-tags">
+        ${sc.tags.map(t => `<span class="tag ${t.t}">${t.label}</span>`).join('')}
+      </div>
+    `;
+    div.onclick = () => startScenario(sc.id);
+    container.appendChild(div);
+  });
+}
+
+// =====================================================
+// SCENARIO
+// =====================================================
+
+function startScenario(id) {
+  state.currentScenario = id;
+  state.currentStep = 0;
+  state.scenarioStarted = true;
+  saveState();
+  renderCurrentStep();
+  showScreen('scenarioScreen');
+}
+
+function renderCurrentStep() {
+  updateHUD();
+  const scenario = SCENARIOS.find(s => s.id === state.currentScenario);
+  if (!scenario) { showHub(); return; }
+
+  const stepIdx = state.currentStep;
+  if (stepIdx >= scenario.steps.length) {
+    if (!state.completed.includes(scenario.id)) {
+      state.completed.push(scenario.id);
+    }
+    state.scenarioStarted = false;
+    saveState();
+    showHub();
+    return;
+  }
+
+  const step = scenario.steps[stepIdx];
+  const container = document.getElementById('scenarioContent');
+
+  let html = `
+    <div class="scenario-card">
+      <div class="scenario-meta">DOSSIER ${scenario.id} · ÉTAPE ${stepIdx + 1} / ${scenario.steps.length}</div>
+      <div class="scenario-title">${scenario.title}</div>
+  `;
+
+  if (step.type === 'role') {
+    const roleLabel = step.role === 'market-maker' ? 'MARKET MAKER' :
+                      step.role === 'prop-trader' ? 'PROP TRADER' : 'STRUCTUREUR';
+    html += `
+      <div class="role-badge ${step.role}">
+        <div class="role-badge-label">— RÔLE : ${roleLabel} —</div>
+        <div class="role-badge-text">${step.text}</div>
+      </div>
+      <button class="btn btn-block" onclick="nextStep()">CONTINUER ▶</button>
+    `;
+  }
+  else if (step.type === 'ticker') {
+    html += `
+      <div class="ticker">
+        <div class="ticker-header">${step.title}</div>
+        ${step.rows.map(r => `
+          <div class="ticker-row">
+            <span class="ticker-label">${r.l}</span>
+            <span class="ticker-value">${r.v}</span>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn btn-block" onclick="nextStep()">CONTINUER ▶</button>
+    `;
+  }
+  else if (step.type === 'knowledge') {
+    html += `
+      <div class="knowledge-box">
+        <div class="knowledge-box-label">★ MÉMO TECHNIQUE ★</div>
+        <div class="knowledge-box-text">${step.text}</div>
+      </div>
+      <button class="btn btn-block" onclick="nextStep()">CONTINUER ▶</button>
+    `;
+  }
+  else if (step.type === 'calc') {
+    html += `
+      <div class="calc-block">
+        <div class="calc-question">${step.question}</div>
+        <div class="calc-formula">${step.formula}</div>
+        <div class="input-group">
+          <input type="text" inputmode="decimal" class="calc-input" id="calcInput" placeholder="Ta réponse">
+          <button class="calc-submit" onclick="validateCalc()">VALIDER</button>
+        </div>
+        <div class="calc-hint">${step.hint}</div>
+        <div class="calc-feedback" id="calcFeedback"></div>
+      </div>
+    `;
+  }
+  else if (step.type === 'choice') {
+    html += `
+      <div class="choices-block">
+        <div class="choice-prompt">${step.prompt}</div>
+        ${step.options.map((opt, i) => `
+          <div class="choice" id="choice-${i}" onclick="selectChoice(${i})">
+            <div class="choice-letter">${String.fromCharCode(65+i)}</div>
+            <div class="choice-content">
+              <div class="choice-title">${opt.title}</div>
+              <div class="choice-detail">${opt.detail}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="outcome-block" id="outcomeBlock"></div>
+    `;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  if (step.type === 'calc') {
+    setTimeout(() => {
+      const inp = document.getElementById('calcInput');
+      if (inp) {
+        inp.focus();
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Enter') validateCalc();
+        });
+      }
+    }, 100);
+  }
+}
+
+function validateCalc() {
+  const scenario = SCENARIOS.find(s => s.id === state.currentScenario);
+  const step = scenario.steps[state.currentStep];
+  const input = document.getElementById('calcInput');
+  const feedback = document.getElementById('calcFeedback');
+  const raw = input.value.trim().replace(',', '.').replace('%', '').replace(/\s/g, '');
+  const val = parseFloat(raw);
+
+  state.totalCalcs++;
+
+  if (isNaN(val)) {
+    feedback.className = 'calc-feedback show error';
+    feedback.innerHTML = '<strong>Réponse invalide.</strong> Entre un nombre.';
+    return;
+  }
+
+  const ok = Math.abs(val - step.answer) <= step.tolerance;
+
+  if (ok) {
+    state.correctCalcs++;
+    if (step.impact) applyImpact(step.impact);
+    saveState();
+    input.classList.add('success');
+    input.disabled = true;
+    feedback.className = 'calc-feedback show success';
+    feedback.innerHTML = `<strong>✓ Correct !</strong> ${step.success}<br><br><button class="btn btn-block" onclick="nextStep()" style="margin-top:8px">CONTINUER ▶</button>`;
+    updateHUD();
+  } else {
+    input.classList.add('error');
+    feedback.className = 'calc-feedback show error';
+    const diff = val > step.answer ? 'trop élevée' : 'trop faible';
+    feedback.innerHTML = `<strong>✗ Pas tout à fait.</strong> Ta réponse est ${diff}. Reprends. ${step.hint}`;
+    setTimeout(() => {
+      input.classList.remove('error');
+      feedback.classList.remove('show');
+    }, 4000);
+  }
+}
+
+function selectChoice(idx) {
+  const scenario = SCENARIOS.find(s => s.id === state.currentScenario);
+  const step = scenario.steps[state.currentStep];
+  const opt = step.options[idx];
+
+  state.totalChoices++;
+  if (opt.optimal) state.optimalChoices++;
+
+  document.querySelectorAll('.choice').forEach((c, i) => {
+    if (i === idx) c.classList.add(opt.optimal ? 'optimal' : 'bad');
+    else c.classList.add('dim');
+  });
+
+  if (opt.impact) applyImpact(opt.impact);
+  saveState();
+  updateHUD();
+
+  const outcome = document.getElementById('outcomeBlock');
+  outcome.className = 'outcome-block show ' + (opt.optimal ? 'win' : 'lose');
+
+  let impactHtml = '';
+  if (opt.impact) {
+    impactHtml = '<div class="outcome-impact">';
+    if (opt.impact.pnl) {
+      const sign = opt.impact.pnl > 0 ? '+' : '';
+      const cls = opt.impact.pnl > 0 ? 'impact-positive' : 'impact-negative';
+      impactHtml += `<div class="impact-line"><span>P&L</span><span class="${cls}">${sign}${formatMoney(opt.impact.pnl)}</span></div>`;
+    }
+    if (opt.impact.rep) {
+      const sign = opt.impact.rep > 0 ? '+' : '';
+      const cls = opt.impact.rep > 0 ? 'impact-positive' : 'impact-negative';
+      impactHtml += `<div class="impact-line"><span>Réputation</span><span class="${cls}">${sign}${opt.impact.rep}</span></div>`;
+    }
+    impactHtml += '</div>';
+  }
+
+  outcome.innerHTML = `
+    <div class="outcome-banner">${opt.optimal ? '★ BON RÉFLEXE TRADER ★' : '⚠ ERREUR DE TRADING ⚠'}</div>
+    <div class="outcome-title">${opt.optimal ? 'Décision validée' : 'À reconsidérer'}</div>
+    <div class="outcome-text">${opt.outcome}</div>
+    ${impactHtml}
+    <button class="btn btn-block" onclick="nextStep()" style="margin-top: 14px">CONTINUER ▶</button>
+  `;
+}
+
+function applyImpact(impact) {
+  if (impact.pnl) state.pnl += impact.pnl;
+  if (impact.rep) state.rep += impact.rep;
+}
+
+function nextStep() {
+  state.currentStep++;
+  saveState();
+  renderCurrentStep();
+}
+
+// =====================================================
+// ENDING
+// =====================================================
+
+function showEnding() {
+  document.getElementById('endBook').textContent = formatBook(state.book + state.pnl);
+  document.getElementById('endPnL').textContent = formatMoney(state.pnl);
+  document.getElementById('endCalcs').textContent = `${state.correctCalcs}/${state.totalCalcs}`;
+  document.getElementById('endChoices').textContent = `${state.optimalChoices}/${state.totalChoices}`;
+
+  const calcScore = state.totalCalcs > 0 ? (state.correctCalcs / state.totalCalcs) * 50 : 50;
+  const choiceScore = state.totalChoices > 0 ? (state.optimalChoices / state.totalChoices) * 35 : 35;
+  const pnlScore = Math.max(0, Math.min(15, (state.pnl / 50000) * 15));
+  const score = Math.round(calcScore + choiceScore + pnlScore);
+  document.getElementById('endScore').textContent = score + '/100';
+
+  let title, rating, stamp;
+  if (score >= 90) {
+    title = 'Senior Vol Trader';
+    rating = "Maîtrise totale du desk options. Tu pourrais structurer un livre de Greeks complexe les yeux fermés. L'examen sera une formalité.";
+    stamp = '— PALMARÈS DORÉ —';
+  } else if (score >= 75) {
+    title = 'Options Trader';
+    rating = "Très bonne maîtrise. Tu connais tes Greeks, tu sais hedger, tu pricies juste. Quelques zones à consolider.";
+    stamp = '— FÉLICITATIONS DU DESK —';
+  } else if (score >= 60) {
+    title = 'Junior Quant';
+    rating = "Niveau correct. Tu as les bases solides mais certaines subtilités te restent invisibles. Refais une session en ciblant tes points faibles.";
+    stamp = '— EN PROGRESSION —';
+  } else if (score >= 40) {
+    title = 'Trainee';
+    rating = "Encore beaucoup de travail. Reprends les calculs où tu t'es trompé(e), relis le cours et refais.";
+    stamp = '— APPRENTISSAGE EN COURS —';
+  } else {
+    title = 'Hors du desk';
+    rating = "Le desk t'a renvoyé en formation. Ce simulateur ne remplace pas la lecture des slides Black-Scholes.";
+    stamp = '— RETOUR FORMATION —';
+  }
+
+  document.getElementById('endingTitle').textContent = title;
+  document.getElementById('endingStamp').textContent = stamp;
+  document.getElementById('endingRating').textContent = rating;
+
+  showScreen('endingScreen');
+}
+
+// =====================================================
+// INIT
+// =====================================================
+
+if (state.completed.length > 0 || state.scenarioStarted) {
+  showHub();
+} else {
+  showScreen('intro');
+}
+</script>
+
+</body>
+</html>
